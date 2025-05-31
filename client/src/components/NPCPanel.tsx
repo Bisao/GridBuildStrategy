@@ -107,7 +107,7 @@ export default function NPCPanel({
     const firstName = capitalizeFirst(npcName.trim());
     const lastName = capitalizeFirst(npcSurname.trim());
     const fullName = `${firstName} ${lastName}`;
-    
+
     if (firstName && lastName && housePosition) {
       onCreateNPC(fullName, housePosition.id);
       setNpcName("");
@@ -170,7 +170,7 @@ export default function NPCPanel({
                 <div>• ID: {housePosition.id}</div>
                 <div>• NPCs: {structureNPCs.length}/4</div>
                 <div>• Status: {structureNPCs.length > 0 ? 'Ocupada' : 'Vazia'}</div>
-                
+
                 {structureNPCs.length > 0 && (
                   <div className="mt-2">
                     <div className="font-medium mb-1">NPCs na estrutura:</div>
@@ -206,6 +206,18 @@ export default function NPCPanel({
                             variant="ghost"
                             size="sm"
                             onClick={() => {
+                              console.log(`Visualizar NPC ${npc.id}`);
+                              // TODO: Implementar visualização do NPC
+                            }}
+                            className="h-7 w-7 p-0 text-lg hover:bg-gray-600/50"
+                            title="Visualizar NPC"
+                          >
+                            👁️
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
                               console.log(`Controles de jogabilidade para NPC ${npc.id}`);
                               // TODO: Implementar painel de jogabilidade
                             }}
@@ -213,18 +225,6 @@ export default function NPCPanel({
                             title="Controles de Jogabilidade"
                           >
                             🕹️
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              console.log(`Visualização para NPC ${npc.id}`);
-                              // TODO: Implementar painel de visualização
-                            }}
-                            className="h-7 w-7 p-0 text-lg hover:bg-gray-600/50"
-                            title="Visualização"
-                          >
-                            👁️
                           </Button>
                         </div>
                       </div>

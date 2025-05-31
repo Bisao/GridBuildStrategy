@@ -7,6 +7,8 @@ interface CreatedNPC {
   structureId: string;
   position: { x: number; z: number };
   type: "villager" | "guard" | "merchant" | "farmer";
+  rotation?: number;
+  animation?: "idle" | "walk";
 }
 
 interface GameState {
@@ -18,6 +20,7 @@ interface GameState {
   isStructurePanelOpen: boolean;
   isNPCConfigPanelOpen: boolean;
   selectedNPCId: string | null;
+  controlledNPCId: string | null;
   createdNPCs: CreatedNPC[];
 
   // Actions
@@ -29,6 +32,7 @@ interface GameState {
   setStructurePanelOpen: (open: boolean) => void;
   setNPCConfigPanelOpen: (open: boolean) => void;
   setSelectedNPCId: (npcId: string | null) => void;
+  setControlledNPCId: (npcId: string | null) => void;
   addNPC: (npc: CreatedNPC) => void;
   updateNPC: (npcId: string, updates: Partial<CreatedNPC>) => void;
   removeNPC: (npcId: string) => void;
@@ -45,6 +49,7 @@ export const useGameState = create<GameState>()(
     isStructurePanelOpen: true,
     isNPCConfigPanelOpen: false,
     selectedNPCId: null,
+    controlledNPCId: null,
     createdNPCs: [],
 
     setSelectedStructure: (structure) => {
@@ -83,6 +88,10 @@ export const useGameState = create<GameState>()(
     },
     setNPCConfigPanelOpen: (open) => set({ isNPCConfigPanelOpen: open }),
     setSelectedNPCId: (npcId) => set({ selectedNPCId: npcId }),
+    setControlledNPCId: (npcId) => {
+      set({ controlledNPCId: npcId });
+      console.log(`NPC control set to: ${npcId || 'none'}`);
+    },
 
     addNPC: (npc) => {
       set((state) => ({

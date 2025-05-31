@@ -7,9 +7,10 @@ interface NPCProps {
   position: [number, number, number];
   color?: string;
   animation?: "idle" | "walk";
+  rotation?: number;
 }
 
-export default function NPC({ position, color = "#8B4513", animation = "idle" }: NPCProps) {
+export default function NPC({ position, color = "#8B4513", animation = "idle", rotation = 0 }: NPCProps) {
   const groupRef = useRef<THREE.Group>(null);
   const headRef = useRef<THREE.Mesh>(null);
   const leftArmRef = useRef<THREE.Mesh>(null);
@@ -54,7 +55,7 @@ export default function NPC({ position, color = "#8B4513", animation = "idle" }:
   });
 
   return (
-    <group ref={groupRef} position={position}>
+    <group ref={groupRef} position={position} rotation={[0, rotation, 0]}>
       {/* Body */}
       <mesh position={[0, 1, 0]}>
         <boxGeometry args={[0.4, 0.8, 0.2]} />

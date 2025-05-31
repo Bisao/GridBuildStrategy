@@ -12,6 +12,7 @@ import Blacksmith from "./structures/Blacksmith";
 import Market from "./structures/Market";
 import { useGridPlacement } from "../hooks/useGridPlacement";
 import { useGameState } from "../lib/stores/useGameState";
+import { useNPCControl } from "../hooks/useNPCControl";
 
 const Game = () => {
   const { camera, gl } = useThree();
@@ -23,8 +24,11 @@ const Game = () => {
     setSelectedStructure, 
     setSelectedHouse, 
     setNPCPanelOpen,
-    createdNPCs
+    createdNPCs,
+    controlledNPCId,
+    setControlledNPCId
   } = useGameState();
+  const { isControlling } = useNPCControl();
   const { 
     placedStructures, 
     hoveredTile, 
@@ -40,12 +44,18 @@ const Game = () => {
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        // Stop NPC control first
+        if (controlledNPCId) {
+          setControlledNPCId(null);
+        }
         // Cancel structure selection
-        if (selectedStructure) {
+        else if (selectedStructure) {
           setSelectedStructure(null);
         }
         // Close NPC panel
-        setNPCPanelOpen(false);
+        else {
+          setNPCPanelOpen(false);
+        }
       } else if (selectedStructure && event.key.toLowerCase() === 'r') {
         rotatePreview();
       }
@@ -53,7 +63,7 @@ const Game = () => {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [selectedStructure, rotatePreview, setSelectedStructure, setNPCPanelOpen]);
+  }, [selectedStructure, rotatePreview, setSelectedStructure, setNPCPanelOpen, controlledNPCId]);
 
   // Handle mouse movement for preview positioning
   useFrame(() => {
@@ -198,8 +208,9 @@ const Game = () => {
         <NPC
           key={npc.id}
           position={[npc.position.x, 0, npc.position.z]}
-          color="#8B4513"
+          color={npc.id === controlledNPCId ? "#FF6B6B" : "#8B4513"}
           animation={npc.animation || "idle"}
+          rotation={npc.rotation || 0}
         />
       ))}
 

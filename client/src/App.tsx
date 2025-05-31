@@ -8,6 +8,7 @@ import StructurePanel from "./components/StructurePanel";
 import NPCPanel from "./components/NPCPanel";
 import NPCConfigPanel from "./components/NPCConfigPanel";
 import { useGameState } from "./lib/stores/useGameState";
+import NPCControlIndicator from "./components/NPCControlIndicator";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -122,11 +123,18 @@ function App() {
           onCreateNPC={handleCreateNPC}
           onConfigureNPC={handleConfigureNPC}
         />
-         <NPCConfigPanel 
-          isOpen={isNPCConfigPanelOpen}
-          npcId={selectedNPC}
-          onClose={() => setNPCConfigPanelOpen(false)}
-        />
+         {/* NPC Config Panel */}
+      <NPCConfigPanel
+        isOpen={isNPCConfigPanelOpen}
+        npcId={selectedNPC}
+        onClose={() => {
+          setNPCConfigPanelOpen(false);
+          setSelectedNPC(null);
+        }}
+      />
+
+      {/* NPC Control Indicator */}
+      <NPCControlIndicator />
       </div>
     </QueryClientProvider>
   );
