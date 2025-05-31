@@ -30,6 +30,12 @@ export default function StructurePanel({
             <Home className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             Casa
           </Button>
+          
+          {selectedStructure && (
+            <div className="mt-2 p-2 bg-gray-700/50 rounded text-xs text-gray-300">
+              <p>Pressione <kbd className="px-1 py-0.5 bg-gray-600 rounded text-white">R</kbd> para rotacionar</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

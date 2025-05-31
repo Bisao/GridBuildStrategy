@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import Grid from "./Grid";
@@ -22,10 +22,24 @@ const Game = () => {
     placedStructures, 
     hoveredTile, 
     previewPosition,
+    previewRotation,
     handleGridClick,
     handleGridHover,
-    canPlaceStructure
+    canPlaceStructure,
+    rotatePreview
   } = useGridPlacement();
+
+  // Handle keyboard input for rotation
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (selectedStructure && event.key.toLowerCase() === 'r') {
+        rotatePreview();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [selectedStructure, rotatePreview]);
 
   // Handle mouse movement for preview positioning
   useFrame(() => {
@@ -72,7 +86,11 @@ const Game = () => {
 
       {/* Placed Structures */}
       {placedStructures.map((structure) => (
-        <group key={structure.id} position={[structure.x, 0, structure.z]}>
+        <group 
+          key={structure.id} 
+          position={[structure.x, 0, structure.z]}
+          rotation={[0, (structure.rotation * Math.PI) / 180, 0]}
+        >
           {structure.type === 'house' && (
             <House 
               position={{ x: structure.x, z: structure.z }}
@@ -84,7 +102,10 @@ const Game = () => {
 
       {/* Preview Structure */}
       {selectedStructure && previewPosition && (
-        <group position={[previewPosition.x, 0, previewPosition.z]}>
+        <group 
+          position={[previewPosition.x, 0, previewPosition.z]}
+          rotation={[0, (previewRotation * Math.PI) / 180, 0]}
+        >
           <House 
             isPreview={true} 
             canPlace={canPlaceStructure(previewPosition.x, previewPosition.z)}

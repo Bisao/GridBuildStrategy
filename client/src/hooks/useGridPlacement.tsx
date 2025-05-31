@@ -6,12 +6,14 @@ export interface PlacedStructure {
   type: string;
   x: number;
   z: number;
+  rotation: number;
 }
 
 export const useGridPlacement = () => {
   const [placedStructures, setPlacedStructures] = useState<PlacedStructure[]>([]);
   const [hoveredTile, setHoveredTile] = useState<{ x: number; z: number } | null>(null);
   const [previewPosition, setPreviewPosition] = useState<{ x: number; z: number } | null>(null);
+  const [previewRotation, setPreviewRotation] = useState<number>(0);
 
   const canPlaceStructure = useCallback((x: number, z: number): boolean => {
     // Check if there's already a structure at this position
@@ -56,24 +58,31 @@ export const useGridPlacement = () => {
         id: `${structureType}-${Date.now()}-${Math.random()}`,
         type: structureType,
         x,
-        z
+        z,
+        rotation: previewRotation
       };
       
       setPlacedStructures(prev => [...prev, newStructure]);
-      console.log(`Placed ${structureType} at (${x}, ${z})`);
+      console.log(`Placed ${structureType} at (${x}, ${z}) with rotation ${previewRotation}`);
       return true;
     } else {
       console.log(`Cannot place structure at (${x}, ${z}) - position occupied`);
       return false;
     }
-  }, [previewPosition, canPlaceStructure]);
+  }, [previewPosition, canPlaceStructure, previewRotation]);
+
+  const rotatePreview = useCallback(() => {
+    setPreviewRotation(prev => (prev + 90) % 360);
+  }, []);
 
   return {
     placedStructures,
     hoveredTile,
     previewPosition,
+    previewRotation,
     handleGridClick,
     handleGridHover,
-    canPlaceStructure
+    canPlaceStructure,
+    rotatePreview
   };
 };
