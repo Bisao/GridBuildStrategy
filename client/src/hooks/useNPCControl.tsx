@@ -97,10 +97,6 @@ export const useNPCControl = () => {
     const lookDirection = cursorWorldPos.clone().sub(npcPos).normalize();
     const rotationY = Math.atan2(lookDirection.x, lookDirection.z);
 
-    // Calculate direction from NPC to cursor for W key movement
-    const npcPos = new THREE.Vector3(controlledNPC.position.x, 0, controlledNPC.position.z);
-    const lookDirection = cursorWorldPos.clone().sub(npcPos).normalize();
-
     // Movement controls
     if (keys.w) {
       // Move towards cursor direction
