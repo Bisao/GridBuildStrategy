@@ -23,8 +23,9 @@ const Grid = ({ onPointerMove, onClick, hoveredTile }: GridProps) => {
   const tiles = [];
   for (let x = 0; x < GRID_SIZE; x++) {
     for (let z = 0; z < GRID_SIZE; z++) {
-      const worldX = (x - GRID_SIZE / 2) * TILE_SIZE + TILE_SIZE / 2;
-      const worldZ = (z - GRID_SIZE / 2) * TILE_SIZE + TILE_SIZE / 2;
+      // Position tiles so they're centered on integer coordinates
+      const worldX = x - GRID_SIZE / 2 + 0.5;
+      const worldZ = z - GRID_SIZE / 2 + 0.5;
       
       const isHovered = hoveredTile && hoveredTile.x === worldX && hoveredTile.z === worldZ;
       

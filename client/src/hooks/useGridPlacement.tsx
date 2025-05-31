@@ -26,15 +26,17 @@ export const useGridPlacement = () => {
     const intersectionPoint = new THREE.Vector3();
     
     if (raycaster.ray.intersectPlane(gridPlane, intersectionPoint)) {
-      // Snap to grid
-      const gridX = Math.round(intersectionPoint.x);
-      const gridZ = Math.round(intersectionPoint.z);
+      // Snap to grid - floor to get tile coordinates, then add 0.5 to center on tile
+      const tileX = Math.floor(intersectionPoint.x);
+      const tileZ = Math.floor(intersectionPoint.z);
+      const gridX = tileX + 0.5;
+      const gridZ = tileZ + 0.5;
       
       // Constrain to grid bounds
       const GRID_SIZE = 20;
       const halfGrid = GRID_SIZE / 2;
       
-      if (gridX >= -halfGrid && gridX < halfGrid && gridZ >= -halfGrid && gridZ < halfGrid) {
+      if (tileX >= -halfGrid && tileX < halfGrid && tileZ >= -halfGrid && tileZ < halfGrid) {
         setHoveredTile({ x: gridX, z: gridZ });
         setPreviewPosition({ x: gridX, z: gridZ });
       } else {
