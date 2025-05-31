@@ -7,7 +7,6 @@ import Game from "./components/Game";
 import StructurePanel from "./components/StructurePanel";
 import NPCPanel from "./components/NPCPanel";
 import NPCConfigPanel from "./components/NPCConfigPanel";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useGameState } from "./lib/stores/useGameState";
 
 const queryClient = new QueryClient({
@@ -114,7 +113,11 @@ function App() {
           onClose={() => setNPCPanelOpen(false)}
           onCreateNPC={handleCreateNPC}
         />
-         <NPCConfigPanel />
+         <NPCConfigPanel 
+          isOpen={isNPCConfigPanelOpen}
+          npcId={selectedNPC}
+          onClose={() => setNPCConfigPanelOpen(false)}
+        />
       </div>
     </QueryClientProvider>
   );
