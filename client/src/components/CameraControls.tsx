@@ -46,13 +46,13 @@ const CameraControls = () => {
     if (controlsRef.current) {
       const controls = controlsRef.current;
       
-      // Handle NPC viewing mode
+      // Handle NPC viewing mode with isometric view
       if (viewingNPCId) {
         const viewedNPC = createdNPCs.find(npc => npc.id === viewingNPCId);
         if (viewedNPC) {
           const npcPosition = new THREE.Vector3(viewedNPC.position.x, 0, viewedNPC.position.z);
-          const cameraOffset = new THREE.Vector3(-3, 4, -3);
-          const targetPosition = npcPosition.clone().add(cameraOffset);
+          const isometricOffset = new THREE.Vector3(-8, 12, -8); // Same isometric angle as control mode
+          const targetPosition = npcPosition.clone().add(isometricOffset);
           
           // Smoothly move camera to follow NPC
           camera.position.lerp(targetPosition, 0.05);

@@ -84,23 +84,8 @@ export const useNPCControl = () => {
     let movement = new THREE.Vector3();
     let isMoving = false;
 
-    // Calculate movement based on cursor position and distance from center
-    const cursorDistance = Math.sqrt(screenMousePosition.x * screenMousePosition.x + screenMousePosition.y * screenMousePosition.y);
-    const movementIntensity = Math.min(cursorDistance * 1.5, 1.0); // Scale movement intensity based on cursor distance from center
-
-    // Only move if cursor is sufficiently far from center (dead zone)
-    const deadZone = 0.1;
-    if (cursorDistance > deadZone) {
-      // Calculate movement direction based on cursor position
-      const moveX = screenMousePosition.x * movementIntensity * speed * deltaTime;
-      const moveZ = screenMousePosition.y * movementIntensity * speed * deltaTime;
-
-      movement.add(new THREE.Vector3(moveX, 0, moveZ));
-      isMoving = true;
-    }
-
-    // Alternative: WASD keys can still be used for manual control
-    const rotationY = mousePosition.x;
+    // Mouse controls NPC rotation only
+    const rotationY = mousePosition.x * Math.PI; // Convert mouse X to rotation
     const forward = new THREE.Vector3(Math.sin(rotationY), 0, Math.cos(rotationY));
     const right = new THREE.Vector3(Math.cos(rotationY), 0, -Math.sin(rotationY));
 
@@ -134,11 +119,10 @@ export const useNPCControl = () => {
         rotation: rotationY
       });
 
-      // Update camera to follow controlled NPC from behind and above
-      const npcDirection = new THREE.Vector3(Math.sin(rotationY), 0, Math.cos(rotationY));
-      const cameraOffset = npcDirection.clone().multiplyScalar(-4).add(new THREE.Vector3(0, 3, 0));
-      const targetPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z).add(cameraOffset);
-      const lookAtPosition = new THREE.Vector3(newPosition.x, 1, newPosition.z).add(npcDirection.clone().multiplyScalar(2));
+      // Update camera to isometric view - fixed position above and behind NPC
+      const isometricOffset = new THREE.Vector3(-8, 12, -8); // Fixed isometric angle
+      const targetPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z).add(isometricOffset);
+      const lookAtPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z);
 
       camera.position.lerp(targetPosition, 0.1);
       camera.lookAt(lookAtPosition.x, lookAtPosition.y, lookAtPosition.z);
