@@ -3,7 +3,6 @@ import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import Grid from "./Grid";
 import House from "./House";
-import StructurePanel from "./StructurePanel";
 import CameraControls from "./CameraControls";
 import { useGridPlacement } from "../hooks/useGridPlacement";
 import { useGameState } from "../lib/stores/useGameState";
@@ -78,11 +77,7 @@ const Game = () => {
         </group>
       )}
 
-      {/* UI Components */}
-      <StructurePanel 
-        selectedStructure={selectedStructure}
-        onSelectStructure={setSelectedStructure}
-      />
+
     </>
   );
 };

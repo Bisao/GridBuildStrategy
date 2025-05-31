@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@fontsource/inter";
 import "./index.css";
 import Game from "./components/Game";
+import StructurePanel from "./components/StructurePanel";
+import { useGameState } from "./lib/stores/useGameState";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,6 +18,8 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  const { selectedStructure, setSelectedStructure } = useGameState();
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="w-full h-screen relative bg-gray-900">
@@ -53,6 +57,12 @@ function App() {
             <Game />
           </Suspense>
         </Canvas>
+
+        {/* UI overlay outside of Canvas */}
+        <StructurePanel 
+          selectedStructure={selectedStructure}
+          onSelectStructure={setSelectedStructure}
+        />
       </div>
     </QueryClientProvider>
   );
