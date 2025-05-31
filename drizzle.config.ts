@@ -10,4 +10,7 @@ export default defineConfig({
   dbCredentials: {
     url: DATABASE_URL,
   },
+  // Skip database operations in development without real DB
+  verbose: false,
+  strict: false,
 });

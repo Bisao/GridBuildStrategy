@@ -14,7 +14,7 @@ localPort = 5000
 externalPort = 80
 
 [workflows]
-runButton = "Desenvolvimento Limpo"
+runButton = "Desenvolvimento (Sem DB)"
 
 [[workflows.workflow]]
 name = "Project"
@@ -59,6 +59,23 @@ args = "pkill -f \"node.*5000\" || true"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run setup"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+
+[[workflows.workflow]]
+name = "Desenvolvimento (Sem DB)"
+author = 43319208
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pkill -f \"node.*5000\" || true"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
