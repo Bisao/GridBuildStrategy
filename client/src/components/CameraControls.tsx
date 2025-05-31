@@ -17,12 +17,17 @@ const CameraControls = () => {
 
   // Handle keyboard input - disabled when controlling NPC
   useEffect(() => {
-    if (controlledNPCId) return; // Disable camera controls when controlling NPC
+    if (controlledNPCId) {
+      // Reset camera keys when NPC control starts
+      setKeys({ w: false, a: false, s: false, d: false });
+      return;
+    }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase();
       if (['w', 'a', 's', 'd'].includes(key)) {
         setKeys(prev => ({ ...prev, [key]: true }));
+        event.preventDefault();
       }
     };
 
@@ -30,6 +35,7 @@ const CameraControls = () => {
       const key = event.key.toLowerCase();
       if (['w', 'a', 's', 'd'].includes(key)) {
         setKeys(prev => ({ ...prev, [key]: false }));
+        event.preventDefault();
       }
     };
 

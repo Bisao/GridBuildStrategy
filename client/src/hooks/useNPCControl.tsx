@@ -63,36 +63,31 @@ export const useNPCControl = () => {
   }, [controlledNPCId]);
 
   // Update NPC position and rotation
-  useFrame(({ camera, size }) => {
+  useFrame(() => {
     if (!controlledNPCId) return;
-
-    const currentTime = Date.now();
-    const deltaTime = (currentTime - lastUpdateTime.current) / 1000;
-    lastUpdateTime.current = currentTime;
 
     const controlledNPC = createdNPCs.find(npc => npc.id === controlledNPCId);
     if (!controlledNPC) return;
 
-    const speed = 2.5;
-    let movement = new THREE.Vector3();
-    let isMoving = false;
+    const currentTime = Date.now();
+    const deltaTime = Math.min((currentTime - lastUpdateTime.current) / 1000, 0.016);
+    lastUpdateTime.current = currentTime;
 
-    // Calculate cursor world position for NPC to look at
-    const mouse = new THREE.Vector2(
-      (screenMousePosition.x / size.width) * 2 - 1,
-      -(screenMousePosition.y / size.height) * 2 + 1
-    );
+    const speed = 3;
+    let newPosition = { ...controlledNPC.position };
+    let newRotation = controlledNPC.rotation || 0;
+    let animation = "idle";
 
-    // Create raycaster to get 3D position from mouse coordinates
+    // Calculate cursor world position for look direction
     const raycaster = new THREE.Raycaster();
-    raycaster.setFromCamera(mouse, camera);
-    
-    // Cast ray onto ground plane (y = 0)
+    raycaster.setFromCamera(mousePosition, camera);
+
+    // Create a plane at ground level (y = 0) for intersection
     const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
     const cursorWorldPos = new THREE.Vector3();
     raycaster.ray.intersectPlane(groundPlane, cursorWorldPos);
 
-    // Calculate rotation for NPC to look at cursor position
+    // Calculate NPC position and look direction
     const npcPos = new THREE.Vector3(controlledNPC.position.x, 0, controlledNPC.position.z);
     const lookDirection = cursorWorldPos.clone().sub(npcPos).normalize();
     const rotationY = Math.atan2(lookDirection.x, lookDirection.z);
@@ -100,46 +95,52 @@ export const useNPCControl = () => {
     // Movement controls
     if (keys.w) {
       // Move towards cursor direction
-      movement.x += lookDirection.x * speed * deltaTime;
-      movement.z += lookDirection.z * speed * deltaTime;
-      isMoving = true;
+      newPosition.x += lookDirection.x * speed * deltaTime;
+      newPosition.z += lookDirection.z * speed * deltaTime;
+      newRotation = rotationY;
+      animation = "walking";
     }
+
     if (keys.s) {
-      // Move away from cursor direction
-      movement.x -= lookDirection.x * speed * deltaTime;
-      movement.z -= lookDirection.z * speed * deltaTime;
-      isMoving = true;
+      // Move away from cursor
+      newPosition.x -= lookDirection.x * speed * deltaTime;
+      newPosition.z -= lookDirection.z * speed * deltaTime;
+      newRotation = rotationY + Math.PI;
+      animation = "walking";
     }
+
     if (keys.a) {
-      // Strafe left relative to cursor direction
+      // Strafe left
       const leftDirection = new THREE.Vector3(-lookDirection.z, 0, lookDirection.x);
-      movement.x += leftDirection.x * speed * deltaTime;
-      movement.z += leftDirection.z * speed * deltaTime;
-      isMoving = true;
+      newPosition.x += leftDirection.x * speed * deltaTime;
+      newPosition.z += leftDirection.z * speed * deltaTime;
+      newRotation = Math.atan2(leftDirection.x, leftDirection.z);
+      animation = "walking";
     }
+
     if (keys.d) {
-      // Strafe right relative to cursor direction
+      // Strafe right
       const rightDirection = new THREE.Vector3(lookDirection.z, 0, -lookDirection.x);
-      movement.x += rightDirection.x * speed * deltaTime;
-      movement.z += rightDirection.z * speed * deltaTime;
-      isMoving = true;
+      newPosition.x += rightDirection.x * speed * deltaTime;
+      newPosition.z += rightDirection.z * speed * deltaTime;
+      newRotation = Math.atan2(rightDirection.x, rightDirection.z);
+      animation = "walking";
     }
 
-    // Update NPC position and animation
-    const newPosition = {
-      x: controlledNPC.position.x + movement.x,
-      z: controlledNPC.position.z + movement.z
-    };
+    // Always look towards cursor when not moving
+    if (!keys.w && !keys.s && !keys.a && !keys.d) {
+      newRotation = rotationY;
+    }
 
-    // Always update NPC to look at cursor position
+    // Update NPC position and rotation
     updateNPC(controlledNPCId, {
       position: newPosition,
-      animation: isMoving ? 'walk' : 'idle',
-      rotation: rotationY
+      rotation: newRotation,
+      animation
     });
 
-      // Update camera to isometric view - fixed position above and behind NPC
-    const isometricOffset = new THREE.Vector3(-8, 12, -8); // Fixed isometric angle
+    // Update camera to isometric view - fixed position above and behind NPC
+    const isometricOffset = new THREE.Vector3(-8, 12, -8);
     const targetPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z).add(isometricOffset);
     const lookAtPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z);
 
