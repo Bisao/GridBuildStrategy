@@ -4,14 +4,16 @@ import { subscribeWithSelector } from "zustand/middleware";
 interface GameState {
   selectedStructure: string | null;
   isPlacementMode: boolean;
-  selectedHouse: { x: number; z: number } | null;
+  selectedHouse: { x: number; z: number; id: string } | null;
   isNPCPanelOpen: boolean;
+  isNPCCreationOpen: boolean;
   
   // Actions
   setSelectedStructure: (structure: string | null) => void;
   setPlacementMode: (mode: boolean) => void;
-  setSelectedHouse: (house: { x: number; z: number } | null) => void;
+  setSelectedHouse: (house: { x: number; z: number; id: string } | null) => void;
   setNPCPanelOpen: (open: boolean) => void;
+  setNPCCreationOpen: (open: boolean) => void;
 }
 
 export const useGameState = create<GameState>()(
@@ -20,6 +22,7 @@ export const useGameState = create<GameState>()(
     isPlacementMode: false,
     selectedHouse: null,
     isNPCPanelOpen: false,
+    isNPCCreationOpen: false,
     
     setSelectedStructure: (structure) => {
       set({ 
@@ -38,14 +41,18 @@ export const useGameState = create<GameState>()(
     
     setSelectedHouse: (house) => {
       set({ selectedHouse: house });
-      console.log(`Selected house: ${house ? `(${house.x}, ${house.z})` : 'none'}`);
+      console.log(`Selected house: ${house ? `(${house.x}, ${house.z}) ID: ${house.id}` : 'none'}`);
     },
     
     setNPCPanelOpen: (open) => {
       set({ isNPCPanelOpen: open });
       if (!open) {
-        set({ selectedHouse: null });
+        set({ selectedHouse: null, isNPCCreationOpen: false });
       }
+    },
+
+    setNPCCreationOpen: (open) => {
+      set({ isNPCCreationOpen: open });
     }
   }))
 );

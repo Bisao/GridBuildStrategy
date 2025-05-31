@@ -81,8 +81,18 @@ const Game = () => {
   };
 
   const handleHouseClick = (position: { x: number; z: number }) => {
-    setSelectedHouse(position);
-    setNPCPanelOpen(true);
+    // Encontrar a casa nas estruturas colocadas para obter o ID
+    const houseStructure = placedStructures.find(
+      structure => 
+        (structure.type === 'house' || structure.type === 'largehouse') &&
+        structure.position.x === position.x && 
+        structure.position.z === position.z
+    );
+    
+    if (houseStructure) {
+      setSelectedHouse({ x: position.x, z: position.z, id: houseStructure.id });
+      setNPCPanelOpen(true);
+    }
   };
 
   return (

@@ -26,18 +26,18 @@ export const useGridPlacement = () => {
     // Create an invisible plane to detect mouse intersection with the grid
     const gridPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
     const intersectionPoint = new THREE.Vector3();
-    
+
     if (raycaster.ray.intersectPlane(gridPlane, intersectionPoint)) {
       // Snap to grid - floor to get tile coordinates, then add 0.5 to center on tile
       const tileX = Math.floor(intersectionPoint.x);
       const tileZ = Math.floor(intersectionPoint.z);
       const gridX = tileX + 0.5;
       const gridZ = tileZ + 0.5;
-      
+
       // Constrain to grid bounds
       const GRID_SIZE = 20;
       const halfGrid = GRID_SIZE / 2;
-      
+
       if (tileX >= -halfGrid && tileX < halfGrid && tileZ >= -halfGrid && tileZ < halfGrid) {
         setHoveredTile({ x: gridX, z: gridZ });
         setPreviewPosition({ x: gridX, z: gridZ });
@@ -50,9 +50,9 @@ export const useGridPlacement = () => {
 
   const handleGridClick = useCallback((raycaster: THREE.Raycaster, structureType: string): boolean => {
     if (!previewPosition) return false;
-    
+
     const { x, z } = previewPosition;
-    
+
     if (canPlaceStructure(x, z)) {
       const newStructure: PlacedStructure = {
         id: `${structureType}-${Date.now()}-${Math.random()}`,
@@ -61,7 +61,7 @@ export const useGridPlacement = () => {
         z,
         rotation: previewRotation
       };
-      
+
       setPlacedStructures(prev => [...prev, newStructure]);
       console.log(`Placed ${structureType} at (${x}, ${z}) with rotation ${previewRotation}`);
       return true;
