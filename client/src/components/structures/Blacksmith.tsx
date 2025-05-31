@@ -36,8 +36,8 @@ const Blacksmith = ({ isPreview = false, canPlace = true, position, onStructureC
   return (
     <group ref={groupRef} onClick={handleClick}>
       {/* Main building */}
-      <mesh position={[0, 0.35, 0]} castShadow>
-        <boxGeometry args={[1.0, 0.7, 0.8]} />
+      <mesh position={[0, 1.05, 0]} castShadow>
+        <boxGeometry args={[3.0, 2.1, 2.4]} />
         <meshLambertMaterial 
           color={wallColor}
           transparent={isPreview}
@@ -46,8 +46,8 @@ const Blacksmith = ({ isPreview = false, canPlace = true, position, onStructureC
       </mesh>
 
       {/* Roof - front slope */}
-      <mesh position={[0, 0.9, 0.3]} rotation={[Math.PI/5, 0, 0]} castShadow>
-        <boxGeometry args={[1.1, 0.08, 0.7]} />
+      <mesh position={[0, 2.4, 0.9]} rotation={[-Math.PI/5, 0, 0]} castShadow>
+        <boxGeometry args={[3.3, 0.24, 2.1]} />
         <meshLambertMaterial 
           color={roofColor}
           transparent={isPreview}
@@ -56,8 +56,8 @@ const Blacksmith = ({ isPreview = false, canPlace = true, position, onStructureC
       </mesh>
 
       {/* Roof - back slope */}
-      <mesh position={[0, 0.9, -0.3]} rotation={[-Math.PI/5, 0, 0]} castShadow>
-        <boxGeometry args={[1.1, 0.08, 0.7]} />
+      <mesh position={[0, 2.4, -0.9]} rotation={[Math.PI/5, 0, 0]} castShadow>
+        <boxGeometry args={[3.3, 0.24, 2.1]} />
         <meshLambertMaterial 
           color={roofColor}
           transparent={isPreview}

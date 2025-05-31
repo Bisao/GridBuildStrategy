@@ -45,8 +45,8 @@ const Windmill = ({ isPreview = false, canPlace = true, position, onStructureCli
       </mesh>
 
       {/* Base tower */}
-      <mesh position={[0, 0.8, 0]} castShadow>
-        <cylinderGeometry args={[0.3, 0.4, 1.6, 8]} />
+      <mesh position={[0, 2.4, 0]} castShadow>
+        <cylinderGeometry args={[0.9, 1.2, 4.8, 8]} />
         <meshLambertMaterial 
           color={baseColor}
           transparent={isPreview}
@@ -55,8 +55,8 @@ const Windmill = ({ isPreview = false, canPlace = true, position, onStructureCli
       </mesh>
 
       {/* Top section */}
-      <mesh position={[0, 1.8, 0]} castShadow>
-        <cylinderGeometry args={[0.25, 0.3, 0.4, 8]} />
+      <mesh position={[0, 5.4, 0]} castShadow>
+        <cylinderGeometry args={[0.75, 0.9, 1.2, 8]} />
         <meshLambertMaterial 
           color={baseColor}
           transparent={isPreview}
@@ -65,8 +65,8 @@ const Windmill = ({ isPreview = false, canPlace = true, position, onStructureCli
       </mesh>
 
       {/* Roof */}
-      <mesh position={[0, 2.3, 0]} castShadow>
-        <coneGeometry args={[0.4, 0.6, 8]} />
+      <mesh position={[0, 6.9, 0]} castShadow>
+        <coneGeometry args={[1.2, 1.8, 8]} />
         <meshLambertMaterial 
           color={roofColor}
           transparent={isPreview}

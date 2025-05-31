@@ -26,8 +26,8 @@ const Tower = ({ isPreview = false, canPlace = true, position, onStructureClick 
   return (
     <group ref={groupRef} onClick={handleClick}>
       {/* Main tower base */}
-      <mesh position={[0, 1.0, 0]} castShadow>
-        <cylinderGeometry args={[0.4, 0.45, 2.0, 8]} />
+      <mesh position={[0, 3.0, 0]} castShadow>
+        <cylinderGeometry args={[1.2, 1.35, 6.0, 8]} />
         <meshLambertMaterial 
           color={stoneColor}
           transparent={isPreview}
@@ -36,8 +36,8 @@ const Tower = ({ isPreview = false, canPlace = true, position, onStructureClick 
       </mesh>
 
       {/* Tower top section */}
-      <mesh position={[0, 2.2, 0]} castShadow>
-        <cylinderGeometry args={[0.42, 0.4, 0.4, 8]} />
+      <mesh position={[0, 6.6, 0]} castShadow>
+        <cylinderGeometry args={[1.26, 1.2, 1.2, 8]} />
         <meshLambertMaterial 
           color={stoneColor}
           transparent={isPreview}
