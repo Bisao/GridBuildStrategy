@@ -1,4 +1,3 @@
-
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
@@ -29,7 +28,7 @@ export default function NPC({ position, color = "#8B4513", animation = "idle", r
       if (headRef.current) {
         headRef.current.position.y = 1.6 + Math.sin(time * 2) * 0.02;
       }
-      
+
       // Slight arm sway
       if (leftArmRef.current) {
         leftArmRef.current.rotation.z = Math.sin(time * 1.5) * 0.1;
@@ -43,12 +42,12 @@ export default function NPC({ position, color = "#8B4513", animation = "idle", r
         leftArmRef.current.rotation.x = Math.sin(time * 4) * 0.5;
         rightArmRef.current.rotation.x = -Math.sin(time * 4) * 0.5;
       }
-      
+
       if (leftLegRef.current && rightLegRef.current) {
         leftLegRef.current.rotation.x = Math.sin(time * 4) * 0.3;
         rightLegRef.current.rotation.x = -Math.sin(time * 4) * 0.3;
       }
-      
+
       // Bob up and down while walking
       groupRef.current.position.y = position[1] + Math.abs(Math.sin(time * 8)) * 0.05;
     }
