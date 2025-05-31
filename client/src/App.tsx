@@ -40,9 +40,9 @@ function App() {
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
-  const handleCreateNPC = (name: string, houseId: string) => {
-    console.log(`Creating NPC "${name}" for house ID: ${houseId} at (${selectedHouse?.x}, ${selectedHouse?.z})`);
-    // TODO: Implement NPC creation logic with name and house ID
+  const handleCreateNPC = (name: string, structureId: string) => {
+    console.log(`Creating NPC "${name}" for structure ID: ${structureId} at (${selectedHouse?.x}, ${selectedHouse?.z})`);
+    // TODO: Implement NPC creation logic with name and structure ID
   };
 
   return (

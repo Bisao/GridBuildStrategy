@@ -80,17 +80,16 @@ const Game = () => {
     }
   };
 
-  const handleHouseClick = (position: { x: number; z: number }) => {
-    // Encontrar a casa nas estruturas colocadas para obter o ID
-    const houseStructure = placedStructures.find(
+  const handleStructureClick = (position: { x: number; z: number }) => {
+    // Encontrar a estrutura nas estruturas colocadas para obter o ID
+    const structureClicked = placedStructures.find(
       structure => 
-        (structure.type === 'house' || structure.type === 'largehouse') &&
         structure.x === position.x && 
         structure.z === position.z
     );
-    
-    if (houseStructure) {
-      setSelectedHouse({ x: position.x, z: position.z, id: houseStructure.id });
+
+    if (structureClicked) {
+      setSelectedHouse({ x: position.x, z: position.z, id: structureClicked.id });
       setNPCPanelOpen(true);
     }
   };
@@ -110,44 +109,44 @@ const Game = () => {
       {/* Placed Structures */}
       {placedStructures.map((structure) => (
         <group 
-          key={structure.id} 
+          key={structure.id}
           position={[structure.x, 0, structure.z]}
           rotation={[0, (structure.rotation * Math.PI) / 180, 0]}
         >
           {structure.type === 'house' && (
             <House 
               position={{ x: structure.x, z: structure.z }}
-              onStructureClick={handleHouseClick}
+              onStructureClick={handleStructureClick}
             />
           )}
           {structure.type === 'windmill' && (
             <Windmill 
               position={{ x: structure.x, z: structure.z }}
-              onStructureClick={handleHouseClick}
+              onStructureClick={handleStructureClick}
             />
           )}
           {structure.type === 'tower' && (
             <Tower 
               position={{ x: structure.x, z: structure.z }}
-              onStructureClick={handleHouseClick}
+              onStructureClick={handleStructureClick}
             />
           )}
           {structure.type === 'largehouse' && (
             <LargeHouse 
               position={{ x: structure.x, z: structure.z }}
-              onStructureClick={handleHouseClick}
+              onStructureClick={handleStructureClick}
             />
           )}
           {structure.type === 'blacksmith' && (
             <Blacksmith 
               position={{ x: structure.x, z: structure.z }}
-              onStructureClick={handleHouseClick}
+              onStructureClick={handleStructureClick}
             />
           )}
           {structure.type === 'market' && (
             <Market 
               position={{ x: structure.x, z: structure.z }}
-              onStructureClick={handleHouseClick}
+              onStructureClick={handleStructureClick}
             />
           )}
         </group>

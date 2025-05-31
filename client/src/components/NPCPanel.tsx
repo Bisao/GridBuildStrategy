@@ -9,7 +9,7 @@ interface NPCPanelProps {
   isOpen: boolean;
   housePosition: { x: number; z: number; id: string } | null;
   onClose: () => void;
-  onCreateNPC: (name: string, houseId: string) => void;
+  onCreateNPC: (name: string, structureId: string) => void;
 }
 
 export default function NPCPanel({ 
@@ -20,6 +20,22 @@ export default function NPCPanel({
 }: NPCPanelProps) {
   const { isNPCCreationOpen, setNPCCreationOpen } = useGameState();
   const [npcName, setNpcName] = useState("");
+
+  // Determinar tipo de estrutura baseado no ID
+  const getStructureInfo = (id: string) => {
+    const type = id.split('-')[0];
+    const structureTypes = {
+      house: { name: "Casa", description: "Uma casa simples para aldeões" },
+      largehouse: { name: "Casa Grande", description: "Uma casa maior para famílias" },
+      windmill: { name: "Moinho", description: "Moinho para processar grãos" },
+      tower: { name: "Torre", description: "Torre de vigilância defensiva" },
+      blacksmith: { name: "Ferraria", description: "Oficina para forjar equipamentos" },
+      market: { name: "Mercado", description: "Local de comércio e trocas" }
+    };
+    return structureTypes[type as keyof typeof structureTypes] || { name: "Estrutura", description: "Estrutura genérica" };
+  };
+
+  const structureInfo = housePosition ? getStructureInfo(housePosition.id) : null;
 
   // Handle ESC key to close panel
   useEffect(() => {
@@ -67,7 +83,7 @@ export default function NPCPanel({
       <Card className="w-80 bg-gray-800/90 border-gray-600 text-white">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg font-bold">
-            Casa ({housePosition.x}, {housePosition.z})
+            {structureInfo?.name} ({housePosition.x}, {housePosition.z})
           </CardTitle>
           <Button
             variant="ghost"
@@ -80,7 +96,7 @@ export default function NPCPanel({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="text-sm text-gray-300">
-            Gerencie esta casa e seus NPCs
+            Gerencie esta estrutura e seus NPCs
           </div>
 
           {!isNPCCreationOpen ? (
@@ -96,8 +112,10 @@ export default function NPCPanel({
               </div>
 
               <div className="p-3 bg-gray-700/50 rounded text-sm text-gray-300">
-                <div className="font-medium mb-1">Informações da Casa:</div>
+                <div className="font-medium mb-1">Informações da Estrutura:</div>
+                <div>• Tipo: {structureInfo?.name}</div>
                 <div>• Posição: ({housePosition.x}, {housePosition.z})</div>
+                <div>• Descrição: {structureInfo?.description}</div>
                 <div>• ID: {housePosition.id}</div>
                 <div>• NPCs: 0/1</div>
                 <div>• Status: Vazia</div>
@@ -115,7 +133,7 @@ export default function NPCPanel({
                   type="text"
                   value={npcName}
                   onChange={(e) => setNpcName(e.target.value)}
-                  placeholder="Digite o nome do aldeão..."
+                  placeholder="Digite o nome do NPC..."
                   className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   maxLength={20}
                 />
