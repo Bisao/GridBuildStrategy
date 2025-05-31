@@ -50,19 +50,12 @@ export const useNPCControl = () => {
     if (!controlledNPCId) return;
 
     const handleMouseMove = (event: MouseEvent) => {
-      // Calculate normalized screen position (-1 to 1)
-      const rect = document.body.getBoundingClientRect();
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
+      // Get mouse position relative to window
+      const mouseX = event.clientX;
+      const mouseY = event.clientY;
 
-      const normalizedX = (event.clientX - centerX) / centerX;
-      const normalizedY = -(event.clientY - centerY) / centerY; // Inverted Y for correct direction
-
-      setScreenMousePosition(new THREE.Vector2(normalizedX, normalizedY));
-
-      // Calculate rotation based on mouse position
-      const angle = Math.atan2(normalizedX, normalizedY);
-      setMousePosition(new THREE.Vector2(angle, 0));
+      // Store mouse position for calculating NPC rotation
+      setScreenMousePosition(new THREE.Vector2(mouseX, mouseY));
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -70,7 +63,7 @@ export const useNPCControl = () => {
   }, [controlledNPCId]);
 
   // Update NPC position and rotation
-  useFrame(() => {
+  useFrame(({ camera, size }) => {
     if (!controlledNPCId) return;
 
     const currentTime = Date.now();
@@ -84,8 +77,26 @@ export const useNPCControl = () => {
     let movement = new THREE.Vector3();
     let isMoving = false;
 
-    // Mouse controls NPC rotation only
-    const rotationY = mousePosition.x * Math.PI; // Convert mouse X to rotation
+    // Calculate cursor world position for NPC to look at
+    const mouse = new THREE.Vector2(
+      (screenMousePosition.x / size.width) * 2 - 1,
+      -(screenMousePosition.y / size.height) * 2 + 1
+    );
+
+    // Create raycaster to get 3D position from mouse coordinates
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+    
+    // Cast ray onto ground plane (y = 0)
+    const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    const cursorWorldPos = new THREE.Vector3();
+    raycaster.ray.intersectPlane(groundPlane, cursorWorldPos);
+
+    // Calculate rotation for NPC to look at cursor position
+    const npcPos = new THREE.Vector3(controlledNPC.position.x, 0, controlledNPC.position.z);
+    const lookDirection = cursorWorldPos.clone().sub(npcPos).normalize();
+    const rotationY = Math.atan2(lookDirection.x, lookDirection.z);
+
     const forward = new THREE.Vector3(Math.sin(rotationY), 0, Math.cos(rotationY));
     const right = new THREE.Vector3(Math.cos(rotationY), 0, -Math.sin(rotationY));
 
@@ -107,26 +118,25 @@ export const useNPCControl = () => {
     }
 
     // Update NPC position and animation
-    if (movement.length() > 0 || mousePosition.x !== 0) {
-      const newPosition = {
-        x: controlledNPC.position.x + movement.x,
-        z: controlledNPC.position.z + movement.z
-      };
+    const newPosition = {
+      x: controlledNPC.position.x + movement.x,
+      z: controlledNPC.position.z + movement.z
+    };
 
-      updateNPC(controlledNPCId, {
-        position: newPosition,
-        animation: isMoving ? 'walk' : 'idle',
-        rotation: rotationY
-      });
+    // Always update NPC to look at cursor position
+    updateNPC(controlledNPCId, {
+      position: newPosition,
+      animation: isMoving ? 'walk' : 'idle',
+      rotation: rotationY
+    });
 
       // Update camera to isometric view - fixed position above and behind NPC
-      const isometricOffset = new THREE.Vector3(-8, 12, -8); // Fixed isometric angle
-      const targetPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z).add(isometricOffset);
-      const lookAtPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z);
+    const isometricOffset = new THREE.Vector3(-8, 12, -8); // Fixed isometric angle
+    const targetPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z).add(isometricOffset);
+    const lookAtPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z);
 
-      camera.position.lerp(targetPosition, 0.1);
-      camera.lookAt(lookAtPosition.x, lookAtPosition.y, lookAtPosition.z);
-    }
+    camera.position.lerp(targetPosition, 0.1);
+    camera.lookAt(lookAtPosition.x, lookAtPosition.y, lookAtPosition.z);
   });
 
   return {
