@@ -16,6 +16,7 @@ import { useGameState } from "./lib/stores/useGameState";
 import { useCombatState } from "./lib/stores/useCombatState";
 
 import SkillsBar from "./components/SkillsBar";
+import PlayerHUD from "./components/PlayerHUD"; // Import PlayerHUD
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -197,14 +198,13 @@ function App() {
       <NPCViewIndicator />
         <NPCControlIndicator />
 
-        {/* Combat Test Panel */}
         <CombatTestPanel
           isOpen={isCombatTestPanelOpen}
           onClose={() => setCombatTestPanelOpen(false)}
         />
 
-      {/* Skills Bar */}
-      <SkillsBar />
+        <SkillsBar />
+        <PlayerHUD />
       </div>
     </QueryClientProvider>
   );
