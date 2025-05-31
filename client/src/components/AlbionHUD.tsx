@@ -105,14 +105,22 @@ export default function AlbionHUD() {
                 const hasInsufficientMana = mana < skill.manaCost;
                 const isDisabled = isOnCooldown || hasInsufficientMana;
                 
+                const handleSkillClick = () => {
+                  if (!isDisabled) {
+                    // Aqui você pode implementar a lógica de usar a skill
+                    console.log(`Usando skill: ${skill.name}`);
+                  }
+                };
+                
                 return (
-                  <div key={skill.id} className="relative">
+                  <div key={skill.id} className="relative group">
                     <button
+                      onClick={handleSkillClick}
                       className={`
                         w-12 h-12 rounded-full border-2 transition-all duration-200 relative overflow-hidden
                         ${isDisabled 
-                          ? 'border-gray-600 bg-gray-800/80 opacity-60' 
-                          : 'border-yellow-500/70 bg-gradient-to-br from-gray-700 to-gray-800 hover:border-yellow-400'
+                          ? 'border-gray-600 bg-gray-800/80 opacity-60 cursor-not-allowed' 
+                          : 'border-yellow-500/70 bg-gradient-to-br from-gray-700 to-gray-800 hover:border-yellow-400 cursor-pointer'
                         }
                       `}
                       disabled={isDisabled}
@@ -121,13 +129,60 @@ export default function AlbionHUD() {
                       
                       {/* Cooldown overlay */}
                       {isOnCooldown && (
-                        <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-black/70 flex items-center justify-center rounded-full">
                           <span className="text-xs text-white font-bold">
                             {Math.ceil(skill.currentCooldown)}
                           </span>
                         </div>
                       )}
+                      
+                      {/* Mana cost indicator */}
+                      {hasInsufficientMana && !isOnCooldown && (
+                        <div className="absolute inset-0 bg-blue-900/70 flex items-center justify-center rounded-full">
+                          <span className="text-xs text-blue-200 font-bold">
+                            {skill.manaCost}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* Key number */}
+                      <div className="absolute -bottom-1 -right-1 bg-yellow-600 text-black text-xs w-4 h-4 flex items-center justify-center rounded-full border border-yellow-400 font-bold">
+                        {index + 1}
+                      </div>
                     </button>
+                    
+                    {/* Tooltip */}
+                    <div className="absolute bottom-14 left-1/2 transform -translate-x-1/2 bg-black/95 border border-yellow-400 text-white text-xs p-3 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-30 min-w-[180px]">
+                      <div className="font-bold text-yellow-400 mb-1">{skill.name}</div>
+                      <div className="text-gray-300 mb-2">{skill.description}</div>
+                      
+                      <div className="border-t border-gray-600 pt-2 space-y-1 text-xs">
+                        {skill.damage && (
+                          <div className="flex justify-between">
+                            <span>Dano:</span>
+                            <span className="text-red-400">{skill.damage}</span>
+                          </div>
+                        )}
+                        {skill.healAmount && (
+                          <div className="flex justify-between">
+                            <span>Cura:</span>
+                            <span className="text-green-400">{skill.healAmount}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
+                          <span>Alcance:</span>
+                          <span className="text-blue-400">{skill.range}m</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Cooldown:</span>
+                          <span className="text-gray-400">{skill.cooldown}s</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Mana:</span>
+                          <span className="text-blue-400">{skill.manaCost}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 );
               })}
