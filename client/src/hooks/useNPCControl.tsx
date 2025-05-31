@@ -50,7 +50,7 @@ export const useNPCControl = () => {
     if (!controlledNPCId) return;
 
     const handleMouseMove = (event: MouseEvent) => {
-      const sensitivity = 0.002;
+      const sensitivity = 0.003; // Increased sensitivity for more responsive controls
       const deltaX = event.movementX * sensitivity;
       setMousePosition(prev => new THREE.Vector2(prev.x - deltaX, prev.y)); // Inverted deltaX for correct rotation
     };
@@ -96,27 +96,46 @@ export const useNPCControl = () => {
       isMoving = true;
     }
 
-    // Update NPC position and animation
-    if (movement.length() > 0 || mousePosition.x !== 0) {
-      const newPosition = {
-        x: controlledNPC.position.x + movement.x,
-        z: controlledNPC.position.z + movement.z
-      };
+    // Always update NPC rotation, and position only when moving
+    const newPosition = {
+      x: controlledNPC.position.x + movement.x,
+      z: controlledNPC.position.z + movement.z
+    };
 
-      updateNPC(controlledNPCId, {
-        position: newPosition,
-        animation: isMoving ? 'walk' : 'idle',
-        rotation: rotationY
-      });
+    // Update NPC state
+    updateNPC(controlledNPCId, {
+      position: newPosition,
+      animation: isMoving ? 'walk' : 'idle',
+      rotation: rotationY
+    });
 
-      // Update camera to follow controlled NPC from behind and above
+    // Always update camera for better responsiveness, even when just rotating
+    if (movement.length() > 0 || mousePosition.x !== 0 || true) {
+
+      // Update camera to follow controlled NPC from behind and above with improved responsiveness
       const npcDirection = new THREE.Vector3(Math.sin(rotationY), 0, Math.cos(rotationY));
-      const cameraOffset = npcDirection.clone().multiplyScalar(-4).add(new THREE.Vector3(0, 3, 0));
+      const cameraOffset = npcDirection.clone().multiplyScalar(-3.5).add(new THREE.Vector3(0, 2.5, 0));
       const targetPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z).add(cameraOffset);
-      const lookAtPosition = new THREE.Vector3(newPosition.x, 1, newPosition.z).add(npcDirection.clone().multiplyScalar(2));
+      const lookAtPosition = new THREE.Vector3(newPosition.x, 1.2, newPosition.z).add(npcDirection.clone().multiplyScalar(1.5));
       
-      camera.position.lerp(targetPosition, 0.1);
-      camera.lookAt(lookAtPosition.x, lookAtPosition.y, lookAtPosition.z);
+      // More responsive camera movement with different lerp speeds for position and rotation
+      const positionLerpSpeed = isMoving ? 0.15 : 0.12;
+      const rotationLerpSpeed = 0.08;
+      
+      camera.position.lerp(targetPosition, positionLerpSpeed);
+      
+      // Smooth camera rotation using quaternions for better interpolation
+      const currentLookAt = new THREE.Vector3();
+      camera.getWorldDirection(currentLookAt);
+      currentLookAt.add(camera.position);
+      
+      const targetLookDirection = lookAtPosition.clone().sub(camera.position).normalize();
+      const currentLookDirection = currentLookAt.clone().sub(camera.position).normalize();
+      
+      const lerpedDirection = currentLookDirection.lerp(targetLookDirection, rotationLerpSpeed);
+      const finalLookAt = camera.position.clone().add(lerpedDirection);
+      
+      camera.lookAt(finalLookAt.x, finalLookAt.y, finalLookAt.z);
     }
   });
 
