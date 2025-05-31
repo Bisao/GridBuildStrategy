@@ -101,19 +101,19 @@ export const useNPCControl = () => {
     const right = new THREE.Vector3(Math.cos(rotationY), 0, -Math.sin(rotationY));
 
     if (keys.w) {
-      movement.add(forward.clone().multiplyScalar(speed * deltaTime * 0.5));
+      movement.add(forward.clone().multiplyScalar(speed * deltaTime));
       isMoving = true;
     }
     if (keys.s) {
-      movement.add(forward.clone().multiplyScalar(-speed * deltaTime * 0.5));
+      movement.add(forward.clone().multiplyScalar(-speed * deltaTime));
       isMoving = true;
     }
     if (keys.a) {
-      movement.add(right.clone().multiplyScalar(speed * deltaTime * 0.5));
+      movement.add(right.clone().multiplyScalar(-speed * deltaTime));
       isMoving = true;
     }
     if (keys.d) {
-      movement.add(right.clone().multiplyScalar(-speed * deltaTime * 0.5));
+      movement.add(right.clone().multiplyScalar(speed * deltaTime));
       isMoving = true;
     }
 
