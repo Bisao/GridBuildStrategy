@@ -2,12 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button";
 import { Home, X, Settings, Castle, Hammer, ShoppingCart, Menu, Save } from "lucide-react";
 import { useEffect } from "react";
+import { useGameState } from "../lib/stores/useGameState";
 
 interface StructurePanelProps {
-  selectedStructure: string | null;
+  selectedStructure?: string | null;
   onSelectStructure: (structure: string | null) => void;
   isOpen: boolean;
-  onToggle: () => void;
+  onClose: () => void;
   onOpenSaveLoad?: () => void;
 }
 
@@ -15,14 +16,15 @@ export default function StructurePanel({
   selectedStructure, 
   onSelectStructure,
   isOpen,
-  onToggle,
+  onClose,
   onOpenSaveLoad
 }: StructurePanelProps) {
+  const { setStructurePanelOpen } = useGameState();
   // Handle ESC key to close panel
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isOpen) {
-        onToggle();
+        onClose();
       }
     };
 
@@ -33,13 +35,13 @@ export default function StructurePanel({
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [isOpen, onToggle]);
+  }, [isOpen, onClose]);
 
   return (
     <div className="fixed top-2 left-2 z-10 sm:top-4 sm:left-4">
       {/* Toggle Button */}
       <Button
-        onClick={onToggle}
+        onClick={() => setStructurePanelOpen(!isOpen)}
         className="mb-2 bg-gray-800/90 border-gray-700 text-white hover:bg-gray-700 backdrop-blur-sm"
         size="sm"
       >

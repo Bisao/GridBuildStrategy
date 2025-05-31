@@ -118,6 +118,7 @@ function App() {
 
         {/* UI overlay outside of Canvas */}
         <StructurePanel
+          selectedStructure={selectedStructure}
           isOpen={isStructurePanelOpen}
           onClose={() => setStructurePanelOpen(false)}
           onSelectStructure={setSelectedStructure}
