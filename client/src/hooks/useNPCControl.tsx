@@ -41,7 +41,7 @@ export const useNPCControl = () => {
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
       const mouse = new THREE.Vector2(x, y);
-      raycaster.setFromCamera(mouse, camera);
+      raycaster.current.setFromCamera(mouse, camera);
 
       // First check if clicking on an enemy
       const enemies = (window as any).enemies || [];
@@ -54,7 +54,7 @@ export const useNPCControl = () => {
           new THREE.Vector3(enemy.position.x + 0.5, 2, enemy.position.z + 0.5)
         );
 
-        const ray = raycaster.ray;
+        const ray = raycaster.current.ray;
         if (ray.intersectsBox(enemyBox)) {
           clickedEnemy = enemy;
           break;
@@ -72,7 +72,7 @@ export const useNPCControl = () => {
         const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
         const intersectionPoint = new THREE.Vector3();
 
-        if (raycaster.ray.intersectPlane(groundPlane, intersectionPoint)) {
+        if (raycaster.current.ray.intersectPlane(groundPlane, intersectionPoint)) {
           setTargetPosition(intersectionPoint.clone());
         }
       }
