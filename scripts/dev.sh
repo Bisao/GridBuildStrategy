@@ -9,6 +9,12 @@ if [ ! -d "node_modules" ]; then
     npm install
 fi
 
+# Verificar se tsx está instalado
+if ! npm list tsx --depth=0 > /dev/null 2>&1; then
+    echo "📦 Instalando tsx..."
+    npm install --save-dev tsx
+fi
+
 # Verificar tipos TypeScript
 echo "🔍 Verificando tipos..."
 npm run type-check
