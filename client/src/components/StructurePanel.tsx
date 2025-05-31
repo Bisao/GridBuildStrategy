@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Home, X, Settings, Castle, Hammer, ShoppingCart, Menu } from "lucide-react";
+import { useEffect } from "react";
 
 interface StructurePanelProps {
   selectedStructure: string | null;
@@ -15,6 +16,23 @@ export default function StructurePanel({
   isOpen,
   onToggle
 }: StructurePanelProps) {
+  // Handle ESC key to close panel
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        onToggle();
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyPress);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [isOpen, onToggle]);
+
   return (
     <div className="fixed top-2 left-2 z-10 sm:top-4 sm:left-4">
       {/* Toggle Button */}

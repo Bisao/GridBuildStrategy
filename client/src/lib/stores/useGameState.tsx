@@ -48,7 +48,7 @@ export const useGameState = create<GameState>()(
     selectedHouse: null,
     isNPCPanelOpen: false,
     isNPCCreationOpen: false,
-    isStructurePanelOpen: true,
+    isStructurePanelOpen: false,
     isNPCConfigPanelOpen: false,
     selectedNPCId: null,
     controlledNPCId: null,
