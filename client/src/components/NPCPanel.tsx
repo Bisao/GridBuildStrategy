@@ -69,6 +69,17 @@ export default function NPCPanel({
 
   const structureInfo = housePosition ? getStructureInfo(housePosition.id) : null;
 
+  // Get family name based on first NPC's surname
+  const getFamilyName = () => {
+    if (structureNPCs.length > 0) {
+      const firstNPC = structureNPCs[0];
+      const nameParts = firstNPC.name.split(' ');
+      const surname = nameParts.slice(1).join(' ') || nameParts[0];
+      return `Família ${surname}`;
+    }
+    return structureInfo?.name || 'Estrutura';
+  };
+
   // Handle ESC key to close panel
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -122,7 +133,7 @@ export default function NPCPanel({
       <Card className="w-80 bg-gray-800/90 border-gray-600 text-white">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg font-bold">
-            {structureInfo?.name} ({housePosition.x}, {housePosition.z})
+            {getFamilyName()}
           </CardTitle>
           <Button
             variant="ghost"
