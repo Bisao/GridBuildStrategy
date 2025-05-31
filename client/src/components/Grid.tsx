@@ -63,11 +63,7 @@ const Grid = ({ onPointerMove, onClick, hoveredTile }: GridProps) => {
     <group ref={gridRef}>
       {tiles}
       
-      {/* Ground plane for visual reference */}
-      <mesh position={[0, -0.1, 0]} receiveShadow>
-        <planeGeometry args={[GRID_SIZE * 2, GRID_SIZE * 2]} />
-        <meshLambertMaterial color="#1a5d1a" />
-      </mesh>
+      
     </group>
   );
 };
