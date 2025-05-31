@@ -31,6 +31,9 @@ function App() {
     addNPC
   } = useGameState();
 
+  const [isNPCConfigPanelOpen, setNPCConfigPanelOpen] = useState(false);
+  const [selectedNPC, setSelectedNPC] = useState<string | null>(null);
+
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -58,6 +61,11 @@ function App() {
     console.log(`Criando NPC "${name}" vinculado à estrutura ${structureId} na posição (${selectedHouse.x}, ${selectedHouse.z})`);
     addNPC(newNPC);
     setNPCPanelOpen(false);
+  };
+
+  const handleConfigureNPC = (npcId: string) => {
+    setSelectedNPC(npcId);
+    setNPCConfigPanelOpen(true);
   };
 
   return (
@@ -112,6 +120,7 @@ function App() {
           housePosition={selectedHouse}
           onClose={() => setNPCPanelOpen(false)}
           onCreateNPC={handleCreateNPC}
+          onConfigureNPC={handleConfigureNPC}
         />
          <NPCConfigPanel 
           isOpen={isNPCConfigPanelOpen}
