@@ -55,7 +55,7 @@ const Market = ({ isPreview = false, canPlace = true, position, onStructureClick
         />
       </mesh>
 
-      {/* Market stalls - left */}
+      {/* Market stalls - left front */}
       <mesh position={[-0.8, 0.15, 0.7]} castShadow>
         <boxGeometry args={[0.3, 0.3, 0.2]} />
         <meshLambertMaterial 
@@ -65,7 +65,7 @@ const Market = ({ isPreview = false, canPlace = true, position, onStructureClick
         />
       </mesh>
 
-      {/* Market stalls - right */}
+      {/* Market stalls - right front */}
       <mesh position={[0.8, 0.15, 0.7]} castShadow>
         <boxGeometry args={[0.3, 0.3, 0.2]} />
         <meshLambertMaterial 
@@ -75,7 +75,27 @@ const Market = ({ isPreview = false, canPlace = true, position, onStructureClick
         />
       </mesh>
 
-      {/* Awnings */}
+      {/* Market stalls - left back */}
+      <mesh position={[-0.8, 0.15, -0.7]} castShadow>
+        <boxGeometry args={[0.3, 0.3, 0.2]} />
+        <meshLambertMaterial 
+          color="#D2691E"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Market stalls - right back */}
+      <mesh position={[0.8, 0.15, -0.7]} castShadow>
+        <boxGeometry args={[0.3, 0.3, 0.2]} />
+        <meshLambertMaterial 
+          color="#D2691E"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Awnings front */}
       <mesh position={[-0.8, 0.35, 0.7]} castShadow>
         <boxGeometry args={[0.35, 0.02, 0.25]} />
         <meshLambertMaterial 
@@ -89,6 +109,25 @@ const Market = ({ isPreview = false, canPlace = true, position, onStructureClick
         <boxGeometry args={[0.35, 0.02, 0.25]} />
         <meshLambertMaterial 
           color="#228B22"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Awnings back */}
+      <mesh position={[-0.8, 0.35, -0.7]} castShadow>
+        <boxGeometry args={[0.35, 0.02, 0.25]} />
+        <meshLambertMaterial 
+          color="#FF8C00"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[0.8, 0.35, -0.7]} castShadow>
+        <boxGeometry args={[0.35, 0.02, 0.25]} />
+        <meshLambertMaterial 
+          color="#9932CC"
           transparent={isPreview}
           opacity={opacity}
         />
@@ -113,6 +152,24 @@ const Market = ({ isPreview = false, canPlace = true, position, onStructureClick
         />
       </mesh>
 
+      <mesh position={[-0.95, 0.25, -0.6]} castShadow>
+        <cylinderGeometry args={[0.02, 0.02, 0.5, 8]} />
+        <meshLambertMaterial 
+          color="#654321"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[0.95, 0.25, -0.6]} castShadow>
+        <cylinderGeometry args={[0.02, 0.02, 0.5, 8]} />
+        <meshLambertMaterial 
+          color="#654321"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
       {/* Main entrance */}
       <mesh position={[0, 0.2, 0.51]} castShadow>
         <boxGeometry args={[0.25, 0.4, 0.02]} />
@@ -123,7 +180,17 @@ const Market = ({ isPreview = false, canPlace = true, position, onStructureClick
         />
       </mesh>
 
-      {/* Windows */}
+      {/* Back door */}
+      <mesh position={[0, 0.2, -0.51]} castShadow>
+        <boxGeometry args={[0.2, 0.35, 0.02]} />
+        <meshLambertMaterial 
+          color="#654321"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Windows front */}
       <mesh position={[-0.4, 0.35, 0.51]} castShadow>
         <boxGeometry args={[0.15, 0.15, 0.02]} />
         <meshLambertMaterial 
@@ -142,7 +209,45 @@ const Market = ({ isPreview = false, canPlace = true, position, onStructureClick
         />
       </mesh>
 
-      {/* Market goods */}
+      {/* Windows back */}
+      <mesh position={[-0.3, 0.35, -0.51]} castShadow>
+        <boxGeometry args={[0.12, 0.12, 0.02]} />
+        <meshLambertMaterial 
+          color="#87CEEB"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[0.3, 0.35, -0.51]} castShadow>
+        <boxGeometry args={[0.12, 0.12, 0.02]} />
+        <meshLambertMaterial 
+          color="#87CEEB"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Side windows */}
+      <mesh position={[-0.71, 0.35, 0]} castShadow>
+        <boxGeometry args={[0.02, 0.12, 0.12]} />
+        <meshLambertMaterial 
+          color="#87CEEB"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[0.71, 0.35, 0]} castShadow>
+        <boxGeometry args={[0.02, 0.12, 0.12]} />
+        <meshLambertMaterial 
+          color="#87CEEB"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Market goods front */}
       <mesh position={[-0.8, 0.32, 0.75]} castShadow>
         <boxGeometry args={[0.08, 0.06, 0.08]} />
         <meshLambertMaterial 
@@ -161,9 +266,47 @@ const Market = ({ isPreview = false, canPlace = true, position, onStructureClick
         />
       </mesh>
 
+      {/* Market goods back */}
+      <mesh position={[-0.8, 0.32, -0.75]} castShadow>
+        <boxGeometry args={[0.06, 0.06, 0.06]} />
+        <meshLambertMaterial 
+          color="#FFD700"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[0.8, 0.32, -0.75]} castShadow>
+        <boxGeometry args={[0.08, 0.06, 0.08]} />
+        <meshLambertMaterial 
+          color="#8A2BE2"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
       {/* Sign */}
       <mesh position={[0, 0.8, 0.6]} castShadow>
         <boxGeometry args={[0.3, 0.1, 0.02]} />
+        <meshLambertMaterial 
+          color="#8B4513"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Decorative barrels */}
+      <mesh position={[-0.5, 0.1, 0.8]} castShadow>
+        <cylinderGeometry args={[0.05, 0.05, 0.2, 8]} />
+        <meshLambertMaterial 
+          color="#8B4513"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[0.5, 0.1, 0.8]} castShadow>
+        <cylinderGeometry args={[0.05, 0.05, 0.2, 8]} />
         <meshLambertMaterial 
           color="#8B4513"
           transparent={isPreview}

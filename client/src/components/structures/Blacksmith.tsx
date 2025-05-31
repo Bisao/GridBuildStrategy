@@ -123,6 +123,16 @@ const Blacksmith = ({ isPreview = false, canPlace = true, position, onStructureC
         />
       </mesh>
 
+      {/* Back door */}
+      <mesh position={[0, 0.2, -0.41]} castShadow>
+        <boxGeometry args={[0.2, 0.4, 0.02]} />
+        <meshLambertMaterial 
+          color="#654321"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
       {/* Anvil inside (visible through door) */}
       <mesh position={[0, 0.1, 0.2]} castShadow>
         <boxGeometry args={[0.1, 0.15, 0.05]} />
@@ -143,7 +153,7 @@ const Blacksmith = ({ isPreview = false, canPlace = true, position, onStructureC
         />
       </mesh>
 
-      {/* Tools hanging outside */}
+      {/* Tools hanging outside front */}
       <mesh position={[0.4, 0.4, 0.35]} rotation={[0, 0, Math.PI/6]} castShadow>
         <boxGeometry args={[0.02, 0.2, 0.02]} />
         <meshLambertMaterial 
@@ -162,11 +172,107 @@ const Blacksmith = ({ isPreview = false, canPlace = true, position, onStructureC
         />
       </mesh>
 
-      {/* Side window */}
+      {/* Tools hanging outside back */}
+      <mesh position={[-0.4, 0.4, -0.35]} rotation={[0, 0, Math.PI/6]} castShadow>
+        <boxGeometry args={[0.02, 0.18, 0.02]} />
+        <meshLambertMaterial 
+          color="#654321"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[-0.35, 0.35, -0.35]} rotation={[0, 0, -Math.PI/6]} castShadow>
+        <boxGeometry args={[0.02, 0.22, 0.02]} />
+        <meshLambertMaterial 
+          color="#654321"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Side windows */}
       <mesh position={[0.51, 0.35, 0]} castShadow>
         <boxGeometry args={[0.02, 0.12, 0.12]} />
         <meshLambertMaterial 
           color="#87CEEB"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[-0.51, 0.35, 0]} castShadow>
+        <boxGeometry args={[0.02, 0.12, 0.12]} />
+        <meshLambertMaterial 
+          color="#87CEEB"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Back window */}
+      <mesh position={[0.3, 0.35, -0.41]} castShadow>
+        <boxGeometry args={[0.12, 0.12, 0.02]} />
+        <meshLambertMaterial 
+          color="#87CEEB"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Metal storage outside */}
+      <mesh position={[0.45, 0.05, 0.55]} castShadow>
+        <boxGeometry args={[0.1, 0.1, 0.15]} />
+        <meshLambertMaterial 
+          color="#2F4F4F"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[-0.45, 0.05, 0.55]} castShadow>
+        <boxGeometry args={[0.08, 0.08, 0.12]} />
+        <meshLambertMaterial 
+          color="#2F4F4F"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Coal pile */}
+      <mesh position={[-0.4, 0.03, -0.6]} castShadow>
+        <sphereGeometry args={[0.08, 8, 8]} />
+        <meshLambertMaterial 
+          color="#1C1C1C"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Water bucket */}
+      <mesh position={[0.4, 0.05, -0.6]} castShadow>
+        <cylinderGeometry args={[0.06, 0.05, 0.1, 8]} />
+        <meshLambertMaterial 
+          color="#8B4513"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Metal rods leaning against wall */}
+      <mesh position={[0.48, 0.2, 0.2]} rotation={[0, 0, Math.PI/6]} castShadow>
+        <cylinderGeometry args={[0.01, 0.01, 0.4, 6]} />
+        <meshLambertMaterial 
+          color="#2F4F4F"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[0.46, 0.18, 0.18]} rotation={[0, 0, Math.PI/7]} castShadow>
+        <cylinderGeometry args={[0.01, 0.01, 0.36, 6]} />
+        <meshLambertMaterial 
+          color="#2F4F4F"
           transparent={isPreview}
           opacity={opacity}
         />

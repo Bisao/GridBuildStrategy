@@ -115,7 +115,17 @@ const LargeHouse = ({ isPreview = false, canPlace = true, position, onStructureC
         />
       </mesh>
 
-      {/* Windows - main building */}
+      {/* Door handle */}
+      <mesh position={[0.08, 0.2, 0.52]} castShadow>
+        <sphereGeometry args={[0.02, 8, 8]} />
+        <meshLambertMaterial 
+          color="#FFD700"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Windows - main building front */}
       <mesh position={[-0.3, 0.4, 0.51]} castShadow>
         <boxGeometry args={[0.15, 0.15, 0.02]} />
         <meshLambertMaterial 
@@ -134,7 +144,46 @@ const LargeHouse = ({ isPreview = false, canPlace = true, position, onStructureC
         />
       </mesh>
 
-      {/* Left wing window */}
+      {/* Windows - main building back */}
+      <mesh position={[-0.3, 0.4, -0.51]} castShadow>
+        <boxGeometry args={[0.15, 0.15, 0.02]} />
+        <meshLambertMaterial 
+          color="#87CEEB"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[0.3, 0.4, -0.51]} castShadow>
+        <boxGeometry args={[0.15, 0.15, 0.02]} />
+        <meshLambertMaterial 
+          color="#87CEEB"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Windows - left side */}
+      <mesh position={[-0.61, 0.4, 0]} castShadow>
+        <boxGeometry args={[0.02, 0.15, 0.15]} />
+        <meshLambertMaterial 
+          color="#87CEEB"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Windows - right side */}
+      <mesh position={[0.61, 0.4, 0]} castShadow>
+        <boxGeometry args={[0.02, 0.15, 0.15]} />
+        <meshLambertMaterial 
+          color="#87CEEB"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Left wing windows */}
       <mesh position={[-0.8, 0.3, 0.51]} castShadow>
         <boxGeometry args={[0.12, 0.12, 0.02]} />
         <meshLambertMaterial 
@@ -144,8 +193,26 @@ const LargeHouse = ({ isPreview = false, canPlace = true, position, onStructureC
         />
       </mesh>
 
-      {/* Right wing window */}
+      <mesh position={[-0.8, 0.3, -0.11]} castShadow>
+        <boxGeometry args={[0.12, 0.12, 0.02]} />
+        <meshLambertMaterial 
+          color="#87CEEB"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Right wing windows */}
       <mesh position={[0.8, 0.3, 0.51]} castShadow>
+        <boxGeometry args={[0.12, 0.12, 0.02]} />
+        <meshLambertMaterial 
+          color="#87CEEB"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[0.8, 0.3, -0.11]} castShadow>
         <boxGeometry args={[0.12, 0.12, 0.02]} />
         <meshLambertMaterial 
           color="#87CEEB"
@@ -168,6 +235,63 @@ const LargeHouse = ({ isPreview = false, canPlace = true, position, onStructureC
         <boxGeometry args={[0.05, 0.4, 0.02]} />
         <meshLambertMaterial 
           color="#654321"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Window frames */}
+      <mesh position={[-0.3, 0.4, 0.52]} castShadow>
+        <boxGeometry args={[0.18, 0.18, 0.01]} />
+        <meshLambertMaterial 
+          color="#654321"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[0.3, 0.4, 0.52]} castShadow>
+        <boxGeometry args={[0.18, 0.18, 0.01]} />
+        <meshLambertMaterial 
+          color="#654321"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Garden decorations */}
+      <mesh position={[-0.4, 0.05, 0.7]} castShadow>
+        <boxGeometry args={[0.1, 0.1, 0.1]} />
+        <meshLambertMaterial 
+          color="#228B22"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[0.4, 0.05, 0.7]} castShadow>
+        <boxGeometry args={[0.1, 0.1, 0.1]} />
+        <meshLambertMaterial 
+          color="#228B22"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Steps to main door */}
+      <mesh position={[0, 0.05, 0.6]} castShadow>
+        <boxGeometry args={[0.3, 0.1, 0.1]} />
+        <meshLambertMaterial 
+          color="#696969"
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      <mesh position={[0, 0.1, 0.65]} castShadow>
+        <boxGeometry args={[0.25, 0.1, 0.05]} />
+        <meshLambertMaterial 
+          color="#696969"
           transparent={isPreview}
           opacity={opacity}
         />
