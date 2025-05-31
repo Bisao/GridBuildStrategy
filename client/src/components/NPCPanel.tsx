@@ -169,6 +169,18 @@ export default function NPCPanel({
                           >
                             🕹️
                           </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              console.log(`Visualização para NPC ${npc.id}`);
+                              // TODO: Implementar painel de visualização
+                            }}
+                            className="h-7 w-7 p-0 text-lg hover:bg-gray-600/50"
+                            title="Visualização"
+                          >
+                            👁️
+                          </Button>
                         </div>
                       </div>
                     ))}
