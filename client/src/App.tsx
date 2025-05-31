@@ -16,7 +16,7 @@ import { useGameState } from "./lib/stores/useGameState";
 import { useCombatState } from "./lib/stores/useCombatState";
 
 import PlayerHUD from "./components/PlayerHUD"; // Import PlayerHUD
-import AlbionHUD from "./components/AlbionHUD";
+import GameHUD from "./components/GameHUD";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -204,7 +204,7 @@ function App() {
         />
 
         {/* Albion HUD */}
-        <AlbionHUD />
+        <GameHUD />
         <PlayerHUD />
       </div>
     </QueryClientProvider>
