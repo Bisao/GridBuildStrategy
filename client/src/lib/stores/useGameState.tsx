@@ -11,6 +11,12 @@ interface CreatedNPC {
   animation?: "idle" | "walk";
 }
 
+interface Enemy {
+  id: string;
+  position: { x: number; z: number };
+  health: number;
+}
+
 interface GameState {
   selectedStructure: string | null;
   isPlacementMode: boolean;
@@ -23,6 +29,7 @@ interface GameState {
   controlledNPCId: string | null;
   viewingNPCId: string | null;
   createdNPCs: CreatedNPC[];
+  enemies: Enemy[];
   currentGameStateId: number | null;
   currentGameStateName: string | null;
   isSaving: boolean;
@@ -45,7 +52,11 @@ interface GameState {
   updateNPC: (npcId: string, updates: Partial<CreatedNPC>) => void;
   removeNPC: (npcId: string) => void;
   getNPCsByStructure: (structureId: string) => CreatedNPC[];
-  
+
+  addEnemy: (enemy: Enemy) => void;
+  removeEnemy: (id: string) => void;
+  spawnTestEnemy: () => void;
+
   // Persistence actions
   saveGame: (name: string, structures: any[]) => Promise<void>;
   updateCurrentSave: (structures: any[]) => Promise<void>;
@@ -70,6 +81,7 @@ export const useGameState = create<GameState>()(
     controlledNPCId: null,
     viewingNPCId: null,
     createdNPCs: [],
+    enemies: [],
     currentGameStateId: null,
     currentGameStateName: null,
     isSaving: false,
@@ -148,6 +160,55 @@ export const useGameState = create<GameState>()(
 
     getNPCsByStructure: (structureId) => {
       return get().createdNPCs.filter(npc => npc.structureId === structureId);
+    },
+
+    addEnemy: (enemy: Enemy) => {
+      set((state) => ({
+        enemies: [...state.enemies, enemy]
+      }));
+    },
+
+    removeEnemy: (id: string) => {
+      set((state) => ({
+        enemies: state.enemies.filter(enemy => enemy.id !== id)
+      }));
+    },
+
+    spawnTestEnemy: () => {
+      const { controlledNPCId, createdNPCs } = get();
+      const controlledNPC = controlledNPCId ? createdNPCs.find(npc => npc.id === controlledNPCId) : null;
+
+      if (controlledNPC) {
+        // Spawn enemy near controlled NPC
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 3 + Math.random() * 2;
+        const enemy: Enemy = {
+          id: `enemy-${Date.now()}-${Math.random()}`,
+          position: {
+            x: controlledNPC.position.x + Math.cos(angle) * distance,
+            z: controlledNPC.position.z + Math.sin(angle) * distance
+          },
+          health: 100
+        };
+
+        set((state) => ({
+          enemies: [...state.enemies, enemy]
+        }));
+      } else {
+        // Spawn at random location if no controlled NPC
+        const enemy: Enemy = {
+          id: `enemy-${Date.now()}-${Math.random()}`,
+          position: {
+            x: (Math.random() - 0.5) * 10,
+            z: (Math.random() - 0.5) * 10
+          },
+          health: 100
+        };
+
+        set((state) => ({
+          enemies: [...state.enemies, enemy]
+        }));
+      }
     },
 
     setCurrentGameStateId: (id) => {
@@ -263,13 +324,13 @@ export const useGameState = create<GameState>()(
       set({ isLoading: true });
       try {
         const response = await fetch(`/api/load-game/${gameStateId}`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to load game');
         }
 
         const result = await response.json();
-        
+
         // Transform loaded NPCs to match current format
         const loadedNPCs = result.npcs.map((npc: any) => ({
           id: npc.npcId,
@@ -303,7 +364,7 @@ export const useGameState = create<GameState>()(
     getGameStates: async () => {
       try {
         const response = await fetch('/api/game-states/1'); // Default user
-        
+
         if (!response.ok) {
           throw new Error('Failed to get game states');
         }

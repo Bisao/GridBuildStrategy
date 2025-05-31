@@ -10,6 +10,7 @@ import NPCPanel from "./components/NPCPanel";
 import NPCConfigPanel from "./components/NPCConfigPanel";
 import NPCControlIndicator from "./components/NPCControlIndicator";
 import NPCViewIndicator from "./components/NPCViewIndicator";
+import CombatTestPanel from "./components/CombatTestPanel";
 import SaveLoadPanel from "./components/SaveLoadPanel";
 import { useGameState } from "./lib/stores/useGameState";
 
@@ -40,6 +41,7 @@ function App() {
   const [isNPCConfigPanelOpen, setNPCConfigPanelOpen] = useState(false);
   const [selectedNPC, setSelectedNPC] = useState<string | null>(null);
   const [isSaveLoadPanelOpen, setIsSaveLoadPanelOpen] = useState(false);
+  const [isCombatTestPanelOpen, setCombatTestPanelOpen] = useState(false);
 
   const [isMobile, setIsMobile] = useState(false);
   const { placedStructures } = useGridPlacement();
@@ -133,6 +135,18 @@ function App() {
           </Suspense>
         </Canvas>
 
+        {/* Top UI */}
+        <div className="absolute top-4 left-4 z-10 flex gap-2">
+          <SaveLoadPanel />
+          <button
+            onClick={() => setCombatTestPanelOpen(!isCombatTestPanelOpen)}
+            className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium transition-colors"
+            title="Teste de Combate"
+          >
+            ⚔️ Combate
+          </button>
+        </div>
+
         {/* UI overlay outside of Canvas */}
         <StructurePanel
           selectedStructure={selectedStructure}
@@ -164,6 +178,15 @@ function App() {
           setSelectedNPC(null);
         }}
       />
+
+      <NPCViewIndicator />
+        <NPCControlIndicator />
+
+        {/* Combat Test Panel */}
+        <CombatTestPanel
+          isOpen={isCombatTestPanelOpen}
+          onClose={() => setCombatTestPanelOpen(false)}
+        />
 
       {/* Skills Bar */}
       <SkillsBar />

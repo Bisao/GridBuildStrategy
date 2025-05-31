@@ -13,12 +13,14 @@ import Market from "./structures/Market";
 import { useGridPlacement } from "../hooks/useGridPlacement";
 import { useGameState } from "../lib/stores/useGameState";
 import { useNPCControl } from "../hooks/useNPCControl";
+import Enemy from "./Enemy";
 
 const Game = () => {
   const { camera, gl } = useThree();
   const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
   const raycaster = useRef(new THREE.Raycaster());
 
+  const { createdNPCs, enemies, viewingNPCId, controlledNPCId, removeEnemy } = useGameState();
   const { 
     selectedStructure, 
     setSelectedStructure, 
@@ -209,14 +211,26 @@ const Game = () => {
         </group>
       )}
 
-      {/* Render created NPCs */}
+      {/* Render NPCs */}
       {createdNPCs.map((npc) => (
         <NPC
           key={npc.id}
+          id={npc.id}
+          name={npc.name}
           position={[npc.position.x, 0, npc.position.z]}
-          color={npc.id === controlledNPCId ? "#FF6B6B" : "#8B4513"}
-          animation={npc.animation || "idle"}
-          rotation={npc.rotation || 0}
+          type={npc.type}
+          rotation={npc.rotation}
+          animation={npc.animation}
+        />
+      ))}
+
+      {/* Render Enemies */}
+      {enemies.map((enemy) => (
+        <Enemy
+          key={enemy.id}
+          id={enemy.id}
+          position={enemy.position}
+          onDestroy={removeEnemy}
         />
       ))}
 
