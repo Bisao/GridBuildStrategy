@@ -191,12 +191,7 @@ const Game = () => {
           )}
         </group>
       )}
-       {/* Example NPC - Aldeão */}
-       <NPC 
-        position={[2, 0, 2]} 
-        color="#8B4513" 
-        animation="idle" 
-      />
+       
     </>
   );
 };
