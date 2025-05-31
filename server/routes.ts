@@ -160,6 +160,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/update-game/:gameStateId", async (req, res) => {
+    try {
+      const gameStateId = parseInt(req.params.gameStateId);
+      const { userId, name, structures, npcs, gameState } = req.body;
+      
+      // Update game state
+      const updatedGameState = await storage.updateGameState(
+        gameStateId,
+        JSON.stringify(gameState)
+      );
+
+      if (!updatedGameState) {
+        return res.status(404).json({ error: "Game state not found" });
+      }
+
+      // Delete existing structures and NPCs for this game state
+      await storage.deleteStructures(gameStateId);
+      await storage.deleteNPCs(gameStateId);
+
+      // Save new structures
+      const savedStructures = await Promise.all(
+        structures.map((structure: any) =>
+          storage.saveStructure({
+            gameStateId: gameStateId,
+            structureId: structure.id,
+            type: structure.type,
+            x: structure.x,
+            z: structure.z,
+            rotation: structure.rotation
+          })
+        )
+      );
+
+      // Save new NPCs
+      const savedNPCs = await Promise.all(
+        npcs.map((npc: any) =>
+          storage.saveNPC({
+            gameStateId: gameStateId,
+            npcId: npc.id,
+            name: npc.name,
+            structureId: npc.structureId,
+            type: npc.type,
+            x: npc.position.x,
+            z: npc.position.z,
+            rotation: npc.rotation || 0,
+            animation: npc.animation || "idle"
+          })
+        )
+      );
+
+      res.json({
+        gameState: updatedGameState,
+        structures: savedStructures,
+        npcs: savedNPCs
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update game" });
+    }
+  });
+
   app.get("/api/load-game/:gameStateId", async (req, res) => {
     try {
       const gameStateId = parseInt(req.params.gameStateId);

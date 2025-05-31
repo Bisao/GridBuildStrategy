@@ -24,8 +24,11 @@ interface GameState {
   viewingNPCId: string | null;
   createdNPCs: CreatedNPC[];
   currentGameStateId: number | null;
+  currentGameStateName: string | null;
   isSaving: boolean;
   isLoading: boolean;
+  autoSaveEnabled: boolean;
+  lastSaveTime: string | null;
 
   // Actions
   setSelectedStructure: (structure: string | null) => void;
@@ -45,9 +48,13 @@ interface GameState {
   
   // Persistence actions
   saveGame: (name: string, structures: any[]) => Promise<void>;
+  updateCurrentSave: (structures: any[]) => Promise<void>;
+  autoSave: (structures: any[]) => Promise<void>;
   loadGame: (gameStateId: number) => Promise<void>;
   getGameStates: () => Promise<any[]>;
   setCurrentGameStateId: (id: number | null) => void;
+  setCurrentGameStateName: (name: string | null) => void;
+  setAutoSaveEnabled: (enabled: boolean) => void;
 }
 
 export const useGameState = create<GameState>()(
@@ -64,8 +71,11 @@ export const useGameState = create<GameState>()(
     viewingNPCId: null,
     createdNPCs: [],
     currentGameStateId: null,
+    currentGameStateName: null,
     isSaving: false,
     isLoading: false,
+    autoSaveEnabled: true,
+    lastSaveTime: null,
 
     setSelectedStructure: (structure) => {
       set({ 
@@ -144,6 +154,69 @@ export const useGameState = create<GameState>()(
       set({ currentGameStateId: id });
     },
 
+    setCurrentGameStateName: (name) => {
+      set({ currentGameStateName: name });
+    },
+
+    setAutoSaveEnabled: (enabled) => {
+      set({ autoSaveEnabled: enabled });
+    },
+
+    updateCurrentSave: async (structures) => {
+      const state = get();
+      if (!state.currentGameStateId || !state.currentGameStateName) {
+        console.warn('Nenhum save atual para atualizar');
+        return;
+      }
+
+      set({ isSaving: true });
+      try {
+        const gameData = {
+          userId: 1,
+          name: state.currentGameStateName,
+          structures,
+          npcs: state.createdNPCs,
+          gameState: {
+            selectedStructure: state.selectedStructure,
+            createdNPCs: state.createdNPCs
+          }
+        };
+
+        const response = await fetch(`/api/update-game/${state.currentGameStateId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(gameData),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update game');
+        }
+
+        set({ lastSaveTime: new Date().toISOString() });
+        console.log('Save atualizado automaticamente!');
+      } catch (error) {
+        console.error('Erro ao atualizar save:', error);
+        throw error;
+      } finally {
+        set({ isSaving: false });
+      }
+    },
+
+    autoSave: async (structures) => {
+      const state = get();
+      if (!state.autoSaveEnabled) return;
+
+      if (state.currentGameStateId && state.currentGameStateName) {
+        await state.updateCurrentSave(structures);
+      } else {
+        // Se não há save atual, criar um novo com nome automático
+        const autoSaveName = `AutoSave_${new Date().toLocaleString('pt-BR').replace(/[\/,:]/g, '-')}`;
+        await state.saveGame(autoSaveName, structures);
+      }
+    },
+
     saveGame: async (name, structures) => {
       set({ isSaving: true });
       try {
@@ -172,7 +245,11 @@ export const useGameState = create<GameState>()(
         }
 
         const result = await response.json();
-        set({ currentGameStateId: result.gameState.id });
+        set({ 
+          currentGameStateId: result.gameState.id,
+          currentGameStateName: name,
+          lastSaveTime: new Date().toISOString()
+        });
         console.log('Jogo salvo com sucesso!', result);
       } catch (error) {
         console.error('Erro ao salvar jogo:', error);
@@ -207,8 +284,10 @@ export const useGameState = create<GameState>()(
         set({
           createdNPCs: loadedNPCs,
           currentGameStateId: gameStateId,
+          currentGameStateName: result.gameState.name,
           selectedStructure: null,
-          isPlacementMode: false
+          isPlacementMode: false,
+          lastSaveTime: result.gameState.updatedAt
         });
 
         console.log('Jogo carregado com sucesso!', result);

@@ -57,23 +57,40 @@ export const useGridPlacement = () => {
       const newStructure: PlacedStructure = {
         id: `${structureType}-${Date.now()}-${Math.random()}`,
         type: structureType,
-        x,
-        z,
+        x: x,
+        z: z,
         rotation: previewRotation
       };
 
-      setPlacedStructures(prev => [...prev, newStructure]);
+      const updatedStructures = [...placedStructures, newStructure];
+      setPlacedStructures(updatedStructures);
       console.log(`Placed ${structureType} at (${x}, ${z}) with rotation ${previewRotation}`);
+
+      // Auto-save after placing structure
+      setTimeout(() => {
+        autoSave(updatedStructures).catch(error => {
+          console.error('Erro no auto-save:', error);
+        });
+      }, 500);
+
       return true;
     } else {
       console.log(`Cannot place structure at (${x}, ${z}) - position occupied`);
       return false;
     }
-  }, [previewPosition, canPlaceStructure, previewRotation]);
+  }, [previewPosition, canPlaceStructure, previewRotation, placedStructures]);
 
   const rotatePreview = useCallback(() => {
     setPreviewRotation(prev => (prev + 90) % 360);
   }, []);
+
+  // Dummy autoSave function - replace with your actual implementation
+  const autoSave = async (structures: PlacedStructure[]) => {
+    console.log('Auto-saving structures:', structures);
+    // Here you would make an API call to save the structures to your backend
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call delay
+    console.log('Auto-save complete.');
+  };
 
   return {
     placedStructures,

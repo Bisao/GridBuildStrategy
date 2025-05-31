@@ -13,7 +13,19 @@ interface SaveLoadPanelProps {
 }
 
 export default function SaveLoadPanel({ isOpen, onClose, structures }: SaveLoadPanelProps) {
-  const { saveGame, loadGame, getGameStates, isSaving, isLoading, currentGameStateId } = useGameState();
+  const { 
+    saveGame, 
+    updateCurrentSave, 
+    loadGame, 
+    getGameStates, 
+    isSaving, 
+    isLoading, 
+    currentGameStateId, 
+    currentGameStateName,
+    autoSaveEnabled,
+    setAutoSaveEnabled,
+    lastSaveTime
+  } = useGameState();
   const [saveName, setSaveName] = useState('');
   const [gameStates, setGameStates] = useState<any[]>([]);
   const [isLoadingStates, setIsLoadingStates] = useState(false);
@@ -49,6 +61,23 @@ export default function SaveLoadPanel({ isOpen, onClose, structures }: SaveLoadP
       alert('Jogo salvo com sucesso!');
     } catch (error) {
       alert('Erro ao salvar o jogo');
+    }
+  };
+
+  const handleUpdateCurrentSave = async () => {
+    if (!currentGameStateId || !currentGameStateName) {
+      alert('Nenhum save atual para atualizar');
+      return;
+    }
+
+    if (confirm(`Atualizar o save "${currentGameStateName}"?`)) {
+      try {
+        await updateCurrentSave(structures);
+        await loadGameStates(); // Reload the list
+        alert('Save atualizado com sucesso!');
+      } catch (error) {
+        alert('Erro ao atualizar o save');
+      }
     }
   };
 
@@ -92,12 +121,36 @@ export default function SaveLoadPanel({ isOpen, onClose, structures }: SaveLoadP
         <CardContent className="space-y-4 overflow-y-auto max-h-[60vh]">
           {/* Save Section */}
           <div className="space-y-3">
-            <h3 className="font-medium text-green-400">Salvar Jogo Atual</h3>
+            <h3 className="font-medium text-green-400">Salvar Jogo</h3>
+            
+            {/* Update Current Save */}
+            {currentGameStateId && currentGameStateName && (
+              <div className="p-3 bg-blue-900/20 border border-blue-600 rounded">
+                <div className="text-sm font-medium text-blue-300 mb-2">
+                  Save Atual: {currentGameStateName}
+                </div>
+                <Button
+                  onClick={handleUpdateCurrentSave}
+                  disabled={isSaving}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  size="sm"
+                >
+                  {isSaving ? 'Salvando...' : 'Atualizar Save Atual'}
+                </Button>
+                {lastSaveTime && (
+                  <div className="text-xs text-gray-400 mt-1">
+                    Último save: {new Date(lastSaveTime).toLocaleString('pt-BR')}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Create New Save */}
             <div className="flex gap-2">
               <Input
                 value={saveName}
                 onChange={(e) => setSaveName(e.target.value)}
-                placeholder="Nome do save..."
+                placeholder="Nome do novo save..."
                 className="bg-gray-700 border-gray-600 text-white"
                 maxLength={50}
               />
@@ -109,6 +162,23 @@ export default function SaveLoadPanel({ isOpen, onClose, structures }: SaveLoadP
                 {isSaving ? '...' : <Save size={16} />}
               </Button>
             </div>
+
+            {/* Auto-save Settings */}
+            <div className="p-2 bg-gray-700/30 rounded text-xs">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={autoSaveEnabled}
+                  onChange={(e) => setAutoSaveEnabled(e.target.checked)}
+                  className="rounded"
+                />
+                <span className="text-gray-300">Auto-save ativo</span>
+              </label>
+              <div className="text-gray-400 mt-1">
+                Salva automaticamente ao posicionar estruturas
+              </div>
+            </div>
+
             <div className="text-xs text-gray-400">
               Estruturas: {structures.length} | NPCs: {useGameState.getState().createdNPCs.length}
             </div>

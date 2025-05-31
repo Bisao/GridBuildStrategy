@@ -43,7 +43,22 @@ function App() {
 
   const [isMobile, setIsMobile] = useState(false);
   const { placedStructures } = useGridPlacement();
+  const { autoSave, autoSaveEnabled, createdNPCs } = useGameState();
 
+  // Periodic auto-save every 2 minutes
+  useEffect(() => {
+    if (!autoSaveEnabled) return;
+
+    const autoSaveInterval = setInterval(() => {
+      if (placedStructures.length > 0 || createdNPCs.length > 0) {
+        autoSave(placedStructures).catch(error => {
+          console.error('Erro no auto-save periódico:', error);
+        });
+      }
+    }, 120000); // 2 minutes
+
+    return () => clearInterval(autoSaveInterval);
+  }, [autoSave, autoSaveEnabled, placedStructures, createdNPCs]);
 
   useEffect(() => {
     const checkIsMobile = () => {
