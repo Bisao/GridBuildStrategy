@@ -5,6 +5,7 @@ import "@fontsource/inter";
 import "./index.css";
 import Game from "./components/Game";
 import StructurePanel from "./components/StructurePanel";
+import NPCPanel from "./components/NPCPanel";
 import { useGameState } from "./lib/stores/useGameState";
 
 const queryClient = new QueryClient({
@@ -18,7 +19,18 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const { selectedStructure, setSelectedStructure } = useGameState();
+  const { 
+    selectedStructure, 
+    setSelectedStructure, 
+    selectedHouse, 
+    isNPCPanelOpen, 
+    setNPCPanelOpen 
+  } = useGameState();
+
+  const handleCreateNPC = () => {
+    console.log(`Creating NPC for house at (${selectedHouse?.x}, ${selectedHouse?.z})`);
+    // TODO: Implement NPC creation logic
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -62,6 +74,13 @@ function App() {
         <StructurePanel 
           selectedStructure={selectedStructure}
           onSelectStructure={setSelectedStructure}
+        />
+        
+        <NPCPanel
+          isOpen={isNPCPanelOpen}
+          housePosition={selectedHouse}
+          onClose={() => setNPCPanelOpen(false)}
+          onCreateNPC={handleCreateNPC}
         />
       </div>
     </QueryClientProvider>

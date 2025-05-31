@@ -73,7 +73,12 @@ const Game = () => {
       {/* Placed Structures */}
       {placedStructures.map((structure) => (
         <group key={structure.id} position={[structure.x, 0, structure.z]}>
-          {structure.type === 'house' && <House />}
+          {structure.type === 'house' && (
+            <House 
+              position={{ x: structure.x, z: structure.z }}
+              onHouseClick={handleHouseClick}
+            />
+          )}
         </group>
       ))}
 
