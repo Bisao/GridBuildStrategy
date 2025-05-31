@@ -5,7 +5,7 @@ interface NPCControlIndicatorProps {
   onStopControl: () => void;
 }
 
-export const NPCControlIndicator: React.FC<NPCControlIndicatorProps> = ({ npcName, onStopControl }) => {
+export default function NPCControlIndicator({ npcName, onStopControl }: NPCControlIndicatorProps) {
   // Component disabled - return null to hide the dialog
   return null;
-};
+}
