@@ -199,7 +199,7 @@ const Game = () => {
           key={npc.id}
           position={[npc.position.x, 0, npc.position.z]}
           color="#8B4513"
-          animation="idle"
+          animation={npc.animation || "idle"}
         />
       ))}
 

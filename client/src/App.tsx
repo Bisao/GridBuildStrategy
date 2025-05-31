@@ -6,6 +6,8 @@ import "./index.css";
 import Game from "./components/Game";
 import StructurePanel from "./components/StructurePanel";
 import NPCPanel from "./components/NPCPanel";
+import NPCConfigPanel from "./components/NPCConfigPanel";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useGameState } from "./lib/stores/useGameState";
 
 const queryClient = new QueryClient({
@@ -36,16 +38,16 @@ function App() {
     const checkIsMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkIsMobile();
     window.addEventListener('resize', checkIsMobile);
-    
+
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
   const handleCreateNPC = (name: string, structureId: string) => {
     if (!selectedHouse) return;
-    
+
     const newNPC = {
       id: `npc-${Date.now()}-${Math.random()}`,
       name,
@@ -53,7 +55,7 @@ function App() {
       position: { x: selectedHouse.x, z: selectedHouse.z },
       type: "villager" as const
     };
-    
+
     console.log(`Criando NPC "${name}" vinculado à estrutura ${structureId} na posição (${selectedHouse.x}, ${selectedHouse.z})`);
     addNPC(newNPC);
     setNPCPanelOpen(false);
@@ -77,7 +79,7 @@ function App() {
           }}
         >
           <color attach="background" args={["#1a1a2e"]} />
-          
+
           {/* Lighting setup */}
           <ambientLight intensity={0.4} />
           <directionalLight
@@ -105,13 +107,14 @@ function App() {
           isOpen={isStructurePanelOpen}
           onToggle={() => setStructurePanelOpen(!isStructurePanelOpen)}
         />
-        
+
         <NPCPanel
           isOpen={isNPCPanelOpen}
           housePosition={selectedHouse}
           onClose={() => setNPCPanelOpen(false)}
           onCreateNPC={handleCreateNPC}
         />
+         <NPCConfigPanel />
       </div>
     </QueryClientProvider>
   );

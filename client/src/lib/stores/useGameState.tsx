@@ -16,8 +16,10 @@ interface GameState {
   isNPCPanelOpen: boolean;
   isNPCCreationOpen: boolean;
   isStructurePanelOpen: boolean;
+  isNPCConfigPanelOpen: boolean;
+  selectedNPCId: string | null;
   createdNPCs: CreatedNPC[];
-  
+
   // Actions
   setSelectedStructure: (structure: string | null) => void;
   setPlacementMode: (mode: boolean) => void;
@@ -25,7 +27,10 @@ interface GameState {
   setNPCPanelOpen: (open: boolean) => void;
   setNPCCreationOpen: (open: boolean) => void;
   setStructurePanelOpen: (open: boolean) => void;
+  setNPCConfigPanelOpen: (open: boolean) => void;
+  setSelectedNPCId: (npcId: string | null) => void;
   addNPC: (npc: CreatedNPC) => void;
+  updateNPC: (npcId: string, updates: Partial<CreatedNPC>) => void;
   removeNPC: (npcId: string) => void;
   getNPCsByStructure: (structureId: string) => CreatedNPC[];
 }
@@ -38,8 +43,10 @@ export const useGameState = create<GameState>()(
     isNPCPanelOpen: false,
     isNPCCreationOpen: false,
     isStructurePanelOpen: true,
+    isNPCConfigPanelOpen: false,
+    selectedNPCId: null,
     createdNPCs: [],
-    
+
     setSelectedStructure: (structure) => {
       set({ 
         selectedStructure: structure,
@@ -47,26 +54,26 @@ export const useGameState = create<GameState>()(
       });
       console.log(`Selected structure: ${structure || 'none'}`);
     },
-    
+
     setPlacementMode: (mode) => {
       set({ isPlacementMode: mode });
       if (!mode) {
         set({ selectedStructure: null });
       }
     },
-    
+
     setSelectedHouse: (house) => {
       set({ selectedHouse: house });
       console.log(`Selected house: ${house ? `(${house.x}, ${house.z}) ID: ${house.id}` : 'none'}`);
     },
-    
+
     setNPCPanelOpen: (open) => {
       set({ isNPCPanelOpen: open });
       if (!open) {
         set({ selectedHouse: null, isNPCCreationOpen: false });
       }
     },
-    
+
     setStructurePanelOpen: (open) => {
       set({ isStructurePanelOpen: open });
     },
@@ -74,12 +81,24 @@ export const useGameState = create<GameState>()(
     setNPCCreationOpen: (open) => {
       set({ isNPCCreationOpen: open });
     },
+    setNPCConfigPanelOpen: (open) => set({ isNPCConfigPanelOpen: open }),
+    setSelectedNPCId: (npcId) => set({ selectedNPCId: npcId }),
 
     addNPC: (npc) => {
       set((state) => ({
-        createdNPCs: [...state.createdNPCs, npc]
+        createdNPCs: [...state.createdNPCs, { ...npc, animation: npc.animation || "idle" }]
       }));
       console.log(`NPC "${npc.name}" criado com sucesso na estrutura ${npc.structureId}`);
+    },
+
+    updateNPC: (npcId, updates) => {
+      set((state) => ({
+        createdNPCs: state.createdNPCs.map(npc => 
+          npc.id === npcId 
+            ? { ...npc, ...updates }
+            : npc
+        )
+      }));
     },
 
     removeNPC: (npcId) => {

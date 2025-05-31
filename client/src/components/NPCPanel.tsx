@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { X, Plus, User } from "lucide-react";
+import { X, Plus, User, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useGameState } from "../lib/stores/useGameState";
 
@@ -10,13 +10,15 @@ interface NPCPanelProps {
   housePosition: { x: number; z: number; id: string } | null;
   onClose: () => void;
   onCreateNPC: (name: string, structureId: string) => void;
+  onConfigureNPC: (npcId: string) => void;
 }
 
 export default function NPCPanel({ 
   isOpen, 
   housePosition, 
   onClose, 
-  onCreateNPC 
+  onCreateNPC,
+  onConfigureNPC 
 }: NPCPanelProps) {
   const { isNPCCreationOpen, setNPCCreationOpen, getNPCsByStructure } = useGameState();
   const [npcName, setNpcName] = useState("");
@@ -128,9 +130,19 @@ export default function NPCPanel({
                   <div className="mt-2">
                     <div className="font-medium mb-1">NPCs na estrutura:</div>
                     {structureNPCs.map((npc) => (
-                      <div key={npc.id} className="flex items-center gap-2 ml-2">
-                        <User size={12} />
-                        <span>{npc.name} ({npc.type})</span>
+                      <div key={npc.id} className="flex items-center justify-between gap-2 ml-2 p-1 rounded hover:bg-gray-600/30">
+                        <div className="flex items-center gap-2">
+                          <User size={12} />
+                          <span>{npc.name} ({npc.type})</span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onConfigureNPC(npc.id)}
+                          className="h-6 w-6 p-0 text-gray-400 hover:text-white"
+                        >
+                          <Settings size={12} />
+                        </Button>
                       </div>
                     ))}
                   </div>
