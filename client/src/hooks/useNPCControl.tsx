@@ -53,6 +53,9 @@ export const useNPCControl = () => {
       }
     };
 
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return;
+
     canvas.addEventListener('click', handleClick);
     return () => canvas.removeEventListener('click', handleClick);
   }, [controlledNPCId, camera]);
