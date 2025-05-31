@@ -7,7 +7,7 @@ interface NPCPanelProps {
   isOpen: boolean;
   housePosition: { x: number; z: number } | null;
   onClose: () => void;
-  onCreateNPC: () => void;
+  onCreateNPC: (type: 'villager' | 'guard' | 'merchant' | 'farmer') => void;
 }
 
 export default function NPCPanel({ 
@@ -56,16 +56,39 @@ export default function NPCPanel({
             Gerencie esta casa e seus NPCs
           </div>
 
-          <Button
-            className="w-full h-16 flex flex-col items-center justify-center gap-2 bg-green-600 hover:bg-green-700 border-green-500 text-white"
-            onClick={onCreateNPC}
-          >
-            <User size={24} />
-            <div className="text-center">
-              <div className="font-medium">Criar NPC</div>
-              <div className="text-xs opacity-75">Adicionar habitante à casa</div>
-            </div>
-          </Button>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              className="h-20 flex flex-col items-center justify-center gap-1 bg-green-600 hover:bg-green-700 text-white text-xs"
+              onClick={() => onCreateNPC('villager')}
+            >
+              <User size={20} />
+              <span>Aldeão</span>
+            </Button>
+            
+            <Button
+              className="h-20 flex flex-col items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs"
+              onClick={() => onCreateNPC('guard')}
+            >
+              <User size={20} />
+              <span>Guarda</span>
+            </Button>
+            
+            <Button
+              className="h-20 flex flex-col items-center justify-center gap-1 bg-purple-600 hover:bg-purple-700 text-white text-xs"
+              onClick={() => onCreateNPC('merchant')}
+            >
+              <User size={20} />
+              <span>Mercador</span>
+            </Button>
+            
+            <Button
+              className="h-20 flex flex-col items-center justify-center gap-1 bg-yellow-600 hover:bg-yellow-700 text-white text-xs"
+              onClick={() => onCreateNPC('farmer')}
+            >
+              <User size={20} />
+              <span>Fazendeiro</span>
+            </Button>
+          </div>
 
           <div className="p-3 bg-gray-700/50 rounded text-sm text-gray-300">
             <div className="font-medium mb-1">Informações da Casa:</div>

@@ -40,9 +40,9 @@ function App() {
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
-  const handleCreateNPC = () => {
-    console.log(`Creating NPC for house at (${selectedHouse?.x}, ${selectedHouse?.z})`);
-    // TODO: Implement NPC creation logic
+  const handleCreateNPC = (type: 'villager' | 'guard' | 'merchant' | 'farmer') => {
+    console.log(`Creating ${type} NPC for house at (${selectedHouse?.x}, ${selectedHouse?.z})`);
+    // TODO: Implement NPC creation logic with type
   };
 
   return (
