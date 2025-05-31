@@ -16,7 +16,7 @@ export default function NPCControlIndicator() {
           Controlando: {controlledNPC?.name || 'NPC'}
         </span>
         <span className="text-sm opacity-75">
-          (WASD: mover, Botão direito: atacar, ESC: parar)
+          (NPC olha para o cursor, WASD para mover, ESC para parar)
         </span>
         <button
           onClick={() => setControlledNPCId(null)}

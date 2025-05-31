@@ -111,11 +111,6 @@ const Game = () => {
     }
   };
 
-  const npcColors = {
-    villager: "#8B4513",
-    guard: "#ADD8E6",
-  };
-
   return (
     <>
       {/* Camera Controls */}
@@ -216,17 +211,14 @@ const Game = () => {
 
       {/* Render created NPCs */}
       {createdNPCs.map((npc) => (
-            <NPC
-              key={npc.id}
-              position={[npc.position.x, 0, npc.position.z]}
-              color={npcColors[npc.type]}
-              animation={npc.animation}
-              rotation={npc.rotation}
-              hp={npc.hp}
-              maxHp={npc.maxHp}
-              isDead={npc.isDead}
-            />
-          ))}
+        <NPC
+          key={npc.id}
+          position={[npc.position.x, 0, npc.position.z]}
+          color={npc.id === controlledNPCId ? "#FF6B6B" : "#8B4513"}
+          animation={npc.animation || "idle"}
+          rotation={npc.rotation || 0}
+        />
+      ))}
 
     </>
   );

@@ -8,11 +8,7 @@ interface CreatedNPC {
   position: { x: number; z: number };
   type: "villager" | "guard" | "merchant" | "farmer";
   rotation?: number;
-  animation?: "idle" | "walk" | "attack" | "hurt" | "death";
-  hp?: number;
-  maxHp?: number;
-  isInCombat?: boolean;
-  isDead?: boolean;
+  animation?: "idle" | "walk";
 }
 
 interface GameState {
@@ -106,16 +102,8 @@ export const useGameState = create<GameState>()(
     },
 
     addNPC: (npc) => {
-      const maxHp = npc.type === "guard" ? 150 : 100;
       set((state) => ({
-        createdNPCs: [...state.createdNPCs, { 
-          ...npc, 
-          animation: npc.animation || "idle",
-          hp: maxHp,
-          maxHp: maxHp,
-          isInCombat: false,
-          isDead: false
-        }]
+        createdNPCs: [...state.createdNPCs, { ...npc, animation: npc.animation || "idle" }]
       }));
       console.log(`NPC "${npc.name}" criado com sucesso na estrutura ${npc.structureId}`);
     },

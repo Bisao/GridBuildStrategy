@@ -15,8 +15,6 @@ export const useNPCControl = () => {
   const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
   const [screenMousePosition, setScreenMousePosition] = useState(new THREE.Vector2());
   const lastUpdateTime = useRef(Date.now());
-  const [isAttacking, setIsAttacking] = useState(false);
-  const attackCooldown = useRef(0);
 
   // Handle keyboard input
   useEffect(() => {
@@ -60,70 +58,9 @@ export const useNPCControl = () => {
       setScreenMousePosition(new THREE.Vector2(mouseX, mouseY));
     };
 
-    const handleRightClick = (event: MouseEvent) => {
-      event.preventDefault();
-      
-      if (attackCooldown.current <= 0) {
-        setIsAttacking(true);
-        attackCooldown.current = 1.0; // 1 segundo de cooldown
-        
-        // Atacar NPCs próximos
-        performAttack();
-        
-        setTimeout(() => setIsAttacking(false), 500);
-      }
-    };
-
     document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('contextmenu', handleRightClick);
-    
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('contextmenu', handleRightClick);
-    };
+    return () => document.removeEventListener('mousemove', handleMouseMove);
   }, [controlledNPCId]);
-
-  const performAttack = () => {
-    const controlledNPC = createdNPCs.find(npc => npc.id === controlledNPCId);
-    if (!controlledNPC || controlledNPC.isDead) return;
-
-    const attackRange = 2.0;
-    const damage = controlledNPC.type === "guard" ? 30 : 20;
-
-    // Encontrar NPCs próximos para atacar
-    const nearbyNPCs = createdNPCs.filter(npc => {
-      if (npc.id === controlledNPCId || npc.isDead) return false;
-      
-      const distance = Math.sqrt(
-        Math.pow(npc.position.x - controlledNPC.position.x, 2) + 
-        Math.pow(npc.position.z - controlledNPC.position.z, 2)
-      );
-      
-      return distance <= attackRange;
-    });
-
-    // Atacar o NPC mais próximo
-    if (nearbyNPCs.length > 0) {
-      const target = nearbyNPCs[0];
-      const newHp = Math.max(0, (target.hp || 0) - damage);
-      
-      updateNPC(target.id, {
-        hp: newHp,
-        animation: newHp > 0 ? 'hurt' : 'death',
-        isInCombat: newHp > 0,
-        isDead: newHp <= 0
-      });
-
-      console.log(`${controlledNPC.name} atacou ${target.name} causando ${damage} de dano!`);
-      
-      // Voltar para idle após ser ferido
-      if (newHp > 0) {
-        setTimeout(() => {
-          updateNPC(target.id, { animation: 'idle' });
-        }, 1000);
-      }
-    }
-  };
 
   // Update NPC position and rotation
   useFrame(({ camera, size }) => {
@@ -180,29 +117,16 @@ export const useNPCControl = () => {
       isMoving = true;
     }
 
-    // Update attack cooldown
-    if (attackCooldown.current > 0) {
-      attackCooldown.current -= deltaTime;
-    }
-
     // Update NPC position and animation
     const newPosition = {
       x: controlledNPC.position.x + movement.x,
       z: controlledNPC.position.z + movement.z
     };
 
-    // Determinar animação baseada no estado
-    let currentAnimation = 'idle';
-    if (isAttacking) {
-      currentAnimation = 'attack';
-    } else if (isMoving) {
-      currentAnimation = 'walk';
-    }
-
     // Always update NPC to look at cursor position
     updateNPC(controlledNPCId, {
       position: newPosition,
-      animation: currentAnimation,
+      animation: isMoving ? 'walk' : 'idle',
       rotation: rotationY
     });
 

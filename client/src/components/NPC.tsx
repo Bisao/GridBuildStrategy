@@ -1,3 +1,4 @@
+
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
@@ -5,7 +6,7 @@ import * as THREE from "three";
 interface NPCProps {
   position: [number, number, number];
   color?: string;
-  animation?: "idle" | "walk" | "attack" | "hurt" | "death";
+  animation?: "idle" | "walk";
   rotation?: number;
 }
 
@@ -28,15 +29,13 @@ export default function NPC({ position, color = "#8B4513", animation = "idle", r
       if (headRef.current) {
         headRef.current.position.y = 1.6 + Math.sin(time * 2) * 0.02;
       }
-
+      
       // Slight arm sway
       if (leftArmRef.current) {
         leftArmRef.current.rotation.z = Math.sin(time * 1.5) * 0.1;
-        leftArmRef.current.rotation.x = 0;
       }
       if (rightArmRef.current) {
         rightArmRef.current.rotation.z = -Math.sin(time * 1.5) * 0.1;
-        rightArmRef.current.rotation.x = 0;
       }
     } else if (animation === "walk") {
       // Walking animation
@@ -44,43 +43,14 @@ export default function NPC({ position, color = "#8B4513", animation = "idle", r
         leftArmRef.current.rotation.x = Math.sin(time * 4) * 0.5;
         rightArmRef.current.rotation.x = -Math.sin(time * 4) * 0.5;
       }
-
+      
       if (leftLegRef.current && rightLegRef.current) {
         leftLegRef.current.rotation.x = Math.sin(time * 4) * 0.3;
         rightLegRef.current.rotation.x = -Math.sin(time * 4) * 0.3;
       }
-
+      
       // Bob up and down while walking
       groupRef.current.position.y = position[1] + Math.abs(Math.sin(time * 8)) * 0.05;
-    } else if (animation === "attack") {
-      // Attack animation - swing arms forward
-      if (leftArmRef.current && rightArmRef.current) {
-        const attackProgress = Math.sin(time * 8) * 0.5 + 0.5;
-        leftArmRef.current.rotation.x = -Math.PI * 0.4 * attackProgress;
-        rightArmRef.current.rotation.x = -Math.PI * 0.4 * attackProgress;
-      }
-
-      // Slight forward lean
-      groupRef.current.rotation.x = -0.1;
-    } else if (animation === "hurt") {
-      // Hurt animation - recoil backward
-      if (headRef.current) {
-        headRef.current.rotation.x = Math.sin(time * 10) * 0.2;
-      }
-      groupRef.current.position.y = position[1] + Math.sin(time * 12) * 0.1;
-    } else if (animation === "death") {
-      // Death animation - fall to the side
-      groupRef.current.rotation.z = Math.min(Math.PI / 2, time * 2);
-      groupRef.current.position.y = position[1] - 0.5;
-    }
-
-    // Reset rotation for non-death animations
-    if (animation !== "death") {
-      groupRef.current.rotation.x = 0;
-      groupRef.current.rotation.z = 0;
-    }
-    if (animation !== "walk" && animation !== "hurt" && animation !== "death") {
-      groupRef.current.position.y = position[1];
     }
   });
 
