@@ -15,9 +15,6 @@ import Tower from "./structures/Tower";
 import LargeHouse from "./structures/LargeHouse";
 import Blacksmith from "./structures/Blacksmith";
 import Market from "./structures/Market";
-import { useGridPlacement } from "../hooks/useGridPlacement";
-import { useGameState } from "../lib/stores/useGameState";
-import { useNPCControl } from "../hooks/useNPCControl";
 import { useAudio } from "../lib/stores/useAudio";
 
 interface ActiveEffect {
