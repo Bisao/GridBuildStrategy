@@ -3,8 +3,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useGameState } from "../lib/stores/useGameState";
-import { useCombatState } from "../lib/stores/useCombatState";
-import { Sword, Target, Shield, Zap, Heart } from "lucide-react";
+import { Sword, Target, Shield } from "lucide-react";
 
 interface CombatTestPanelProps {
   isOpen: boolean;
@@ -13,26 +12,62 @@ interface CombatTestPanelProps {
 
 export default function CombatTestPanel({ isOpen, onClose }: CombatTestPanelProps) {
   const { enemies, spawnTestEnemy, removeEnemy, controlledNPCId, createdNPCs } = useGameState();
-  const { 
-    combatLog, 
-    playerStats, 
-    takeDamage, 
-    heal, 
-    updatePlayerStats, 
-    resetCooldowns,
-    addToCombatLog 
-  } = useCombatState();
+  const [combatLog, setCombatLog] = useState<string[]>([]);
+
+  const addToCombatLog = (message: string) => {
+    setCombatLog(prev => [...prev.slice(-4), `${new Date().toLocaleTimeString()}: ${message}`]);
+  };
 
   const handleSpawnEnemy = () => {
     spawnTestEnemy();
     addToCombatLog("Inimigo spawnou!");
   };
 
-  const handleSpawnMultipleEnemies = () => {
-    for (let i = 0; i < 3; i++) {
-      setTimeout(() => spawnTestEnemy(), i * 200);
+  const handleAttackNearestEnemy = () => {
+    if (!controlledNPCId) {
+      addToCombatLog("Nenhum NPC controlado!");
+      return;
     }
-    addToCombatLog("3 inimigos spawnaram!");
+
+    // Use the skills system instead of direct attack
+    const executeActiveSkill = (window as any).executeActiveSkill;
+    if (executeActiveSkill) {
+      executeActiveSkill();
+      addToCombatLog("Executou skill ativa!");
+    } else {
+      // Fallback to basic attack
+      const controlledNPC = createdNPCs.find(npc => npc.id === controlledNPCId);
+      if (!controlledNPC) return;
+
+      // Find nearest enemy
+      let nearestEnemy = null;
+      let minDistance = Infinity;
+
+      enemies.forEach(enemy => {
+        const distance = Math.sqrt(
+          Math.pow(enemy.position.x - controlledNPC.position.x, 2) +
+          Math.pow(enemy.position.z - controlledNPC.position.z, 2)
+        );
+        
+        if (distance < minDistance && distance < 2) {
+          minDistance = distance;
+          nearestEnemy = enemy;
+        }
+      });
+
+      if (nearestEnemy) {
+        // Deal damage to enemy
+        const damage = 25 + Math.floor(Math.random() * 25);
+        const takeDamageFunc = (window as any)[`enemy_${nearestEnemy.id}_takeDamage`];
+        
+        if (takeDamageFunc) {
+          takeDamageFunc(damage);
+          addToCombatLog(`${controlledNPC.name} atacou por ${damage} de dano!`);
+        }
+      } else {
+        addToCombatLog("Nenhum inimigo próximo para atacar!");
+      }
+    }
   };
 
   const handleClearAllEnemies = () => {
@@ -40,34 +75,11 @@ export default function CombatTestPanel({ isOpen, onClose }: CombatTestPanelProp
     addToCombatLog("Todos os inimigos foram removidos!");
   };
 
-  const handleTestDamage = () => {
-    takeDamage(20);
-  };
-
-  const handleTestHeal = () => {
-    heal(30);
-  };
-
-  const handleResetCooldowns = () => {
-    resetCooldowns();
-    addToCombatLog("Todos os cooldowns foram resetados!");
-  };
-
-  const handleRestoreResources = () => {
-    updatePlayerStats({
-      health: playerStats.maxHealth,
-      mana: playerStats.maxMana
-    });
-    addToCombatLog("Vida e mana restauradas!");
-  };
-
-  const handleBoostStats = () => {
-    updatePlayerStats({
-      attack: playerStats.attack + 10,
-      defense: playerStats.defense + 5,
-      speed: playerStats.speed + 2
-    });
-    addToCombatLog("Atributos aumentados temporariamente!");
+  const handleSpawnMultipleEnemies = () => {
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => spawnTestEnemy(), i * 200);
+    }
+    addToCombatLog("3 inimigos spawnaram!");
   };
 
   if (!isOpen) return null;
@@ -78,17 +90,17 @@ export default function CombatTestPanel({ isOpen, onClose }: CombatTestPanelProp
         <CardHeader>
           <CardTitle className="text-lg font-bold flex items-center gap-2">
             <Sword size={20} className="text-red-500" />
-            Sistema de Combate
+            Teste de Combate
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="text-sm text-gray-300">
-            Teste o sistema de combate avançado com skills, cooldowns e stats
+            Teste o sistema de combate spawning inimigos e atacando
           </div>
 
-          {/* Enemy Controls */}
+          {/* Spawn Controls */}
           <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-yellow-400">Inimigos:</h3>
+            <h3 className="text-sm font-semibold text-yellow-400">Spawn Inimigos:</h3>
             <div className="grid grid-cols-2 gap-2">
               <Button
                 onClick={handleSpawnEnemy}
@@ -107,93 +119,28 @@ export default function CombatTestPanel({ isOpen, onClose }: CombatTestPanelProp
                 Spawn 3
               </Button>
             </div>
-            <Button
-              onClick={handleClearAllEnemies}
-              className="bg-gray-600 hover:bg-gray-700 text-white w-full"
-              size="sm"
-            >
-              <Shield size={14} className="mr-1" />
-              Limpar Todos
-            </Button>
           </div>
 
-          {/* Player Stats */}
+          {/* Combat Controls */}
           <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-yellow-400">Stats do Jogador:</h3>
-            <div className="text-xs space-y-1 bg-gray-900/50 p-2 rounded">
-              <div className="flex justify-between">
-                <span>❤️ Vida:</span>
-                <span className="text-red-400">{playerStats.health}/{playerStats.maxHealth}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>💙 Mana:</span>
-                <span className="text-blue-400">{playerStats.mana}/{playerStats.maxMana}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>⚔️ Ataque:</span>
-                <span className="text-orange-400">{playerStats.attack}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>🛡️ Defesa:</span>
-                <span className="text-green-400">{playerStats.defense}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>⚡ Velocidade:</span>
-                <span className="text-purple-400">{playerStats.speed}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Combat Testing */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-yellow-400">Testes de Combate:</h3>
+            <h3 className="text-sm font-semibold text-yellow-400">Combate:</h3>
             <div className="grid grid-cols-2 gap-2">
               <Button
-                onClick={handleTestDamage}
-                className="bg-red-600 hover:bg-red-700 text-white"
+                onClick={handleAttackNearestEnemy}
+                className="bg-orange-600 hover:bg-orange-700 text-white"
                 size="sm"
+                disabled={!controlledNPCId}
               >
                 <Sword size={14} className="mr-1" />
-                Dano -20
+                Atacar
               </Button>
               <Button
-                onClick={handleTestHeal}
-                className="bg-green-600 hover:bg-green-700 text-white"
+                onClick={handleClearAllEnemies}
+                className="bg-gray-600 hover:bg-gray-700 text-white"
                 size="sm"
               >
-                <Heart size={14} className="mr-1" />
-                Cura +30
-              </Button>
-            </div>
-          </div>
-
-          {/* Utility Functions */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-yellow-400">Utilitários:</h3>
-            <div className="space-y-1">
-              <Button
-                onClick={handleRestoreResources}
-                className="bg-blue-600 hover:bg-blue-700 text-white w-full"
-                size="sm"
-              >
-                <Heart size={14} className="mr-1" />
-                Restaurar Vida/Mana
-              </Button>
-              <Button
-                onClick={handleResetCooldowns}
-                className="bg-purple-600 hover:bg-purple-700 text-white w-full"
-                size="sm"
-              >
-                <Zap size={14} className="mr-1" />
-                Reset Cooldowns
-              </Button>
-              <Button
-                onClick={handleBoostStats}
-                className="bg-yellow-600 hover:bg-yellow-700 text-white w-full"
-                size="sm"
-              >
-                <Sword size={14} className="mr-1" />
-                Boost Stats
+                <Shield size={14} className="mr-1" />
+                Limpar
               </Button>
             </div>
           </div>
@@ -210,11 +157,11 @@ export default function CombatTestPanel({ isOpen, onClose }: CombatTestPanelProp
           {/* Combat Log */}
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-yellow-400">Log de Combate:</h3>
-            <div className="bg-gray-900/50 p-2 rounded text-xs max-h-24 overflow-y-auto">
+            <div className="bg-gray-900/50 p-2 rounded text-xs max-h-20 overflow-y-auto">
               {combatLog.length === 0 ? (
                 <div className="text-gray-500">Nenhuma ação ainda...</div>
               ) : (
-                combatLog.slice(-5).map((log, index) => (
+                combatLog.map((log, index) => (
                   <div key={index} className="text-gray-300">
                     {log}
                   </div>
@@ -225,10 +172,11 @@ export default function CombatTestPanel({ isOpen, onClose }: CombatTestPanelProp
 
           {/* Instructions */}
           <div className="text-xs text-gray-400 border-t border-gray-600 pt-2">
-            <div>• Use as teclas Q-P para habilidades</div>
-            <div>• Diferentes tipos: Dano, Cura, Buff, Debuff</div>
-            <div>• Sistema de cooldown e mana</div>
-            <div>• Alcance das habilidades varia</div>
+            <div>• Controle um NPC primeiro</div>
+            <div>• Spawne inimigos para testar</div>
+            <div>• Use skills (1-5) para combate</div>
+            <div>• Inimigos perseguem NPCs controlados</div>
+            <div>• Skills têm cooldown e efeitos únicos</div>
           </div>
 
           <Button
