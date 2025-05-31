@@ -124,6 +124,12 @@ export default function SkillsBar() {
         if (takeDamageFunc) {
           takeDamageFunc(damage);
           console.log(`${npc.name} usou ${skill.name} e causou ${damage} de dano!`);
+          
+          // Create visual effect at enemy position
+          const createEffect = (window as any).createSkillEffect;
+          if (createEffect) {
+            createEffect(enemyPos, skill.id);
+          }
         }
       }
     });
@@ -132,19 +138,37 @@ export default function SkillsBar() {
   const executeHealSkill = (skill: any, npc: any) => {
     const healAmount = skill.healAmount || 40;
     console.log(`${npc.name} se curou em ${healAmount} pontos de vida!`);
-    // Aqui você implementaria a lógica de cura no NPC
+    
+    // Create visual effect at NPC position
+    const createEffect = (window as any).createSkillEffect;
+    if (createEffect) {
+      const npcPos = new THREE.Vector3(npc.position.x, 0, npc.position.z);
+      createEffect(npcPos, skill.id);
+    }
   };
 
   const executeUtilitySkill = (skill: any, npc: any, targetPosition?: THREE.Vector3) => {
     if (skill.id === 'dash' && targetPosition) {
       console.log(`${npc.name} fez uma investida!`);
-      // Implementar movimento rápido
+      
+      // Create visual effect at NPC position
+      const createEffect = (window as any).createSkillEffect;
+      if (createEffect) {
+        const npcPos = new THREE.Vector3(npc.position.x, 0, npc.position.z);
+        createEffect(npcPos, skill.id);
+      }
     }
   };
 
   const executeDefenseSkill = (skill: any, npc: any, targetPosition?: THREE.Vector3) => {
     console.log(`${npc.name} usou ${skill.name} defensivamente!`);
-    // Implementar efeitos defensivos
+    
+    // Create visual effect at NPC position
+    const createEffect = (window as any).createSkillEffect;
+    if (createEffect) {
+      const npcPos = new THREE.Vector3(npc.position.x, 0, npc.position.z);
+      createEffect(npcPos, skill.id);
+    }
   };
 
   // Function to execute skill on specific enemy
@@ -176,6 +200,12 @@ export default function SkillsBar() {
         if (takeDamageFunc) {
           takeDamageFunc(damage);
           console.log(`${controlledNPC.name} atacou o inimigo com ${basicAttack.name}!`);
+          
+          // Create visual effect at enemy position
+          const createEffect = (window as any).createSkillEffect;
+          if (createEffect) {
+            createEffect(enemyPos, 'basic_attack');
+          }
         }
       }
     } else {

@@ -14,6 +14,7 @@ export default function Enemy({ id, position, onDestroy }: EnemyProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [health, setHealth] = useState(100);
   const [isAttacking, setIsAttacking] = useState(false);
+  const [isSelected, setIsSelected] = useState(false);
   const { createdNPCs, controlledNPCId } = useGameState();
 
   // Simple AI: move towards controlled NPC
@@ -54,13 +55,35 @@ export default function Enemy({ id, position, onDestroy }: EnemyProps) {
     });
   };
 
-  // Expose takeDamage to global for testing
+  // Expose functions to global for testing and targeting
   useEffect(() => {
     (window as any)[`enemy_${id}_takeDamage`] = takeDamage;
+    (window as any)[`enemy_${id}_setSelected`] = setIsSelected;
+    
+    // Add enemy to global enemies array with position reference
+    if (!(window as any).enemies) {
+      (window as any).enemies = [];
+    }
+    
+    const enemyData = { id, position, takeDamage, setSelected: setIsSelected };
+    const existingIndex = (window as any).enemies.findIndex((e: any) => e.id === id);
+    
+    if (existingIndex >= 0) {
+      (window as any).enemies[existingIndex] = enemyData;
+    } else {
+      (window as any).enemies.push(enemyData);
+    }
+    
     return () => {
       delete (window as any)[`enemy_${id}_takeDamage`];
+      delete (window as any)[`enemy_${id}_setSelected`];
+      
+      // Remove from global enemies array
+      if ((window as any).enemies) {
+        (window as any).enemies = (window as any).enemies.filter((e: any) => e.id !== id);
+      }
     };
-  }, [id]);
+  }, [id, position]);
 
   const healthPercent = health / 100;
   const enemyColor = isAttacking ? "#FF4444" : "#8B0000";
@@ -102,6 +125,14 @@ export default function Enemy({ id, position, onDestroy }: EnemyProps) {
           <meshBasicMaterial color={healthPercent > 0.3 ? "#00FF00" : "#FF0000"} side={THREE.DoubleSide} />
         </mesh>
       </group>
+
+      {/* Selection indicator - red circle on ground */}
+      {isSelected && (
+        <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.6, 0.8, 16]} />
+          <meshBasicMaterial color="#FF0000" transparent opacity={0.8} />
+        </mesh>
+      )}
 
       {/* Attack indicator */}
       {isAttacking && (

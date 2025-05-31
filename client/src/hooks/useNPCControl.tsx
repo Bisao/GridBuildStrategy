@@ -8,6 +8,7 @@ export const useNPCControl = () => {
   const { camera } = useThree();
   const [targetPosition, setTargetPosition] = useState<THREE.Vector3 | null>(null);
   const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
+  const [selectedEnemyId, setSelectedEnemyId] = useState<string | null>(null);
   const raycaster = useRef(new THREE.Raycaster());
   const lastUpdateTime = useRef(Date.now());
 
@@ -62,6 +63,17 @@ export const useNPCControl = () => {
       }
 
       if (clickedEnemy) {
+        // Clear previous selection
+        if (selectedEnemyId) {
+          const prevSetSelected = (window as any)[`enemy_${selectedEnemyId}_setSelected`];
+          if (prevSetSelected) prevSetSelected(false);
+        }
+        
+        // Set new selection
+        setSelectedEnemyId(clickedEnemy.id);
+        const setSelected = (window as any)[`enemy_${clickedEnemy.id}_setSelected`];
+        if (setSelected) setSelected(true);
+        
         // Execute attack skill on enemy
         const executeSkillOnEnemy = (window as any).executeSkillOnEnemy;
         if (executeSkillOnEnemy) {
@@ -92,6 +104,13 @@ export const useNPCControl = () => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setTargetPosition(null);
+        
+        // Clear enemy selection
+        if (selectedEnemyId) {
+          const setSelected = (window as any)[`enemy_${selectedEnemyId}_setSelected`];
+          if (setSelected) setSelected(false);
+          setSelectedEnemyId(null);
+        }
       }
     };
 
@@ -171,6 +190,7 @@ export const useNPCControl = () => {
   return {
     isControlling: !!controlledNPCId,
     controlledNPCId,
-    targetPosition
+    targetPosition,
+    selectedEnemyId
   };
 };

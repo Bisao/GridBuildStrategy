@@ -3,8 +3,14 @@ import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import Grid from "./Grid";
 import House from "./House";
-import CameraControls from "./CameraControls";
 import NPC from "./NPC";
+import Enemy from "./Enemy";
+import SkillEffect from "./SkillEffect";
+import CameraControls from "./CameraControls";
+import { useGridPlacement } from "../hooks/useGridPlacement";
+import { useGameState } from "../lib/stores/useGameState";
+import { useNPCControl } from "../hooks/useNPCControl";
+import Enemy from "./Enemy";
 import Windmill from "./structures/Windmill";
 import Tower from "./structures/Tower";
 import LargeHouse from "./structures/LargeHouse";
@@ -13,12 +19,19 @@ import Market from "./structures/Market";
 import { useGridPlacement } from "../hooks/useGridPlacement";
 import { useGameState } from "../lib/stores/useGameState";
 import { useNPCControl } from "../hooks/useNPCControl";
-import Enemy from "./Enemy";
+import { useAudio } from "../lib/stores/useAudio";
+
+interface ActiveEffect {
+  id: string;
+  position: THREE.Vector3;
+  skillType: string;
+}
 
 const Game = () => {
   const { camera, gl } = useThree();
   const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
   const raycaster = useRef(new THREE.Raycaster());
+  const [activeEffects, setActiveEffects] = useState<ActiveEffect[]>([]);
 
   const { 
     selectedStructure, 
@@ -113,6 +126,28 @@ const Game = () => {
       setSelectedHouse({ x: position.x, z: position.z, id: structureClicked.id });
       setNPCPanelOpen(true);
     }
+  };
+
+  useEffect(() => {
+    playSound('background', 0.3, true);
+
+    // Expose effect creation function globally
+    (window as any).createSkillEffect = (position: THREE.Vector3, skillType: string) => {
+      const effectId = `effect_${Date.now()}_${Math.random()}`;
+      setActiveEffects(prev => [...prev, {
+        id: effectId,
+        position: position.clone(),
+        skillType
+      }]);
+    };
+
+    return () => {
+      delete (window as any).createSkillEffect;
+    };
+  }, [playSound]);
+
+  const removeEffect = (effectId: string) => {
+    setActiveEffects(prev => prev.filter(effect => effect.id !== effectId));
   };
 
   return (
@@ -228,13 +263,23 @@ const Game = () => {
 
       {/* Render Enemies */}
       {enemies.map((enemy) => (
-        <Enemy
-          key={enemy.id}
-          id={enemy.id}
-          position={enemy.position}
-          onDestroy={removeEnemy}
-        />
-      ))}
+              <Enemy
+                key={enemy.id}
+                id={enemy.id}
+                position={enemy.position}
+                onDestroy={(id) => removeEnemy(id)}
+              />
+            ))}
+
+            {/* Skill effects */}
+            {activeEffects.map((effect) => (
+              <SkillEffect
+                key={effect.id}
+                position={effect.position}
+                skillType={effect.skillType}
+                onComplete={() => removeEffect(effect.id)}
+              />
+            ))}
 
     </>
   );
