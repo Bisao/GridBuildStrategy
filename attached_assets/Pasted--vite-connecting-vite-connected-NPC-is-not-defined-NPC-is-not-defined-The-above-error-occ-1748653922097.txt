@@ -1,0 +1,29 @@
+[vite] connecting...
+[vite] connected.
+NPC is not defined
+NPC is not defined
+The above error occurred in the <Game> component:
+
+    at Game (https://8b0c9d5c-966e-4696-9cac-cceb6357efcd-00-2s60s4iq9wi60.spock.replit.dev/src/components/Game.tsx:28:26)
+    at Suspense
+    at Suspense
+    at ErrorBoundary (https://8b0c9d5c-966e-4696-9cac-cceb6357efcd-00-2s60s4iq9wi60.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-A3GN3WMN.js?v=22f0335f:16490:5)
+    at FiberProvider (https://8b0c9d5c-966e-4696-9cac-cceb6357efcd-00-2s60s4iq9wi60.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-A3GN3WMN.js?v=22f0335f:18170:21)
+    at Provider (https://8b0c9d5c-966e-4696-9cac-cceb6357efcd-00-2s60s4iq9wi60.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-A3GN3WMN.js?v=22f0335f:17779:3)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+NPC is not defined
+NPC is not defined
+The above error occurred in the <ForwardRef(Canvas)> component:
+
+    at Canvas (https://8b0c9d5c-966e-4696-9cac-cceb6357efcd-00-2s60s4iq9wi60.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-A3GN3WMN.js?v=22f0335f:18236:3)
+    at FiberProvider (https://8b0c9d5c-966e-4696-9cac-cceb6357efcd-00-2s60s4iq9wi60.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-A3GN3WMN.js?v=22f0335f:18170:21)
+    at CanvasWrapper
+    at div
+    at QueryClientProvider (https://8b0c9d5c-966e-4696-9cac-cceb6357efcd-00-2s60s4iq9wi60.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=5b7f35f4:2805:3)
+    at App (https://8b0c9d5c-966e-4696-9cac-cceb6357efcd-00-2s60s4iq9wi60.spock.replit.dev/src/App.tsx?v=dBZ3GpyPZaWkX8dAGE6St:44:7)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+NPC is not defined
+THREE.WebGLRenderer: Context Lost.
