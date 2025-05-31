@@ -12,7 +12,7 @@ interface Skill {
 }
 
 const SkillsBar: React.FC = () => {
-  const { controlledNPCId } = useGameState();
+  const { controlledNPCId, viewingNPCId } = useGameState();
 
   // Skills padrão (pode ser expandido para diferentes tipos de NPC)
   const skills: Skill[] = [
@@ -34,8 +34,9 @@ const SkillsBar: React.FC = () => {
     // Aqui você pode implementar a lógica da habilidade
   };
 
-  // Só mostra a barra se um NPC estiver sendo controlado
-  if (!controlledNPCId) return null;
+  // Só mostra a barra se um NPC estiver sendo controlado pelo jogador
+  // Não mostra durante visualização (viewingNPCId) ou controle de IA
+  if (!controlledNPCId || viewingNPCId) return null;
 
   return (
     <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
