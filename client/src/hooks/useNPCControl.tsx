@@ -97,23 +97,23 @@ export const useNPCControl = () => {
     const lookDirection = cursorWorldPos.clone().sub(npcPos).normalize();
     const rotationY = Math.atan2(lookDirection.x, lookDirection.z);
 
-    const forward = new THREE.Vector3(Math.sin(rotationY), 0, Math.cos(rotationY));
-    const right = new THREE.Vector3(Math.cos(rotationY), 0, -Math.sin(rotationY));
-
+    // Project Zomboid style movement - absolute directions
+    // W = North (positive Z), S = South (negative Z)
+    // A = West (negative X), D = East (positive X)
     if (keys.w) {
-      movement.add(forward.clone().multiplyScalar(speed * deltaTime));
+      movement.z += speed * deltaTime; // Move north
       isMoving = true;
     }
     if (keys.s) {
-      movement.add(forward.clone().multiplyScalar(-speed * deltaTime));
+      movement.z -= speed * deltaTime; // Move south
       isMoving = true;
     }
     if (keys.a) {
-      movement.add(right.clone().multiplyScalar(speed * deltaTime));
+      movement.x -= speed * deltaTime; // Move west
       isMoving = true;
     }
     if (keys.d) {
-      movement.add(right.clone().multiplyScalar(-speed * deltaTime));
+      movement.x += speed * deltaTime; // Move east
       isMoving = true;
     }
 
