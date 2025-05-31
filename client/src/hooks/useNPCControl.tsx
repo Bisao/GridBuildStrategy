@@ -1,59 +1,69 @@
 import { useState, useEffect, useRef } from 'react';
-import *THREE from 'three';
+import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useGameState } from '../lib/stores/useGameState';
 
 export const useNPCControl = () => {
   const { controlledNPCId, updateNPC, createdNPCs } = useGameState();
-  const { camera, gl } = useThree();
-  const [targetPosition, setTargetPosition] = useState<THREE.Vector3 | null>(null);
-  const [isMovingToTarget, setIsMovingToTarget] = useState(false);
+  const { camera } = useThree();
+  const [keys, setKeys] = useState({
+    w: false,
+    a: false,
+    s: false,
+    d: false
+  });
+  const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
+  const [screenMousePosition, setScreenMousePosition] = useState(new THREE.Vector2());
   const lastUpdateTime = useRef(Date.now());
-  const raycaster = useRef(new THREE.Raycaster());
 
-  // Handle mouse clicks for movement (Albion style)
+  // Handle keyboard input
   useEffect(() => {
     if (!controlledNPCId) return;
 
-    const handleMouseClick = (event: MouseEvent) => {
-      // Right click to move
-      if (event.button === 2) {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const key = event.key.toLowerCase();
+      if (['w', 'a', 's', 'd'].includes(key)) {
+        setKeys(prev => ({ ...prev, [key]: true }));
         event.preventDefault();
-
-        // Calculate mouse position in normalized device coordinates
-        const rect = gl.domElement.getBoundingClientRect();
-        const mouse = new THREE.Vector2(
-          ((event.clientX - rect.left) / rect.width) * 2 - 1,
-          -((event.clientY - rect.top) / rect.height) * 2 + 1
-        );
-
-        // Cast ray to find ground intersection
-        raycaster.current.setFromCamera(mouse, camera);
-        const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-        const intersectionPoint = new THREE.Vector3();
-
-        if (raycaster.current.ray.intersectPlane(groundPlane, intersectionPoint)) {
-          setTargetPosition(intersectionPoint.clone());
-          setIsMovingToTarget(true);
-        }
       }
     };
 
-    const handleContextMenu = (event: MouseEvent) => {
-      event.preventDefault(); // Prevent context menu
+    const handleKeyUp = (event: KeyboardEvent) => {
+      const key = event.key.toLowerCase();
+      if (['w', 'a', 's', 'd'].includes(key)) {
+        setKeys(prev => ({ ...prev, [key]: false }));
+        event.preventDefault();
+      }
     };
 
-    gl.domElement.addEventListener('mousedown', handleMouseClick);
-    gl.domElement.addEventListener('contextmenu', handleContextMenu);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
     return () => {
-      gl.domElement.removeEventListener('mousedown', handleMouseClick);
-      gl.domElement.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [controlledNPCId, camera, gl]);
+  }, [controlledNPCId]);
 
-  // Update NPC movement and rotation
-  useFrame(() => {
+  // Handle mouse movement for NPC direction control
+  useEffect(() => {
+    if (!controlledNPCId) return;
+
+    const handleMouseMove = (event: MouseEvent) => {
+      // Get mouse position relative to window
+      const mouseX = event.clientX;
+      const mouseY = event.clientY;
+
+      // Store mouse position for calculating NPC rotation
+      setScreenMousePosition(new THREE.Vector2(mouseX, mouseY));
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => document.removeEventListener('mousemove', handleMouseMove);
+  }, [controlledNPCId]);
+
+  // Update NPC position and rotation
+  useFrame(({ camera, size }) => {
     if (!controlledNPCId) return;
 
     const currentTime = Date.now();
@@ -63,55 +73,74 @@ export const useNPCControl = () => {
     const controlledNPC = createdNPCs.find(npc => npc.id === controlledNPCId);
     if (!controlledNPC) return;
 
-    const currentPos = new THREE.Vector3(controlledNPC.position.x, 0, controlledNPC.position.z);
-    const speed = 3.0;
-    let newPosition = { x: controlledNPC.position.x, z: controlledNPC.position.z };
-    let rotationY = controlledNPC.rotation || 0;
-    let animation = 'idle';
+    const speed = 2.5;
+    let movement = new THREE.Vector3();
+    let isMoving = false;
 
-    // Handle movement to target position (Albion style)
-    if (isMovingToTarget && targetPosition) {
-      const direction = targetPosition.clone().sub(currentPos);
-      const distance = direction.length();
+    // Calculate cursor world position for NPC to look at
+    const mouse = new THREE.Vector2(
+      (screenMousePosition.x / size.width) * 2 - 1,
+      -(screenMousePosition.y / size.height) * 2 + 1
+    );
 
-      if (distance > 0.1) {
-        // Calculate rotation to face movement direction
-        direction.normalize();
-        rotationY = Math.atan2(direction.x, direction.z);
+    // Create raycaster to get 3D position from mouse coordinates
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+    
+    // Cast ray onto ground plane (y = 0)
+    const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    const cursorWorldPos = new THREE.Vector3();
+    raycaster.ray.intersectPlane(groundPlane, cursorWorldPos);
 
-        // Move towards target
-        const movement = direction.multiplyScalar(speed * deltaTime);
-        newPosition.x += movement.x;
-        newPosition.z += movement.z;
-        animation = 'walk';
-      } else {
-        // Reached target
-        setIsMovingToTarget(false);
-        setTargetPosition(null);
-        animation = 'idle';
-      }
+    // Calculate rotation for NPC to look at cursor position
+    const npcPos = new THREE.Vector3(controlledNPC.position.x, 0, controlledNPC.position.z);
+    const lookDirection = cursorWorldPos.clone().sub(npcPos).normalize();
+    const rotationY = Math.atan2(lookDirection.x, lookDirection.z);
+
+    const forward = new THREE.Vector3(Math.sin(rotationY), 0, Math.cos(rotationY));
+    const right = new THREE.Vector3(Math.cos(rotationY), 0, -Math.sin(rotationY));
+
+    if (keys.w) {
+      movement.add(forward.clone().multiplyScalar(speed * deltaTime * 0.5));
+      isMoving = true;
+    }
+    if (keys.s) {
+      movement.add(forward.clone().multiplyScalar(-speed * deltaTime * 0.5));
+      isMoving = true;
+    }
+    if (keys.a) {
+      movement.add(right.clone().multiplyScalar(speed * deltaTime * 0.5));
+      isMoving = true;
+    }
+    if (keys.d) {
+      movement.add(right.clone().multiplyScalar(-speed * deltaTime * 0.5));
+      isMoving = true;
     }
 
-    // Update NPC
+    // Update NPC position and animation
+    const newPosition = {
+      x: controlledNPC.position.x + movement.x,
+      z: controlledNPC.position.z + movement.z
+    };
+
+    // Always update NPC to look at cursor position
     updateNPC(controlledNPCId, {
       position: newPosition,
-      animation,
+      animation: isMoving ? 'walk' : 'idle',
       rotation: rotationY
     });
 
-    // Update camera to follow NPC (Albion style isometric)
-    const isometricOffset = new THREE.Vector3(-10, 15, -10);
-    const targetCameraPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z).add(isometricOffset);
+      // Update camera to isometric view - fixed position above and behind NPC
+    const isometricOffset = new THREE.Vector3(-8, 12, -8); // Fixed isometric angle
+    const targetPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z).add(isometricOffset);
     const lookAtPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z);
 
-    camera.position.lerp(targetCameraPosition, 0.08);
+    camera.position.lerp(targetPosition, 0.1);
     camera.lookAt(lookAtPosition.x, lookAtPosition.y, lookAtPosition.z);
   });
 
   return {
     isControlling: !!controlledNPCId,
-    controlledNPCId,
-    isMovingToTarget,
-    targetPosition
+    controlledNPCId
   };
 };

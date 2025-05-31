@@ -109,9 +109,9 @@ const CameraControls = () => {
     <OrbitControls
       ref={controlsRef}
       args={[camera]}
-      enablePan={!controlledNPCId}
-      enableZoom={!controlledNPCId}
-      enableRotate={!controlledNPCId}
+      enablePan={true}
+      enableZoom={true}
+      enableRotate={true}
       minDistance={5}
       maxDistance={30}
       minPolarAngle={Math.PI / 6}

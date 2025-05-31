@@ -13,7 +13,6 @@ import Market from "./structures/Market";
 import { useGridPlacement } from "../hooks/useGridPlacement";
 import { useGameState } from "../lib/stores/useGameState";
 import { useNPCControl } from "../hooks/useNPCControl";
-import MovementIndicator from "./MovementIndicator";
 
 const Game = () => {
   const { camera, gl } = useThree();
@@ -31,7 +30,7 @@ const Game = () => {
     viewingNPCId,
     setViewingNPCId
   } = useGameState();
-  const { isControlling, isMovingToTarget, targetPosition } = useNPCControl();
+  const { isControlling } = useNPCControl();
   const { 
     placedStructures, 
     hoveredTile, 
@@ -220,12 +219,6 @@ const Game = () => {
           rotation={npc.rotation || 0}
         />
       ))}
-
-      {/* Movement indicator for controlled NPC */}
-      <MovementIndicator 
-        targetPosition={targetPosition}
-        isVisible={isMovingToTarget}
-      />
 
     </>
   );
