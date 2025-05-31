@@ -13,6 +13,7 @@ import NPCViewIndicator from "./components/NPCViewIndicator";
 import CombatTestPanel from "./components/CombatTestPanel";
 import SaveLoadPanel from "./components/SaveLoadPanel";
 import { useGameState } from "./lib/stores/useGameState";
+import { useCombatState } from "./lib/stores/useCombatState";
 
 import SkillsBar from "./components/SkillsBar";
 
@@ -46,6 +47,7 @@ function App() {
   const [isMobile, setIsMobile] = useState(false);
   const { placedStructures } = useGridPlacement();
   const { autoSave, autoSaveEnabled, createdNPCs } = useGameState();
+  const { updatePlayerStats, playerStats } = useCombatState();
 
   // Periodic auto-save every 2 minutes
   useEffect(() => {
@@ -61,6 +63,19 @@ function App() {
 
     return () => clearInterval(autoSaveInterval);
   }, [autoSave, autoSaveEnabled, placedStructures, createdNPCs]);
+
+  // Mana regeneration system
+  useEffect(() => {
+    const manaRegenInterval = setInterval(() => {
+      if (playerStats.mana < playerStats.maxMana) {
+        updatePlayerStats({
+          mana: Math.min(playerStats.maxMana, playerStats.mana + 2)
+        });
+      }
+    }, 1000); // Regenerate 2 mana per second
+
+    return () => clearInterval(manaRegenInterval);
+  }, [playerStats.mana, playerStats.maxMana, updatePlayerStats]);
 
   useEffect(() => {
     const checkIsMobile = () => {
