@@ -15,8 +15,7 @@ import SaveLoadPanel from "./components/SaveLoadPanel";
 import { useGameState } from "./lib/stores/useGameState";
 import { useCombatState } from "./lib/stores/useCombatState";
 
-import SkillsBar from "./components/SkillsBar";
-import PlayerHUD from "./components/PlayerHUD"; // Import PlayerHUD
+import AlbionHUD from "./components/AlbionHUD";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -203,8 +202,7 @@ function App() {
           onClose={() => setCombatTestPanelOpen(false)}
         />
 
-        <SkillsBar />
-        <PlayerHUD />
+        <AlbionHUD />
       </div>
     </QueryClientProvider>
   );
