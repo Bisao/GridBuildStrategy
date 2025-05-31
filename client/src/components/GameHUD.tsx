@@ -1,7 +1,159 @@
 
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useGameState } from '../lib/stores/useGameState';
 import { useSkills } from '../lib/stores/useSkills';
+
+// Componente para painel de skills arrastável
+const DraggableSkillsPanel = ({ skills, mana }: { skills: any[], mana: number }) => {
+  const [isDragging, setIsDragging] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (panelRef.current) {
+      const rect = panelRef.current.getBoundingClientRect();
+      setDragOffset({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      });
+      setIsDragging(true);
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      setPosition({
+        x: e.clientX - dragOffset.x,
+        y: e.clientY - dragOffset.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  React.useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, dragOffset]);
+
+  return (
+    <div
+      ref={panelRef}
+      className={`bg-black/80 border-2 border-yellow-600/70 rounded-lg p-2 select-none ${
+        isDragging ? 'cursor-grabbing shadow-2xl scale-105' : 'cursor-grab'
+      } transition-all duration-200`}
+      style={{
+        transform: `translate(${position.x}px, ${position.y}px)`,
+        zIndex: isDragging ? 1000 : 'auto'
+      }}
+      onMouseDown={handleMouseDown}
+    >
+      {/* Indicador de movimento */}
+      <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-600 rounded-full flex items-center justify-center text-black text-xs font-bold border-2 border-yellow-400">
+        ⚡
+      </div>
+      
+      <div className="flex gap-1">
+        {skills.slice(0, 10).map((skill, index) => {
+          const isOnCooldown = skill.currentCooldown > 0;
+          const hasInsufficientMana = mana < skill.manaCost;
+          const isDisabled = isOnCooldown || hasInsufficientMana;
+          
+          const handleSkillClick = (e: React.MouseEvent) => {
+            e.stopPropagation(); // Previne que o clique inicie o drag
+            if (!isDisabled) {
+              console.log(`Usando skill: ${skill.name}`);
+            }
+          };
+          
+          return (
+            <div key={skill.id} className="relative group">
+              <button
+                onClick={handleSkillClick}
+                className={`
+                  w-12 h-12 rounded-full border-2 transition-all duration-200 relative overflow-hidden
+                  ${isDisabled 
+                    ? 'border-gray-600 bg-gray-800/80 opacity-60 cursor-not-allowed' 
+                    : 'border-yellow-500/70 bg-gradient-to-br from-gray-700 to-gray-800 hover:border-yellow-400 cursor-pointer'
+                  }
+                `}
+                disabled={isDisabled}
+                onMouseDown={(e) => e.stopPropagation()} // Previne drag quando clicando no botão
+              >
+                <div className="text-lg">{skill.icon}</div>
+                
+                {/* Cooldown overlay */}
+                {isOnCooldown && (
+                  <div className="absolute inset-0 bg-black/70 flex items-center justify-center rounded-full">
+                    <span className="text-xs text-white font-bold">
+                      {Math.ceil(skill.currentCooldown)}
+                    </span>
+                  </div>
+                )}
+                
+                {/* Mana cost indicator */}
+                {hasInsufficientMana && !isOnCooldown && (
+                  <div className="absolute inset-0 bg-blue-900/70 flex items-center justify-center rounded-full">
+                    <span className="text-xs text-blue-200 font-bold">
+                      {skill.manaCost}
+                    </span>
+                  </div>
+                )}
+                
+                {/* Key number */}
+                <div className="absolute -bottom-1 -right-1 bg-yellow-600 text-black text-xs w-4 h-4 flex items-center justify-center rounded-full border border-yellow-400 font-bold">
+                  {index + 1}
+                </div>
+              </button>
+              
+              {/* Tooltip */}
+              <div className="absolute bottom-14 left-1/2 transform -translate-x-1/2 bg-black/95 border border-yellow-400 text-white text-xs p-3 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-30 min-w-[180px]">
+                <div className="font-bold text-yellow-400 mb-1">{skill.name}</div>
+                <div className="text-gray-300 mb-2">{skill.description}</div>
+                
+                <div className="border-t border-gray-600 pt-2 space-y-1 text-xs">
+                  {skill.damage && (
+                    <div className="flex justify-between">
+                      <span>Dano:</span>
+                      <span className="text-red-400">{skill.damage}</span>
+                    </div>
+                  )}
+                  {skill.healAmount && (
+                    <div className="flex justify-between">
+                      <span>Cura:</span>
+                      <span className="text-green-400">{skill.healAmount}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span>Alcance:</span>
+                    <span className="text-blue-400">{skill.range}m</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Cooldown:</span>
+                    <span className="text-gray-400">{skill.cooldown}s</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Mana:</span>
+                    <span className="text-blue-400">{skill.manaCost}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export default function GameHUD() {
   const { controlledNPCId, createdNPCs } = useGameState();
@@ -97,96 +249,7 @@ export default function GameHUD() {
             </div>
 
             {/* Skills Panel */}
-            <div className="bg-black/80 border-2 border-yellow-600/70 rounded-lg p-2">
-              <div className="flex gap-1">
-                {skills.slice(0, 10).map((skill, index) => {
-                  const isOnCooldown = skill.currentCooldown > 0;
-                  const hasInsufficientMana = mana < skill.manaCost;
-                  const isDisabled = isOnCooldown || hasInsufficientMana;
-                  
-                  const handleSkillClick = () => {
-                    if (!isDisabled) {
-                      // Aqui você pode implementar a lógica de usar a skill
-                      console.log(`Usando skill: ${skill.name}`);
-                    }
-                  };
-                  
-                  return (
-                    <div key={skill.id} className="relative group">
-                      <button
-                        onClick={handleSkillClick}
-                        className={`
-                          w-12 h-12 rounded-full border-2 transition-all duration-200 relative overflow-hidden
-                          ${isDisabled 
-                            ? 'border-gray-600 bg-gray-800/80 opacity-60 cursor-not-allowed' 
-                            : 'border-yellow-500/70 bg-gradient-to-br from-gray-700 to-gray-800 hover:border-yellow-400 cursor-pointer'
-                          }
-                        `}
-                        disabled={isDisabled}
-                      >
-                        <div className="text-lg">{skill.icon}</div>
-                        
-                        {/* Cooldown overlay */}
-                        {isOnCooldown && (
-                          <div className="absolute inset-0 bg-black/70 flex items-center justify-center rounded-full">
-                            <span className="text-xs text-white font-bold">
-                              {Math.ceil(skill.currentCooldown)}
-                            </span>
-                          </div>
-                        )}
-                        
-                        {/* Mana cost indicator */}
-                        {hasInsufficientMana && !isOnCooldown && (
-                          <div className="absolute inset-0 bg-blue-900/70 flex items-center justify-center rounded-full">
-                            <span className="text-xs text-blue-200 font-bold">
-                              {skill.manaCost}
-                            </span>
-                          </div>
-                        )}
-                        
-                        {/* Key number */}
-                        <div className="absolute -bottom-1 -right-1 bg-yellow-600 text-black text-xs w-4 h-4 flex items-center justify-center rounded-full border border-yellow-400 font-bold">
-                          {index + 1}
-                        </div>
-                      </button>
-                      
-                      {/* Tooltip */}
-                      <div className="absolute bottom-14 left-1/2 transform -translate-x-1/2 bg-black/95 border border-yellow-400 text-white text-xs p-3 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-30 min-w-[180px]">
-                        <div className="font-bold text-yellow-400 mb-1">{skill.name}</div>
-                        <div className="text-gray-300 mb-2">{skill.description}</div>
-                        
-                        <div className="border-t border-gray-600 pt-2 space-y-1 text-xs">
-                          {skill.damage && (
-                            <div className="flex justify-between">
-                              <span>Dano:</span>
-                              <span className="text-red-400">{skill.damage}</span>
-                            </div>
-                          )}
-                          {skill.healAmount && (
-                            <div className="flex justify-between">
-                              <span>Cura:</span>
-                              <span className="text-green-400">{skill.healAmount}</span>
-                            </div>
-                          )}
-                          <div className="flex justify-between">
-                            <span>Alcance:</span>
-                            <span className="text-blue-400">{skill.range}m</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Cooldown:</span>
-                            <span className="text-gray-400">{skill.cooldown}s</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Mana:</span>
-                            <span className="text-blue-400">{skill.manaCost}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            <DraggableSkillsPanel skills={skills} mana={mana} />
 
             {/* Mana Orb */}
             <div className="relative">
