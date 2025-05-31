@@ -8,8 +8,7 @@ import StructurePanel from "./components/StructurePanel";
 import NPCPanel from "./components/NPCPanel";
 import NPCConfigPanel from "./components/NPCConfigPanel";
 import { useGameState } from "./lib/stores/useGameState";
-import NPCControlIndicator from "./components/NPCControlIndicator";
-import NPCViewIndicator from "./components/NPCViewIndicator";
+
 import SkillsBar from "./components/SkillsBar";
 
 const queryClient = new QueryClient({
@@ -135,10 +134,6 @@ function App() {
         }}
       />
 
-      {/* NPC Control Indicator */}
-      <NPCControlIndicator />
-      <NPCViewIndicator />
-      
       {/* Skills Bar */}
       <SkillsBar />
       </div>
