@@ -5,6 +5,11 @@ import Grid from "./Grid";
 import House from "./House";
 import CameraControls from "./CameraControls";
 import NPC from "./NPC";
+import Windmill from "./structures/Windmill";
+import Tower from "./structures/Tower";
+import LargeHouse from "./structures/LargeHouse";
+import Blacksmith from "./structures/Blacksmith";
+import Market from "./structures/Market";
 import { useGridPlacement } from "../hooks/useGridPlacement";
 import { useGameState } from "../lib/stores/useGameState";
 
@@ -102,7 +107,37 @@ const Game = () => {
           {structure.type === 'house' && (
             <House 
               position={{ x: structure.x, z: structure.z }}
-              onHouseClick={handleHouseClick}
+              onStructureClick={handleHouseClick}
+            />
+          )}
+          {structure.type === 'windmill' && (
+            <Windmill 
+              position={{ x: structure.x, z: structure.z }}
+              onStructureClick={handleHouseClick}
+            />
+          )}
+          {structure.type === 'tower' && (
+            <Tower 
+              position={{ x: structure.x, z: structure.z }}
+              onStructureClick={handleHouseClick}
+            />
+          )}
+          {structure.type === 'largehouse' && (
+            <LargeHouse 
+              position={{ x: structure.x, z: structure.z }}
+              onStructureClick={handleHouseClick}
+            />
+          )}
+          {structure.type === 'blacksmith' && (
+            <Blacksmith 
+              position={{ x: structure.x, z: structure.z }}
+              onStructureClick={handleHouseClick}
+            />
+          )}
+          {structure.type === 'market' && (
+            <Market 
+              position={{ x: structure.x, z: structure.z }}
+              onStructureClick={handleHouseClick}
             />
           )}
         </group>
@@ -114,10 +149,42 @@ const Game = () => {
           position={[previewPosition.x, 0, previewPosition.z]}
           rotation={[0, (previewRotation * Math.PI) / 180, 0]}
         >
-          <House 
-            isPreview={true} 
-            canPlace={canPlaceStructure(previewPosition.x, previewPosition.z)}
-          />
+          {selectedStructure === 'house' && (
+            <House 
+              isPreview={true} 
+              canPlace={canPlaceStructure(previewPosition.x, previewPosition.z)}
+            />
+          )}
+          {selectedStructure === 'windmill' && (
+            <Windmill 
+              isPreview={true} 
+              canPlace={canPlaceStructure(previewPosition.x, previewPosition.z)}
+            />
+          )}
+          {selectedStructure === 'tower' && (
+            <Tower 
+              isPreview={true} 
+              canPlace={canPlaceStructure(previewPosition.x, previewPosition.z)}
+            />
+          )}
+          {selectedStructure === 'largehouse' && (
+            <LargeHouse 
+              isPreview={true} 
+              canPlace={canPlaceStructure(previewPosition.x, previewPosition.z)}
+            />
+          )}
+          {selectedStructure === 'blacksmith' && (
+            <Blacksmith 
+              isPreview={true} 
+              canPlace={canPlaceStructure(previewPosition.x, previewPosition.z)}
+            />
+          )}
+          {selectedStructure === 'market' && (
+            <Market 
+              isPreview={true} 
+              canPlace={canPlaceStructure(previewPosition.x, previewPosition.z)}
+            />
+          )}
         </group>
       )}
        {/* Example NPCs */}

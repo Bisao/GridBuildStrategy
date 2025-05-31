@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { Home } from "lucide-react";
+import { Home, X, Settings, Castle, Hammer, ShoppingCart } from "lucide-react";
 
 interface StructurePanelProps {
   selectedStructure: string | null;
@@ -30,7 +30,72 @@ export default function StructurePanel({
             <Home className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             Casa
           </Button>
-          
+
+        <Button
+          variant={selectedStructure === 'largehouse' ? 'default' : 'outline'}
+          className={`w-full justify-start text-xs sm:text-sm h-8 sm:h-10 ${
+            selectedStructure === 'largehouse' 
+              ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+              : 'border-gray-600 text-gray-300 hover:bg-gray-700'
+          }`}
+          onClick={() => onSelectStructure('largehouse')}
+        >
+          <Home className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+          Casa Grande
+        </Button>
+
+        <Button
+          variant={selectedStructure === 'windmill' ? 'default' : 'outline'}
+          className={`w-full justify-start text-xs sm:text-sm h-8 sm:h-10 ${
+            selectedStructure === 'windmill' 
+              ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+              : 'border-gray-600 text-gray-300 hover:bg-gray-700'
+          }`}
+          onClick={() => onSelectStructure('windmill')}
+        >
+          <Settings className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+          Moinho
+        </Button>
+
+        <Button
+          variant={selectedStructure === 'tower' ? 'default' : 'outline'}
+          className={`w-full justify-start text-xs sm:text-sm h-8 sm:h-10 ${
+            selectedStructure === 'tower' 
+              ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+              : 'border-gray-600 text-gray-300 hover:bg-gray-700'
+          }`}
+          onClick={() => onSelectStructure('tower')}
+        >
+          <Castle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+          Torre
+        </Button>
+
+        <Button
+          variant={selectedStructure === 'blacksmith' ? 'default' : 'outline'}
+          className={`w-full justify-start text-xs sm:text-sm h-8 sm:h-10 ${
+            selectedStructure === 'blacksmith' 
+              ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+              : 'border-gray-600 text-gray-300 hover:bg-gray-700'
+          }`}
+          onClick={() => onSelectStructure('blacksmith')}
+        >
+          <Hammer className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+          Ferraria
+        </Button>
+
+        <Button
+          variant={selectedStructure === 'market' ? 'default' : 'outline'}
+          className={`w-full justify-start text-xs sm:text-sm h-8 sm:h-10 ${
+            selectedStructure === 'market' 
+              ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+              : 'border-gray-600 text-gray-300 hover:bg-gray-700'
+          }`}
+          onClick={() => onSelectStructure('market')}
+        >
+          <ShoppingCart className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+          Mercado
+        </Button>
+
           {selectedStructure && (
             <div className="mt-2 p-2 bg-gray-700/50 rounded text-xs text-gray-300 space-y-1">
               <p>Pressione <kbd className="px-1 py-0.5 bg-gray-600 rounded text-white">R</kbd> para rotacionar</p>
