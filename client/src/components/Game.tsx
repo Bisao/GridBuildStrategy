@@ -10,7 +10,6 @@ import CameraControls from "./CameraControls";
 import { useGridPlacement } from "../hooks/useGridPlacement";
 import { useGameState } from "../lib/stores/useGameState";
 import { useNPCControl } from "../hooks/useNPCControl";
-import Enemy from "./Enemy";
 import Windmill from "./structures/Windmill";
 import Tower from "./structures/Tower";
 import LargeHouse from "./structures/LargeHouse";
