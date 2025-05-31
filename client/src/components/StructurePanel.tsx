@@ -7,67 +7,31 @@ interface StructurePanelProps {
   onSelectStructure: (structure: string | null) => void;
 }
 
-const StructurePanel = ({ selectedStructure, onSelectStructure }: StructurePanelProps) => {
-  const structures = [
-    {
-      id: 'house',
-      name: 'House',
-      icon: Home,
-      description: 'Basic residential building'
-    }
-  ];
-
+export default function StructurePanel({ 
+  selectedStructure, 
+  onSelectStructure 
+}: StructurePanelProps) {
   return (
-    <div className="absolute top-4 left-4 z-10">
-      <Card className="w-64 bg-gray-800/90 border-gray-600 text-white">
-        <CardHeader>
-          <CardTitle className="text-lg font-bold text-center">
-            Structure Panel
-          </CardTitle>
+    <div className="fixed top-2 left-2 z-10 sm:top-4 sm:left-4">
+      <Card className="w-48 sm:w-64 bg-gray-800/90 border-gray-700 backdrop-blur-sm">
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="text-white text-sm sm:text-lg">Estruturas</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {structures.map((structure) => {
-            const Icon = structure.icon;
-            const isSelected = selectedStructure === structure.id;
-            
-            return (
-              <Button
-                key={structure.id}
-                variant={isSelected ? "default" : "outline"}
-                className={`w-full h-20 flex flex-col items-center justify-center gap-2 ${
-                  isSelected 
-                    ? "bg-blue-600 hover:bg-blue-700 border-blue-500" 
-                    : "bg-gray-700 hover:bg-gray-600 border-gray-500 text-white"
-                }`}
-                onClick={() => onSelectStructure(isSelected ? null : structure.id)}
-              >
-                <Icon size={24} />
-                <div className="text-center">
-                  <div className="font-medium">{structure.name}</div>
-                  <div className="text-xs opacity-75">{structure.description}</div>
-                </div>
-              </Button>
-            );
-          })}
-          
-          {selectedStructure && (
-            <div className="text-center text-sm text-gray-300 mt-4 p-2 bg-gray-700/50 rounded">
-              Click on a grid tile to place the selected structure
-            </div>
-          )}
-          
+        <CardContent className="space-y-2 pt-0">
           <Button
-            variant="outline"
-            className="w-full bg-red-600 hover:bg-red-700 border-red-500 text-white"
-            onClick={() => onSelectStructure(null)}
-            disabled={!selectedStructure}
+            variant={selectedStructure === 'house' ? 'default' : 'outline'}
+            className={`w-full justify-start text-xs sm:text-sm h-8 sm:h-10 ${
+              selectedStructure === 'house' 
+                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                : 'border-gray-600 text-gray-300 hover:bg-gray-700'
+            }`}
+            onClick={() => onSelectStructure('house')}
           >
-            Cancel
+            <Home className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            Casa
           </Button>
         </CardContent>
       </Card>
     </div>
   );
-};
-
-export default StructurePanel;
+}

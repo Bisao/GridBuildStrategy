@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@fontsource/inter";
 import "./index.css";
@@ -27,6 +27,19 @@ function App() {
     setNPCPanelOpen 
   } = useGameState();
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
   const handleCreateNPC = () => {
     console.log(`Creating NPC for house at (${selectedHouse?.x}, ${selectedHouse?.z})`);
     // TODO: Implement NPC creation logic
@@ -38,14 +51,15 @@ function App() {
         <Canvas
           shadows
           camera={{
-            position: [10, 8, 10],
-            fov: 60,
+            position: isMobile ? [8, 6, 8] : [10, 8, 10],
+            fov: isMobile ? 70 : 60,
             near: 0.1,
             far: 1000,
           }}
           gl={{
-            antialias: true,
-            powerPreference: "high-performance",
+            antialias: !isMobile,
+            powerPreference: isMobile ? "default" : "high-performance",
+            pixelRatio: Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2),
           }}
         >
           <color attach="background" args={["#1a1a2e"]} />
