@@ -109,11 +109,14 @@ export const useNPCControl = () => {
         rotation: rotationY
       });
 
-      // Update camera to follow controlled NPC
-      const cameraOffset = new THREE.Vector3(-3, 5, -3);
+      // Update camera to follow controlled NPC from behind and above
+      const npcDirection = new THREE.Vector3(Math.sin(rotationY), 0, Math.cos(rotationY));
+      const cameraOffset = npcDirection.clone().multiplyScalar(-4).add(new THREE.Vector3(0, 3, 0));
       const targetPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z).add(cameraOffset);
+      const lookAtPosition = new THREE.Vector3(newPosition.x, 1, newPosition.z).add(npcDirection.clone().multiplyScalar(2));
+      
       camera.position.lerp(targetPosition, 0.1);
-      camera.lookAt(newPosition.x, 0, newPosition.z);
+      camera.lookAt(lookAtPosition.x, lookAtPosition.y, lookAtPosition.z);
     }
   });
 
