@@ -22,7 +22,8 @@ const Game = () => {
     selectedStructure, 
     setSelectedStructure, 
     setSelectedHouse, 
-    setNPCPanelOpen 
+    setNPCPanelOpen,
+    createdNPCs
   } = useGameState();
   const { 
     placedStructures, 
@@ -193,7 +194,7 @@ const Game = () => {
       )}
 
       {/* Render created NPCs */}
-      {useGameState.getState().createdNPCs.map((npc) => (
+      {createdNPCs.map((npc) => (
         <NPC
           key={npc.id}
           position={[npc.position.x, 0, npc.position.z]}

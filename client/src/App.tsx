@@ -27,7 +27,7 @@ function App() {
     setNPCPanelOpen,
     isStructurePanelOpen,
     setStructurePanelOpen,
-    createdNPCs
+    addNPC
   } = useGameState();
 
   const [isMobile, setIsMobile] = useState(false);
@@ -54,7 +54,7 @@ function App() {
       type: "villager" as const
     };
     
-    useGameState.getState().addNPC(newNPC);
+    addNPC(newNPC);
     setNPCPanelOpen(false);
   };
 
