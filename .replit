@@ -14,7 +14,7 @@ localPort = 5000
 externalPort = 80
 
 [workflows]
-runButton = "Start Game - Fixed"
+runButton = "Desenvolvimento Limpo"
 
 [[workflows.workflow]]
 name = "Project"
@@ -38,6 +38,23 @@ waitForPort = 5000
 name = "Start Game - Fixed"
 author = 43319208
 mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run setup"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+
+[[workflows.workflow]]
+name = "Desenvolvimento Limpo"
+author = 43319208
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pkill -f \"node.*5000\" || true"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
