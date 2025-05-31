@@ -9,7 +9,7 @@ export default function NPCControlIndicator() {
   const controlledNPC = createdNPCs.find(npc => npc.id === controlledNPCId);
 
   return (
-    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-blue-600/90 text-white px-3 py-2 rounded-lg shadow-lg z-50"></div>
+    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-blue-600/90 text-white px-3 py-2 rounded-lg shadow-lg z-50">
       <div className="flex items-center gap-2">
         <span className="text-lg">🕹️</span>
         <span className="font-medium">
