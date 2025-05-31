@@ -98,6 +98,7 @@ const Game = () => {
         console.log("Structure placed successfully!");
       }
     }
+    // NPC movement is handled in useNPCControl hook
   };
 
   const handleStructureClick = (position: { x: number; z: number }) => {

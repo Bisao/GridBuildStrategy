@@ -1,4 +1,3 @@
-
 import { useGameState } from "../lib/stores/useGameState";
 
 export default function NPCControlIndicator() {
@@ -16,7 +15,7 @@ export default function NPCControlIndicator() {
           Controlando: {controlledNPC?.name || 'NPC'}
         </span>
         <span className="text-sm opacity-75">
-          (NPC olha para o cursor, WASD para mover, ESC para parar)
+          (Click to move • Mouse to look around • ESC to stop)
         </span>
         <button
           onClick={() => setControlledNPCId(null)}
@@ -26,6 +25,9 @@ export default function NPCControlIndicator() {
           ❌
         </button>
       </div>
+      <div className="text-xs text-green-300">
+          Click to move • Mouse to look around • ESC to stop
+        </div>
     </div>
   );
 }
