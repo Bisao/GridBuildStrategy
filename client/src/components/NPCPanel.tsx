@@ -130,19 +130,46 @@ export default function NPCPanel({
                   <div className="mt-2">
                     <div className="font-medium mb-1">NPCs na estrutura:</div>
                     {structureNPCs.map((npc) => (
-                      <div key={npc.id} className="flex items-center justify-between gap-2 ml-2 p-1 rounded hover:bg-gray-600/30">
+                      <div key={npc.id} className="flex items-center justify-between gap-2 ml-2 p-2 rounded hover:bg-gray-600/30 border border-gray-600/50">
                         <div className="flex items-center gap-2">
                           <User size={12} />
-                          <span>{npc.name} ({npc.type})</span>
+                          <span className="text-sm">{npc.name} ({npc.type})</span>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onConfigureNPC(npc.id)}
-                          className="h-6 w-6 p-0 text-gray-400 hover:text-white"
-                        >
-                          <Settings size={12} />
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onConfigureNPC(npc.id)}
+                            className="h-7 w-7 p-0 text-lg hover:bg-gray-600/50"
+                            title="Configurações"
+                          >
+                            ⚙️
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              console.log(`Controle de IA para NPC ${npc.id}`);
+                              // TODO: Implementar painel de controle de IA
+                            }}
+                            className="h-7 w-7 p-0 text-lg hover:bg-gray-600/50"
+                            title="Controle de IA"
+                          >
+                            🤖
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              console.log(`Controles de jogabilidade para NPC ${npc.id}`);
+                              // TODO: Implementar painel de jogabilidade
+                            }}
+                            className="h-7 w-7 p-0 text-lg hover:bg-gray-600/50"
+                            title="Controles de Jogabilidade"
+                          >
+                            🕹️
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
