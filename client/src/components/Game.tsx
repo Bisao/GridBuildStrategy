@@ -125,8 +125,6 @@ const Game = () => {
   };
 
   useEffect(() => {
-    playSound('background', 0.3, true);
-
     // Expose effect creation function globally
     (window as any).createSkillEffect = (position: THREE.Vector3, skillType: string) => {
       const effectId = `effect_${Date.now()}_${Math.random()}`;
@@ -140,7 +138,7 @@ const Game = () => {
     return () => {
       delete (window as any).createSkillEffect;
     };
-  }, [playSound]);
+  }, []);
 
   const removeEffect = (effectId: string) => {
     setActiveEffects(prev => prev.filter(effect => effect.id !== effectId));
