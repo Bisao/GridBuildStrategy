@@ -83,22 +83,22 @@ const SkillsBar: React.FC = () => {
         ))}
       </div>
       
-      {/* Barra de vida à esquerda */}
+      {/* Barra de mana à esquerda */}
       <div className="absolute -top-12 -left-20">
-        <div className="flex flex-col items-center">
-          <span className="text-xs text-red-300 mb-1 font-bold">❤️ VIDA</span>
-          <div className="bg-red-900/80 h-3 w-32 rounded-full overflow-hidden border border-red-400/50">
-            <div className="bg-red-500 h-full w-full transition-all duration-300"></div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Barra de mana à direita */}
-      <div className="absolute -top-12 -right-20">
         <div className="flex flex-col items-center">
           <span className="text-xs text-blue-300 mb-1 font-bold">💙 MANA</span>
           <div className="bg-blue-900/80 h-3 w-32 rounded-full overflow-hidden border border-blue-400/50">
             <div className="bg-blue-500 h-full w-full transition-all duration-300"></div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Barra de vida à direita */}
+      <div className="absolute -top-12 -right-20">
+        <div className="flex flex-col items-center">
+          <span className="text-xs text-red-300 mb-1 font-bold">❤️ VIDA</span>
+          <div className="bg-red-900/80 h-3 w-32 rounded-full overflow-hidden border border-red-400/50">
+            <div className="bg-red-500 h-full w-full transition-all duration-300"></div>
           </div>
         </div>
       </div>
