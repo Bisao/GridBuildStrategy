@@ -55,13 +55,8 @@ export default function SkillsBar() {
       return;
     }
 
-    // Toggle skill selection
-    if (activeSkillId === skillId) {
-      setActiveSkill(null);
-    } else {
-      setActiveSkill(skillId);
-      console.log(`Skill "${skill.name}" selecionada! Clique no mundo para usar.`);
-    }
+    // Ativar skill imediatamente
+    executeActiveSkill(skillId);
   };
 
   // Handle skill usage on world click
@@ -86,13 +81,13 @@ export default function SkillsBar() {
   }, [activeSkillId, controlledNPCId]);
 
   // Execute skill when active skill is used
-  const executeActiveSkill = (targetPosition?: THREE.Vector3) => {
-    if (!activeSkillId || !controlledNPCId) return;
+  const executeActiveSkill = (skillId: string, targetPosition?: THREE.Vector3) => {
+    if (!controlledNPCId) return;
 
-    const skill = skills.find(s => s.id === activeSkillId);
+    const skill = skills.find(s => s.id === skillId);
     const controlledNPC = createdNPCs.find(npc => npc.id === controlledNPCId);
     
-    if (!skill || !controlledNPC || !useSkill(activeSkillId)) {
+    if (!skill || !controlledNPC || !useSkill(skillId)) {
       return;
     }
 
@@ -112,8 +107,6 @@ export default function SkillsBar() {
         executeDefenseSkill(skill, controlledNPC, targetPosition);
         break;
     }
-
-    setActiveSkill(null);
   };
 
   const executeAttackSkill = (skill: any, npc: any, targetPosition?: THREE.Vector3) => {
@@ -154,13 +147,53 @@ export default function SkillsBar() {
     // Implementar efeitos defensivos
   };
 
-  // Expose executeActiveSkill globally for world interaction
+  // Function to execute skill on specific enemy
+  const executeSkillOnEnemy = (enemyId: string) => {
+    if (!controlledNPCId) return;
+
+    const enemy = enemies.find(e => e.id === enemyId);
+    const controlledNPC = createdNPCs.find(npc => npc.id === controlledNPCId);
+    
+    if (!enemy || !controlledNPC) return;
+
+    // Check distance to enemy
+    const npcPos = new THREE.Vector3(controlledNPC.position.x, 0, controlledNPC.position.z);
+    const enemyPos = new THREE.Vector3(enemy.position.x, 0, enemy.position.z);
+    const distance = npcPos.distanceTo(enemyPos);
+
+    // Use basic attack skill
+    const basicAttack = skills.find(s => s.id === 'basic_attack');
+    if (!basicAttack || basicAttack.currentCooldown > 0) {
+      console.log("Ataque básico em cooldown!");
+      return;
+    }
+
+    if (distance <= basicAttack.range) {
+      if (useSkill('basic_attack')) {
+        const damage = basicAttack.damage || 25;
+        const takeDamageFunc = (window as any)[`enemy_${enemy.id}_takeDamage`];
+        
+        if (takeDamageFunc) {
+          takeDamageFunc(damage);
+          console.log(`${controlledNPC.name} atacou o inimigo com ${basicAttack.name}!`);
+        }
+      }
+    } else {
+      console.log("Inimigo muito longe para atacar!");
+    }
+  };
+
+  // Expose functions globally for world interaction
   useEffect(() => {
     (window as any).executeActiveSkill = executeActiveSkill;
+    (window as any).executeSkillOnEnemy = executeSkillOnEnemy;
+    (window as any).enemies = enemies;
     return () => {
       delete (window as any).executeActiveSkill;
+      delete (window as any).executeSkillOnEnemy;
+      delete (window as any).enemies;
     };
-  }, [activeSkillId, controlledNPCId, skills]);
+  }, [activeSkillId, controlledNPCId, skills, enemies]);
 
   if (!controlledNPCId) {
     return null;
@@ -184,10 +217,7 @@ export default function SkillsBar() {
                 onClick={() => handleSkillClick(skill.id)}
                 className={`
                   w-12 h-12 rounded-lg border-2 transition-all duration-200 relative overflow-hidden
-                  ${activeSkillId === skill.id 
-                    ? 'border-yellow-400 bg-yellow-400/20' 
-                    : 'border-gray-500 bg-gray-700 hover:border-gray-400'
-                  }
+                  border-gray-500 bg-gray-700 hover:border-gray-400
                   ${skill.currentCooldown > 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                 `}
                 disabled={skill.currentCooldown > 0}
@@ -227,13 +257,11 @@ export default function SkillsBar() {
           ))}
         </div>
         
-        {activeSkillId && (
-          <div className="text-xs text-yellow-400 mt-2 text-center">
-            Skill selecionada: {skills.find(s => s.id === activeSkillId)?.name}
-            <br />
-            <span className="text-gray-400">Clique no mundo para usar ou ESC para cancelar</span>
-          </div>
-        )}
+        <div className="text-xs text-gray-400 mt-2 text-center">
+          Pressione os números (1-5) para usar skills
+          <br />
+          <span className="text-yellow-400">Skills de ataque: clique no inimigo para focar</span>
+        </div>
       </div>
     </div>
   );

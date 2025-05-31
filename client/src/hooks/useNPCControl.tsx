@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
@@ -35,21 +34,47 @@ export const useNPCControl = () => {
     if (!controlledNPCId) return;
 
     const handleClick = (event: MouseEvent) => {
-      const canvas = document.querySelector('canvas');
-      if (!canvas) return;
+      if (!canvas || !camera || !controlledNPCId) return;
 
       const rect = canvas.getBoundingClientRect();
       const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-      raycaster.current.setFromCamera(new THREE.Vector2(x, y), camera);
+      const mouse = new THREE.Vector2(x, y);
+      raycaster.setFromCamera(mouse, camera);
 
-      // Create a plane at ground level for intersection
-      const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-      const intersectionPoint = new THREE.Vector3();
+      // First check if clicking on an enemy
+      const enemies = (window as any).enemies || [];
+      let clickedEnemy = null;
 
-      if (raycaster.current.ray.intersectPlane(groundPlane, intersectionPoint)) {
-        setTargetPosition(intersectionPoint.clone());
+      for (const enemy of enemies) {
+        // Create a simple bounding box for enemy detection
+        const enemyBox = new THREE.Box3(
+          new THREE.Vector3(enemy.position.x - 0.5, 0, enemy.position.z - 0.5),
+          new THREE.Vector3(enemy.position.x + 0.5, 2, enemy.position.z + 0.5)
+        );
+
+        const ray = raycaster.ray;
+        if (ray.intersectsBox(enemyBox)) {
+          clickedEnemy = enemy;
+          break;
+        }
+      }
+
+      if (clickedEnemy) {
+        // Execute attack skill on enemy
+        const executeSkillOnEnemy = (window as any).executeSkillOnEnemy;
+        if (executeSkillOnEnemy) {
+          executeSkillOnEnemy(clickedEnemy.id);
+        }
+      } else {
+        // Check intersection with ground plane for movement
+        const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        const intersectionPoint = new THREE.Vector3();
+
+        if (raycaster.ray.intersectPlane(groundPlane, intersectionPoint)) {
+          setTargetPosition(intersectionPoint.clone());
+        }
       }
     };
 
@@ -109,10 +134,10 @@ export const useNPCControl = () => {
         // Move towards target
         const moveDirection = targetPosition.clone().sub(currentPos).normalize();
         const speed = 3;
-        
+
         newPosition.x += moveDirection.x * speed * deltaTime;
         newPosition.z += moveDirection.z * speed * deltaTime;
-        
+
         // Face movement direction
         newRotation = Math.atan2(moveDirection.x, moveDirection.z);
         animation = "walking";
