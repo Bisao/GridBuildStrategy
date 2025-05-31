@@ -19,10 +19,37 @@ export default function NPCConfigPanel({
   onClose 
 }: NPCConfigPanelProps) {
   const { createdNPCs, updateNPC, removeNPC } = useGameState();
-  const [npcName, setNpcName] = useState("");
+  const [npcFirstName, setNpcFirstName] = useState("");
+  const [npcLastName, setNpcLastName] = useState("");
   const [npcType, setNpcType] = useState<"villager" | "guard" | "merchant" | "farmer">("villager");
   const [npcAnimation, setNpcAnimation] = useState<"idle" | "walk">("idle");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // Arrays para geração aleatória de nomes
+  const firstNames = [
+    "Ana", "Bruno", "Carlos", "Diana", "Eduardo", "Fernanda", "Gabriel", "Helena",
+    "Igor", "Julia", "Lucas", "Maria", "Nicolas", "Olivia", "Pedro", "Raquel",
+    "Sofia", "Thiago", "Valentina", "William", "Dudu", "Lya", "Toby", "Papai",
+    "João", "Beatriz", "Rafael", "Camila", "Diego", "Larissa", "Felipe", "Natalia"
+  ];
+
+  const surnames = [
+    "Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Alves", "Pereira",
+    "Lima", "Gomes", "Costa", "Ribeiro", "Martins", "Carvalho", "Almeida", "Lopes",
+    "Soares", "Fernandes", "Vieira", "Barbosa", "Rocha", "Dias", "Monteiro", "Cardoso",
+    "Reis", "Araújo", "Castro", "Andrade", "Nascimento", "Correia", "Teixeira", "Moreira"
+  ];
+
+  const capitalizeFirst = (text: string) => {
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  };
+
+  const generateRandomName = () => {
+    const randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const randomSurname = surnames[Math.floor(Math.random() * surnames.length)];
+    setNpcFirstName(randomFirstName);
+    setNpcLastName(randomSurname);
+  };
 
   // Get current NPC data
   const currentNPC = npcId ? createdNPCs.find(npc => npc.id === npcId) : null;
@@ -30,7 +57,9 @@ export default function NPCConfigPanel({
   // Update local state when NPC changes
   useEffect(() => {
     if (currentNPC) {
-      setNpcName(currentNPC.name);
+      const nameParts = currentNPC.name.split(' ');
+      setNpcFirstName(nameParts[0] || '');
+      setNpcLastName(nameParts.slice(1).join(' ') || '');
       setNpcType(currentNPC.type);
       setNpcAnimation(currentNPC.animation || "idle");
     }
@@ -58,9 +87,13 @@ export default function NPCConfigPanel({
   }, [isOpen, showDeleteConfirm, onClose]);
 
   const handleSaveChanges = () => {
-    if (currentNPC && npcName.trim()) {
+    const firstName = capitalizeFirst(npcFirstName.trim());
+    const lastName = capitalizeFirst(npcLastName.trim());
+    const fullName = `${firstName} ${lastName}`;
+    
+    if (currentNPC && firstName && lastName) {
       updateNPC(currentNPC.id, {
-        name: npcName.trim(),
+        name: fullName,
         type: npcType,
         animation: npcAnimation
       });
@@ -112,20 +145,43 @@ export default function NPCConfigPanel({
         <CardContent className="space-y-4">
           {!showDeleteConfirm ? (
             <>
-              <div className="text-sm text-gray-300">
-                Configure as propriedades deste NPC
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-300">
+                  Configure as propriedades deste NPC
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={generateRandomName}
+                  className="text-lg hover:bg-gray-600/50"
+                  title="Gerar nome aleatório"
+                >
+                  🎲
+                </Button>
               </div>
 
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <label className="text-sm text-gray-400">Nome do NPC:</label>
+                  <label className="text-sm text-gray-400">Nome:</label>
                   <Input
                     type="text"
-                    value={npcName}
-                    onChange={(e) => setNpcName(e.target.value)}
-                    placeholder="Digite o nome do NPC..."
+                    value={npcFirstName}
+                    onChange={(e) => setNpcFirstName(e.target.value)}
+                    placeholder="Digite o nome..."
                     className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                    maxLength={20}
+                    maxLength={15}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm text-gray-400">Sobrenome:</label>
+                  <Input
+                    type="text"
+                    value={npcLastName}
+                    onChange={(e) => setNpcLastName(e.target.value)}
+                    placeholder="Digite o sobrenome..."
+                    className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                    maxLength={15}
                   />
                 </div>
 
@@ -170,7 +226,7 @@ export default function NPCConfigPanel({
                 <Button
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   onClick={handleSaveChanges}
-                  disabled={!npcName.trim()}
+                  disabled={!npcFirstName.trim() || !npcLastName.trim()}
                 >
                   Salvar Alterações
                 </Button>
