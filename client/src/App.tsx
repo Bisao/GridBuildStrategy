@@ -24,7 +24,9 @@ function App() {
     setSelectedStructure, 
     selectedHouse, 
     isNPCPanelOpen, 
-    setNPCPanelOpen 
+    setNPCPanelOpen,
+    isStructurePanelOpen,
+    setStructurePanelOpen
   } = useGameState();
 
   const [isMobile, setIsMobile] = useState(false);
@@ -88,6 +90,8 @@ function App() {
         <StructurePanel 
           selectedStructure={selectedStructure}
           onSelectStructure={setSelectedStructure}
+          isOpen={isStructurePanelOpen}
+          onToggle={() => setStructurePanelOpen(!isStructurePanelOpen)}
         />
         
         <NPCPanel

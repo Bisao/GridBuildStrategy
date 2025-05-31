@@ -158,12 +158,7 @@ const Game = () => {
           position={[previewPosition.x, 0, previewPosition.z]}
           rotation={[0, (previewRotation * Math.PI) / 180, 0]}
         >
-          {selectedStructure === 'house' && (
-            <House 
-              isPreview={true} 
-              canPlace={canPlaceStructure(previewPosition.x, previewPosition.z)}
-            />
-          )}
+          
           {selectedStructure === 'windmill' && (
             <Windmill 
               isPreview={true} 

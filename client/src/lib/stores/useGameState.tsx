@@ -7,6 +7,7 @@ interface GameState {
   selectedHouse: { x: number; z: number; id: string } | null;
   isNPCPanelOpen: boolean;
   isNPCCreationOpen: boolean;
+  isStructurePanelOpen: boolean;
   
   // Actions
   setSelectedStructure: (structure: string | null) => void;
@@ -14,6 +15,7 @@ interface GameState {
   setSelectedHouse: (house: { x: number; z: number; id: string } | null) => void;
   setNPCPanelOpen: (open: boolean) => void;
   setNPCCreationOpen: (open: boolean) => void;
+  setStructurePanelOpen: (open: boolean) => void;
 }
 
 export const useGameState = create<GameState>()(
@@ -23,6 +25,7 @@ export const useGameState = create<GameState>()(
     selectedHouse: null,
     isNPCPanelOpen: false,
     isNPCCreationOpen: false,
+    isStructurePanelOpen: true,
     
     setSelectedStructure: (structure) => {
       set({ 
@@ -49,6 +52,10 @@ export const useGameState = create<GameState>()(
       if (!open) {
         set({ selectedHouse: null, isNPCCreationOpen: false });
       }
+    },
+    
+    setStructurePanelOpen: (open) => {
+      set({ isStructurePanelOpen: open });
     },
 
     setNPCCreationOpen: (open) => {
