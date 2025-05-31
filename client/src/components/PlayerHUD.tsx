@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useGameState } from '../lib/stores/useGameState';
 
@@ -73,47 +72,7 @@ const CircularBar: React.FC<CircularBarProps> = ({
   );
 };
 
+// PlayerHUD is now integrated into SkillsBar component
 export default function PlayerHUD() {
-  const { controlledNPCId } = useGameState();
-  
-  // Mock player stats - você pode integrar com o sistema de combate depois
-  const playerStats = {
-    health: 85,
-    maxHealth: 100,
-    mana: 60,
-    maxMana: 100
-  };
-
-  // Só mostra o HUD se há um NPC controlado
-  if (!controlledNPCId) {
-    return null;
-  }
-
-  return (
-    <>
-      {/* Health Circle - Left side */}
-      <div className="fixed left-6 top-1/2 transform -translate-y-1/2 z-20">
-        <CircularBar
-          value={playerStats.health}
-          maxValue={playerStats.maxHealth}
-          color="#ef4444" // red-500
-          size={80}
-          strokeWidth={6}
-          label="VIDA"
-        />
-      </div>
-
-      {/* Mana Circle - Right side */}
-      <div className="fixed right-6 top-1/2 transform -translate-y-1/2 z-20">
-        <CircularBar
-          value={playerStats.mana}
-          maxValue={playerStats.maxMana}
-          color="#3b82f6" // blue-500
-          size={80}
-          strokeWidth={6}
-          label="MANA"
-        />
-      </div>
-    </>
-  );
+  return null;
 }
