@@ -36,7 +36,7 @@ const Market = ({ isPreview = false, canPlace = true, position, onStructureClick
       </mesh>
 
       {/* Roof - front slope */}
-      <mesh position={[0, 0.85, 0.35]} rotation={[-Math.PI/5, 0, 0]} castShadow>
+      <mesh position={[0, 0.85, 0.35]} rotation={[Math.PI/5, 0, 0]} castShadow>
         <boxGeometry args={[1.5, 0.08, 0.8]} />
         <meshLambertMaterial 
           color={roofColor}
@@ -46,7 +46,7 @@ const Market = ({ isPreview = false, canPlace = true, position, onStructureClick
       </mesh>
 
       {/* Roof - back slope */}
-      <mesh position={[0, 0.85, -0.35]} rotation={[Math.PI/5, 0, 0]} castShadow>
+      <mesh position={[0, 0.85, -0.35]} rotation={[-Math.PI/5, 0, 0]} castShadow>
         <boxGeometry args={[1.5, 0.08, 0.8]} />
         <meshLambertMaterial 
           color={roofColor}

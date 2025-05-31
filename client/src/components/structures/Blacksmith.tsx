@@ -46,7 +46,7 @@ const Blacksmith = ({ isPreview = false, canPlace = true, position, onStructureC
       </mesh>
 
       {/* Roof - front slope */}
-      <mesh position={[0, 0.9, 0.3]} rotation={[-Math.PI/5, 0, 0]} castShadow>
+      <mesh position={[0, 0.9, 0.3]} rotation={[Math.PI/5, 0, 0]} castShadow>
         <boxGeometry args={[1.1, 0.08, 0.7]} />
         <meshLambertMaterial 
           color={roofColor}
@@ -56,7 +56,7 @@ const Blacksmith = ({ isPreview = false, canPlace = true, position, onStructureC
       </mesh>
 
       {/* Roof - back slope */}
-      <mesh position={[0, 0.9, -0.3]} rotation={[Math.PI/5, 0, 0]} castShadow>
+      <mesh position={[0, 0.9, -0.3]} rotation={[-Math.PI/5, 0, 0]} castShadow>
         <boxGeometry args={[1.1, 0.08, 0.7]} />
         <meshLambertMaterial 
           color={roofColor}
