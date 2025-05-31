@@ -26,7 +26,9 @@ const Game = () => {
     setNPCPanelOpen,
     createdNPCs,
     controlledNPCId,
-    setControlledNPCId
+    setControlledNPCId,
+    viewingNPCId,
+    setViewingNPCId
   } = useGameState();
   const { isControlling } = useNPCControl();
   const { 
@@ -48,6 +50,10 @@ const Game = () => {
         if (controlledNPCId) {
           setControlledNPCId(null);
         }
+        // Stop NPC viewing
+        else if (viewingNPCId) {
+          setViewingNPCId(null);
+        }
         // Cancel structure selection
         else if (selectedStructure) {
           setSelectedStructure(null);
@@ -63,7 +69,7 @@ const Game = () => {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [selectedStructure, rotatePreview, setSelectedStructure, setNPCPanelOpen, controlledNPCId]);
+  }, [selectedStructure, rotatePreview, setSelectedStructure, setNPCPanelOpen, controlledNPCId, viewingNPCId, setControlledNPCId, setViewingNPCId]);
 
   // Handle mouse movement for preview positioning
   useFrame(() => {

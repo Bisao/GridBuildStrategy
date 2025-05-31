@@ -21,6 +21,7 @@ interface GameState {
   isNPCConfigPanelOpen: boolean;
   selectedNPCId: string | null;
   controlledNPCId: string | null;
+  viewingNPCId: string | null;
   createdNPCs: CreatedNPC[];
 
   // Actions
@@ -33,6 +34,7 @@ interface GameState {
   setNPCConfigPanelOpen: (open: boolean) => void;
   setSelectedNPCId: (npcId: string | null) => void;
   setControlledNPCId: (npcId: string | null) => void;
+  setViewingNPCId: (npcId: string | null) => void;
   addNPC: (npc: CreatedNPC) => void;
   updateNPC: (npcId: string, updates: Partial<CreatedNPC>) => void;
   removeNPC: (npcId: string) => void;
@@ -50,6 +52,7 @@ export const useGameState = create<GameState>()(
     isNPCConfigPanelOpen: false,
     selectedNPCId: null,
     controlledNPCId: null,
+    viewingNPCId: null,
     createdNPCs: [],
 
     setSelectedStructure: (structure) => {
@@ -91,6 +94,11 @@ export const useGameState = create<GameState>()(
     setControlledNPCId: (npcId) => {
       set({ controlledNPCId: npcId });
       console.log(`NPC control set to: ${npcId || 'none'}`);
+    },
+
+    setViewingNPCId: (npcId) => {
+      set({ viewingNPCId: npcId });
+      console.log(`NPC viewing set to: ${npcId || 'none'}`);
     },
 
     addNPC: (npc) => {

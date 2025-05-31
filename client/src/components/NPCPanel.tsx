@@ -20,7 +20,17 @@ export default function NPCPanel({
   onCreateNPC,
   onConfigureNPC 
 }: NPCPanelProps) {
-  const { isNPCCreationOpen, setNPCCreationOpen, getNPCsByStructure } = useGameState();
+  const { 
+    selectedStructure, 
+    setSelectedStructure, 
+    setSelectedHouse, 
+    setNPCPanelOpen,
+    createdNPCs,
+    controlledNPCId,
+    setControlledNPCId,
+    viewingNPCId,
+    setViewingNPCId
+  } = useGameState();
   const [npcName, setNpcName] = useState("");
   const [npcSurname, setNpcSurname] = useState("");
 
@@ -195,7 +205,7 @@ export default function NPCPanel({
                             size="sm"
                             onClick={() => {
                               console.log(`Controle de IA para NPC ${npc.id}`);
-                              // TODO: Implementar painel de controle de IA
+                              // TODO: Implementar controle de IA
                             }}
                             className="h-7 w-7 p-0 text-lg hover:bg-gray-600/50"
                             title="Controle de IA"
@@ -207,9 +217,9 @@ export default function NPCPanel({
                             size="sm"
                             onClick={() => {
                               console.log(`Visualizar NPC ${npc.id}`);
-                              // TODO: Implementar visualização do NPC
+                              setViewingNPCId(viewingNPCId === npc.id ? null : npc.id);
                             }}
-                            className="h-7 w-7 p-0 text-lg hover:bg-gray-600/50"
+                            className={`h-7 w-7 p-0 text-lg hover:bg-gray-600/50 ${viewingNPCId === npc.id ? 'bg-blue-600' : ''}`}
                             title="Visualizar NPC"
                           >
                             👁️
@@ -219,9 +229,12 @@ export default function NPCPanel({
                             size="sm"
                             onClick={() => {
                               console.log(`Controles de jogabilidade para NPC ${npc.id}`);
-                              // TODO: Implementar painel de jogabilidade
+                              setControlledNPCId(controlledNPCId === npc.id ? null : npc.id);
+                              if (viewingNPCId === npc.id) {
+                                setViewingNPCId(null);
+                              }
                             }}
-                            className="h-7 w-7 p-0 text-lg hover:bg-gray-600/50"
+                            className={`h-7 w-7 p-0 text-lg hover:bg-gray-600/50 ${controlledNPCId === npc.id ? 'bg-green-600' : ''}`}
                             title="Controles de Jogabilidade"
                           >
                             🕹️

@@ -2,10 +2,12 @@ import { useRef, useEffect, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
+import { useGameState } from "../lib/stores/useGameState";
 
 const CameraControls = () => {
   const controlsRef = useRef<any>();
   const { camera } = useThree();
+  const { controlledNPCId, viewingNPCId, createdNPCs } = useGameState();
   const [keys, setKeys] = useState({
     w: false,
     a: false,
@@ -13,8 +15,10 @@ const CameraControls = () => {
     d: false
   });
 
-  // Handle keyboard input
+  // Handle keyboard input - disabled when controlling NPC
   useEffect(() => {
+    if (controlledNPCId) return; // Disable camera controls when controlling NPC
+
     const handleKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase();
       if (['w', 'a', 's', 'd'].includes(key)) {
@@ -36,11 +40,34 @@ const CameraControls = () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [controlledNPCId]);
 
   useFrame(() => {
     if (controlsRef.current) {
       const controls = controlsRef.current;
+      
+      // Handle NPC viewing mode
+      if (viewingNPCId) {
+        const viewedNPC = createdNPCs.find(npc => npc.id === viewingNPCId);
+        if (viewedNPC) {
+          const npcPosition = new THREE.Vector3(viewedNPC.position.x, 0, viewedNPC.position.z);
+          const cameraOffset = new THREE.Vector3(-3, 4, -3);
+          const targetPosition = npcPosition.clone().add(cameraOffset);
+          
+          // Smoothly move camera to follow NPC
+          camera.position.lerp(targetPosition, 0.05);
+          controls.target.lerp(npcPosition, 0.05);
+          controls.update();
+          return;
+        }
+      }
+      
+      // Skip WASD movement if controlling NPC
+      if (controlledNPCId) {
+        controls.update();
+        return;
+      }
+      
       const speed = 0.3;
       
       // Get camera direction vectors
