@@ -97,23 +97,35 @@ export const useNPCControl = () => {
     const lookDirection = cursorWorldPos.clone().sub(npcPos).normalize();
     const rotationY = Math.atan2(lookDirection.x, lookDirection.z);
 
-    // Project Zomboid style movement - absolute directions
-    // W = North (positive Z), S = South (negative Z)
-    // A = West (negative X), D = East (positive X)
+    // Calculate direction from NPC to cursor for W key movement
+    const npcPos = new THREE.Vector3(controlledNPC.position.x, 0, controlledNPC.position.z);
+    const lookDirection = cursorWorldPos.clone().sub(npcPos).normalize();
+
+    // Movement controls
     if (keys.w) {
-      movement.z += speed * deltaTime; // Move north
+      // Move towards cursor direction
+      movement.x += lookDirection.x * speed * deltaTime;
+      movement.z += lookDirection.z * speed * deltaTime;
       isMoving = true;
     }
     if (keys.s) {
-      movement.z -= speed * deltaTime; // Move south
+      // Move away from cursor direction
+      movement.x -= lookDirection.x * speed * deltaTime;
+      movement.z -= lookDirection.z * speed * deltaTime;
       isMoving = true;
     }
     if (keys.a) {
-      movement.x -= speed * deltaTime; // Move west
+      // Strafe left relative to cursor direction
+      const leftDirection = new THREE.Vector3(-lookDirection.z, 0, lookDirection.x);
+      movement.x += leftDirection.x * speed * deltaTime;
+      movement.z += leftDirection.z * speed * deltaTime;
       isMoving = true;
     }
     if (keys.d) {
-      movement.x += speed * deltaTime; // Move east
+      // Strafe right relative to cursor direction
+      const rightDirection = new THREE.Vector3(lookDirection.z, 0, -lookDirection.x);
+      movement.x += rightDirection.x * speed * deltaTime;
+      movement.z += rightDirection.z * speed * deltaTime;
       isMoving = true;
     }
 
