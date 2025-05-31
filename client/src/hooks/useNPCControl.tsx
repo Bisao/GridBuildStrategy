@@ -109,11 +109,11 @@ export const useNPCControl = () => {
       isMoving = true;
     }
     if (keys.a) {
-      movement.add(right.clone().multiplyScalar(-speed * deltaTime));
+      movement.add(right.clone().multiplyScalar(speed * deltaTime));
       isMoving = true;
     }
     if (keys.d) {
-      movement.add(right.clone().multiplyScalar(speed * deltaTime));
+      movement.add(right.clone().multiplyScalar(-speed * deltaTime));
       isMoving = true;
     }
 
