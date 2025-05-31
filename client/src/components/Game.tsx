@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import * as THREE from "three";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import Grid from "./Grid";
 import House from "./House";
 import CameraControls from "./CameraControls";
@@ -224,39 +224,4 @@ const Game = () => {
   );
 };
 
-const App = () => {
-  return (
-    <Canvas
-      camera={{ position: [10, 10, 10], fov: 75 }}
-      shadows
-      onCreated={({ gl }) => {
-        gl.getContext().addEventListener('webglcontextlost', (event) => {
-          console.warn('WebGL context lost. Preventing default behavior.');
-          event.preventDefault();
-        });
-
-        gl.getContext().addEventListener('webglcontextrestored', () => {
-          console.log('WebGL context restored.');
-        });
-      }}
-    >
-      <ambientLight intensity={0.5} />
-      <directionalLight
-        position={[10, 10, 5]}
-        intensity={1}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-camera-far={50}
-        shadow-camera-left={-10}
-        shadow-camera-right={10}
-        shadow-camera-top={10}
-        shadow-camera-bottom={-10}
-      />
-      <Game />
-    </Canvas>
-  );
-};
-
-
-export default App;
+export default Game;
