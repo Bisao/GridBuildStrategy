@@ -20,17 +20,18 @@ const Game = () => {
   const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
   const raycaster = useRef(new THREE.Raycaster());
 
-  const { createdNPCs, enemies, viewingNPCId, controlledNPCId, removeEnemy } = useGameState();
   const { 
     selectedStructure, 
     setSelectedStructure, 
     setSelectedHouse, 
     setNPCPanelOpen,
     createdNPCs,
+    enemies,
     controlledNPCId,
     setControlledNPCId,
     viewingNPCId,
-    setViewingNPCId
+    setViewingNPCId,
+    removeEnemy
   } = useGameState();
   const { isControlling } = useNPCControl();
   const { 
