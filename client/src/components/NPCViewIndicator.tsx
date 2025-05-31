@@ -9,7 +9,7 @@ export default function NPCViewIndicator() {
   const viewedNPC = createdNPCs.find(npc => npc.id === viewingNPCId);
 
   return (
-    <div className="fixed bottom-4 right-4 bg-blue-600/90 text-white px-3 py-2 rounded-lg shadow-lg z-50"></div>
+    <div className="fixed bottom-4 right-4 bg-blue-600/90 text-white px-3 py-2 rounded-lg shadow-lg z-50">
       <div className="flex items-center gap-2">
         <span className="text-lg">👁️</span>
         <span className="font-medium">
