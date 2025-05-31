@@ -12,7 +12,12 @@ const Game = () => {
   const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
   const raycaster = useRef(new THREE.Raycaster());
   
-  const { selectedStructure, setSelectedStructure } = useGameState();
+  const { 
+    selectedStructure, 
+    setSelectedStructure, 
+    setSelectedHouse, 
+    setNPCPanelOpen 
+  } = useGameState();
   const { 
     placedStructures, 
     hoveredTile, 
@@ -46,6 +51,11 @@ const Game = () => {
         console.log("Structure placed successfully!");
       }
     }
+  };
+
+  const handleHouseClick = (position: { x: number; z: number }) => {
+    setSelectedHouse(position);
+    setNPCPanelOpen(true);
   };
 
   return (

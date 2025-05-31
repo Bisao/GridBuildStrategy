@@ -5,9 +5,11 @@ import { useTexture } from "@react-three/drei";
 interface HouseProps {
   isPreview?: boolean;
   canPlace?: boolean;
+  position?: { x: number; z: number };
+  onHouseClick?: (position: { x: number; z: number }) => void;
 }
 
-const House = ({ isPreview = false, canPlace = true }: HouseProps) => {
+const House = ({ isPreview = false, canPlace = true, position, onHouseClick }: HouseProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const woodTexture = useTexture("/textures/wood.jpg");
   
@@ -19,8 +21,15 @@ const House = ({ isPreview = false, canPlace = true }: HouseProps) => {
   const wallColor = isPreview ? (canPlace ? "#8B4513" : "#FF4444") : "#8B4513";
   const roofColor = isPreview ? (canPlace ? "#654321" : "#AA2222") : "#654321";
 
+  const handleClick = (event: any) => {
+    if (!isPreview && position && onHouseClick) {
+      event.stopPropagation();
+      onHouseClick(position);
+    }
+  };
+
   return (
-    <group ref={groupRef}>
+    <group ref={groupRef} onClick={handleClick}>
       {/* House Base */}
       <mesh position={[0, 0.25, 0]} castShadow>
         <boxGeometry args={[0.8, 0.5, 0.8]} />
