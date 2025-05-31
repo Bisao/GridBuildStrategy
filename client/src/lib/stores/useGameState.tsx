@@ -23,6 +23,9 @@ interface GameState {
   controlledNPCId: string | null;
   viewingNPCId: string | null;
   createdNPCs: CreatedNPC[];
+  currentGameStateId: number | null;
+  isSaving: boolean;
+  isLoading: boolean;
 
   // Actions
   setSelectedStructure: (structure: string | null) => void;
@@ -39,6 +42,12 @@ interface GameState {
   updateNPC: (npcId: string, updates: Partial<CreatedNPC>) => void;
   removeNPC: (npcId: string) => void;
   getNPCsByStructure: (structureId: string) => CreatedNPC[];
+  
+  // Persistence actions
+  saveGame: (name: string, structures: any[]) => Promise<void>;
+  loadGame: (gameStateId: number) => Promise<void>;
+  getGameStates: () => Promise<any[]>;
+  setCurrentGameStateId: (id: number | null) => void;
 }
 
 export const useGameState = create<GameState>()(
@@ -54,6 +63,9 @@ export const useGameState = create<GameState>()(
     controlledNPCId: null,
     viewingNPCId: null,
     createdNPCs: [],
+    currentGameStateId: null,
+    isSaving: false,
+    isLoading: false,
 
     setSelectedStructure: (structure) => {
       set({ 
@@ -126,6 +138,103 @@ export const useGameState = create<GameState>()(
 
     getNPCsByStructure: (structureId) => {
       return get().createdNPCs.filter(npc => npc.structureId === structureId);
+    },
+
+    setCurrentGameStateId: (id) => {
+      set({ currentGameStateId: id });
+    },
+
+    saveGame: async (name, structures) => {
+      set({ isSaving: true });
+      try {
+        const state = get();
+        const gameData = {
+          userId: 1, // Default user for now
+          name,
+          structures,
+          npcs: state.createdNPCs,
+          gameState: {
+            selectedStructure: state.selectedStructure,
+            createdNPCs: state.createdNPCs
+          }
+        };
+
+        const response = await fetch('/api/save-game', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(gameData),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to save game');
+        }
+
+        const result = await response.json();
+        set({ currentGameStateId: result.gameState.id });
+        console.log('Jogo salvo com sucesso!', result);
+      } catch (error) {
+        console.error('Erro ao salvar jogo:', error);
+        throw error;
+      } finally {
+        set({ isSaving: false });
+      }
+    },
+
+    loadGame: async (gameStateId) => {
+      set({ isLoading: true });
+      try {
+        const response = await fetch(`/api/load-game/${gameStateId}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to load game');
+        }
+
+        const result = await response.json();
+        
+        // Transform loaded NPCs to match current format
+        const loadedNPCs = result.npcs.map((npc: any) => ({
+          id: npc.npcId,
+          name: npc.name,
+          structureId: npc.structureId,
+          position: { x: npc.x, z: npc.z },
+          type: npc.type,
+          rotation: npc.rotation,
+          animation: npc.animation
+        }));
+
+        set({
+          createdNPCs: loadedNPCs,
+          currentGameStateId: gameStateId,
+          selectedStructure: null,
+          isPlacementMode: false
+        });
+
+        console.log('Jogo carregado com sucesso!', result);
+        return result;
+      } catch (error) {
+        console.error('Erro ao carregar jogo:', error);
+        throw error;
+      } finally {
+        set({ isLoading: false });
+      }
+    },
+
+    getGameStates: async () => {
+      try {
+        const response = await fetch('/api/game-states/1'); // Default user
+        
+        if (!response.ok) {
+          throw new Error('Failed to get game states');
+        }
+
+        const gameStates = await response.json();
+        return gameStates;
+      } catch (error) {
+        console.error('Erro ao buscar jogos salvos:', error);
+        throw error;
+      }
     }
   }))
 );

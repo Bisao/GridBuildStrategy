@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { Home, X, Settings, Castle, Hammer, ShoppingCart, Menu } from "lucide-react";
+import { Home, X, Settings, Castle, Hammer, ShoppingCart, Menu, Save } from "lucide-react";
 import { useEffect } from "react";
 
 interface StructurePanelProps {
@@ -8,13 +8,15 @@ interface StructurePanelProps {
   onSelectStructure: (structure: string | null) => void;
   isOpen: boolean;
   onToggle: () => void;
+  onOpenSaveLoad?: () => void;
 }
 
 export default function StructurePanel({ 
   selectedStructure, 
   onSelectStructure,
   isOpen,
-  onToggle
+  onToggle,
+  onOpenSaveLoad
 }: StructurePanelProps) {
   // Handle ESC key to close panel
   useEffect(() => {
@@ -51,7 +53,7 @@ export default function StructurePanel({
           <CardTitle className="text-white text-sm sm:text-lg">Estruturas</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 pt-0">
-          
+
 
         <Button
           variant={selectedStructure === 'largehouse' ? 'default' : 'outline'}
@@ -124,6 +126,16 @@ export default function StructurePanel({
               <p>Pressione <kbd className="px-1 py-0.5 bg-gray-600 rounded text-white">ESC</kbd> para cancelar</p>
             </div>
           )}
+
+        {onOpenSaveLoad && (
+          <Button
+            onClick={onOpenSaveLoad}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center gap-2"
+          >
+            <Save size={16} />
+            Salvar / Carregar
+          </Button>
+        )}
         </CardContent>
       </Card>
       )}

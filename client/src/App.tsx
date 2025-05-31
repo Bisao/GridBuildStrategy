@@ -4,9 +4,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@fontsource/inter";
 import "./index.css";
 import Game from "./components/Game";
+import { useGridPlacement } from "./hooks/useGridPlacement";
 import StructurePanel from "./components/StructurePanel";
 import NPCPanel from "./components/NPCPanel";
 import NPCConfigPanel from "./components/NPCConfigPanel";
+import NPCControlIndicator from "./components/NPCControlIndicator";
+import NPCViewIndicator from "./components/NPCViewIndicator";
+import SaveLoadPanel from "./components/SaveLoadPanel";
 import { useGameState } from "./lib/stores/useGameState";
 
 import SkillsBar from "./components/SkillsBar";
@@ -35,8 +39,11 @@ function App() {
 
   const [isNPCConfigPanelOpen, setNPCConfigPanelOpen] = useState(false);
   const [selectedNPC, setSelectedNPC] = useState<string | null>(null);
+  const [isSaveLoadPanelOpen, setIsSaveLoadPanelOpen] = useState(false);
 
   const [isMobile, setIsMobile] = useState(false);
+  const { placedStructures } = useGridPlacement();
+
 
   useEffect(() => {
     const checkIsMobile = () => {
@@ -110,11 +117,17 @@ function App() {
         </Canvas>
 
         {/* UI overlay outside of Canvas */}
-        <StructurePanel 
-          selectedStructure={selectedStructure}
-          onSelectStructure={setSelectedStructure}
+        <StructurePanel
           isOpen={isStructurePanelOpen}
-          onToggle={() => setStructurePanelOpen(!isStructurePanelOpen)}
+          onClose={() => setStructurePanelOpen(false)}
+          onSelectStructure={setSelectedStructure}
+          onOpenSaveLoad={() => setIsSaveLoadPanelOpen(true)}
+        />
+
+        <SaveLoadPanel
+          isOpen={isSaveLoadPanelOpen}
+          onClose={() => setIsSaveLoadPanelOpen(false)}
+          structures={placedStructures}
         />
 
         <NPCPanel
