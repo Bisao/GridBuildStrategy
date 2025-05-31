@@ -85,8 +85,8 @@ const Game = () => {
     const houseStructure = placedStructures.find(
       structure => 
         (structure.type === 'house' || structure.type === 'largehouse') &&
-        structure.position.x === position.x && 
-        structure.position.z === position.z
+        structure.x === position.x && 
+        structure.z === position.z
     );
     
     if (houseStructure) {
