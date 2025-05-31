@@ -1,33 +1,11 @@
-import { useGameState } from "../lib/stores/useGameState";
+import React from 'react';
 
-export default function NPCControlIndicator() {
-  const { controlledNPCId, createdNPCs, setControlledNPCId } = useGameState();
-
-  if (!controlledNPCId) return null;
-
-  const controlledNPC = createdNPCs.find(npc => npc.id === controlledNPCId);
-
-  return (
-    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-blue-600/90 text-white px-3 py-2 rounded-lg shadow-lg z-50">
-      <div className="flex items-center gap-2">
-        <span className="text-lg">🕹️</span>
-        <span className="font-medium">
-          Controlando: {controlledNPC?.name || 'NPC'}
-        </span>
-        <span className="text-sm opacity-75">
-          (Click to move • Mouse to look around • ESC to stop)
-        </span>
-        <button
-          onClick={() => setControlledNPCId(null)}
-          className="ml-2 text-lg hover:bg-white/20 rounded px-1"
-          title="Parar controle"
-        >
-          ❌
-        </button>
-      </div>
-      <div className="text-xs text-green-300">
-          Click to move • Mouse to look around • ESC to stop
-        </div>
-    </div>
-  );
+interface NPCControlIndicatorProps {
+  npcName: string;
+  onStopControl: () => void;
 }
+
+export const NPCControlIndicator: React.FC<NPCControlIndicatorProps> = ({ npcName, onStopControl }) => {
+  // Component disabled - return null to hide the dialog
+  return null;
+};
