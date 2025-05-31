@@ -4,6 +4,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import Grid from "./Grid";
 import House from "./House";
 import CameraControls from "./CameraControls";
+import NPC from "./NPC";
 import { useGridPlacement } from "../hooks/useGridPlacement";
 import { useGameState } from "../lib/stores/useGameState";
 
