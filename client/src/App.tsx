@@ -8,7 +8,8 @@ import StructurePanel from "./components/StructurePanel";
 import NPCPanel from "./components/NPCPanel";
 import NPCConfigPanel from "./components/NPCConfigPanel";
 import { useGameState } from "./lib/stores/useGameState";
-import NPCControlIndicator from "./components/NPCControlIndicator";
+import NPCControlIndicator from './components/NPCControlIndicator';
+import CombatIndicator from './components/CombatIndicator';
 import NPCViewIndicator from "./components/NPCViewIndicator";
 
 const queryClient = new QueryClient({
@@ -136,8 +137,9 @@ function App() {
 
       {/* NPC Control Indicator */}
       <NPCControlIndicator />
+      <CombatIndicator />
       <NPCViewIndicator />
-      </div>
+    </div>
     </QueryClientProvider>
   );
 }
