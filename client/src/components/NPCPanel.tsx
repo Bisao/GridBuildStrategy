@@ -33,6 +33,7 @@ export default function NPCPanel({
   } = useGameState();
   const [npcName, setNpcName] = useState("");
   const [npcSurname, setNpcSurname] = useState("");
+  const [isNPCCreationOpen, setNPCCreationOpen] = useState(false);
 
   // Arrays para geração aleatória de nomes
   const firstNames = [
@@ -60,6 +61,11 @@ export default function NPCPanel({
     setNpcSurname(randomSurname);
   };
 
+  // Function to get NPCs by structure
+  const getNPCsByStructure = (structureId: string) => {
+    return createdNPCs.filter(npc => npc.structureId === structureId);
+  };
+  
   // Obter NPCs da estrutura atual
   const structureNPCs = housePosition ? getNPCsByStructure(housePosition.id) : [];
 
