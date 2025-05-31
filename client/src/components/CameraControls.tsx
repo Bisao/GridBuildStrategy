@@ -42,30 +42,10 @@ const CameraControls = () => {
     };
   }, [controlledNPCId]);
 
-  useEffect(() => {
-    if (controlledNPCId) {
-      // Disable orbit controls and adjust camera for NPC control mode
-      if (controlsRef.current) {
-        controlsRef.current.enabled = false;
-      }
-      // Set better FOV for third-person view
-      camera.fov = 75;
-      camera.updateProjectionMatrix();
-    } else {
-      // Re-enable orbit controls and reset camera settings
-      if (controlsRef.current) {
-        controlsRef.current.enabled = true;
-      }
-      // Reset to default FOV
-      camera.fov = 50;
-      camera.updateProjectionMatrix();
-    }
-  }, [controlledNPCId, camera]);
-
   useFrame(() => {
     if (controlsRef.current) {
       const controls = controlsRef.current;
-
+      
       // Handle NPC viewing mode
       if (viewingNPCId) {
         const viewedNPC = createdNPCs.find(npc => npc.id === viewingNPCId);
@@ -73,7 +53,7 @@ const CameraControls = () => {
           const npcPosition = new THREE.Vector3(viewedNPC.position.x, 0, viewedNPC.position.z);
           const cameraOffset = new THREE.Vector3(-3, 4, -3);
           const targetPosition = npcPosition.clone().add(cameraOffset);
-
+          
           // Smoothly move camera to follow NPC
           camera.position.lerp(targetPosition, 0.05);
           controls.target.lerp(npcPosition, 0.05);
@@ -81,27 +61,27 @@ const CameraControls = () => {
           return;
         }
       }
-
+      
       // Skip WASD movement if controlling NPC
       if (controlledNPCId) {
         controls.update();
         return;
       }
-
+      
       const speed = 0.3;
-
+      
       // Get camera direction vectors
       const direction = new THREE.Vector3();
       camera.getWorldDirection(direction);
       direction.y = 0; // Keep movement on horizontal plane
       direction.normalize();
-
+      
       const right = new THREE.Vector3();
       right.crossVectors(direction, camera.up).normalize();
-
+      
       // Calculate movement
       const movement = new THREE.Vector3();
-
+      
       if (keys.w) {
         movement.add(direction.clone().multiplyScalar(speed));
       }
@@ -114,13 +94,13 @@ const CameraControls = () => {
       if (keys.d) {
         movement.add(right.clone().multiplyScalar(speed));
       }
-
+      
       // Apply movement to camera and target
       if (movement.length() > 0) {
         camera.position.add(movement);
         controls.target.add(movement);
       }
-
+      
       controls.update();
     }
   });
