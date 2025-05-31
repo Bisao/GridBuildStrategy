@@ -21,6 +21,8 @@ interface ActiveEffect {
   id: string;
   position: THREE.Vector3;
   skillType: string;
+  startTime: number;
+  duration: number;
 }
 
 const Game = () => {
@@ -124,15 +126,35 @@ const Game = () => {
     }
   };
 
+  const getDurationForSkill = (skillType: string): number => {
+    switch (skillType) {
+      case "fireball":
+        return 1500;
+      case "ice_storm":
+        return 2500;
+      default:
+        return 2000;
+    }
+  };
+
   useEffect(() => {
     // Expose effect creation function globally
     (window as any).createSkillEffect = (position: THREE.Vector3, skillType: string) => {
       const effectId = `effect_${Date.now()}_${Math.random()}`;
+      const duration = getDurationForSkill(skillType);
+
       setActiveEffects(prev => [...prev, {
         id: effectId,
         position: position.clone(),
-        skillType
+        skillType,
+        startTime: Date.now(),
+        duration
       }]);
+
+      // Auto-remove effect after duration
+      setTimeout(() => {
+        removeEffect(effectId);
+      }, duration);
     };
 
     return () => {
@@ -265,15 +287,17 @@ const Game = () => {
               />
             ))}
 
-            {/* Skill effects */}
-            {activeEffects.map((effect) => (
-              <SkillEffect
-                key={effect.id}
-                position={effect.position}
-                skillType={effect.skillType}
-                onComplete={() => removeEffect(effect.id)}
-              />
-            ))}
+            {/* Skill Effects */}
+        {activeEffects.map(effect => (
+          <SkillEffect
+            key={effect.id}
+            position={effect.position}
+            skillType={effect.skillType}
+            startTime={effect.startTime}
+            duration={effect.duration}
+            onComplete={() => removeEffect(effect.id)}
+          />
+        ))}
 
     </>
   );

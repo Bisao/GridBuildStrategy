@@ -10,7 +10,10 @@ export default function SkillsBar() {
     activeSkillId, 
     setActiveSkill, 
     useSkill, 
-    updateCooldowns, 
+    updateCooldowns,
+    updateMana,
+    mana,
+    maxMana,
     initializeSkills 
   } = useSkills();
   
@@ -28,7 +31,7 @@ export default function SkillsBar() {
     initializeSkills();
   }, [initializeSkills]);
 
-  // Update cooldowns
+  // Update cooldowns and mana
   useEffect(() => {
     const updateLoop = () => {
       const currentTime = performance.now();
@@ -36,12 +39,13 @@ export default function SkillsBar() {
       lastUpdateTime.current = currentTime;
       
       updateCooldowns(deltaTime);
+      updateMana(deltaTime);
       requestAnimationFrame(updateLoop);
     };
     
     const animationId = requestAnimationFrame(updateLoop);
     return () => cancelAnimationFrame(animationId);
-  }, [updateCooldowns]);
+  }, [updateCooldowns, updateMana]);
 
   // Handle skill activation
   const handleSkillClick = (skillId: string) => {
@@ -51,7 +55,10 @@ export default function SkillsBar() {
     }
 
     const skill = skills.find(s => s.id === skillId);
-    if (!skill || skill.currentCooldown > 0) {
+    if (!skill || skill.currentCooldown > 0 || mana < skill.manaCost) {
+      if (mana < skill.manaCost) {
+        console.log("Mana insuficiente!");
+      }
       return;
     }
 
@@ -235,62 +242,130 @@ export default function SkillsBar() {
 
   return (
     <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-20">
-      <div className="bg-gray-800/95 border-2 border-gray-600 rounded-lg p-3">
-        <div className="flex gap-2 items-center">
-          <div className="text-xs text-gray-300 mr-2">Skills:</div>
-          {skills.map((skill, index) => (
-            <div
-              key={skill.id}
-              className="relative group"
-            >
-              <button
-                onClick={() => handleSkillClick(skill.id)}
-                className={`
-                  w-12 h-12 rounded-lg border-2 transition-all duration-200 relative overflow-hidden
-                  border-gray-500 bg-gray-700 hover:border-gray-400
-                  ${skill.currentCooldown > 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                `}
-                disabled={skill.currentCooldown > 0}
-                title={`${skill.name} (${index + 1}) - ${skill.description}`}
-              >
-                <div className="text-lg">{skill.icon}</div>
-                
-                {/* Cooldown overlay */}
-                {skill.currentCooldown > 0 && (
-                  <div
-                    className="absolute inset-0 bg-gray-900/70 flex items-center justify-center text-xs text-white font-bold"
-                    style={{
-                      background: `conic-gradient(from 0deg, transparent ${100 - getCooldownPercentage(skill)}%, rgba(0,0,0,0.8) ${100 - getCooldownPercentage(skill)}%)`
-                    }}
-                  >
-                    {Math.ceil(skill.currentCooldown)}
-                  </div>
-                )}
-                
-                {/* Key indicator */}
-                <div className="absolute -bottom-1 -right-1 bg-gray-600 text-white text-xs rounded w-4 h-4 flex items-center justify-center">
-                  {index + 1}
-                </div>
-              </button>
+      {/* Mana Bar */}
+      <div className="mb-2 flex justify-center">
+        <div className="bg-black/80 border border-blue-400 rounded-full px-4 py-1 min-w-[200px]">
+          <div className="flex items-center justify-between text-xs text-white mb-1">
+            <span>MANA</span>
+            <span>{Math.floor(mana)}/{maxMana}</span>
+          </div>
+          <div className="w-full bg-gray-700 rounded-full h-2">
+            <div 
+              className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${(mana / maxMana) * 100}%` }}
+            />
+          </div>
+        </div>
+      </div>
 
-              {/* Tooltip */}
-              <div className="absolute bottom-14 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-30">
-                <div className="font-semibold">{skill.name}</div>
-                <div>{skill.description}</div>
-                <div className="text-gray-400">Tecla: {index + 1}</div>
-                {skill.damage && <div className="text-red-400">Dano: {skill.damage}</div>}
-                {skill.healAmount && <div className="text-green-400">Cura: {skill.healAmount}</div>}
-                <div className="text-blue-400">Alcance: {skill.range}m</div>
-                <div className="text-yellow-400">Cooldown: {skill.cooldown}s</div>
+      {/* Skills Hotbar - Albion Style */}
+      <div className="bg-black/90 border-2 border-gray-500 rounded-lg p-2">
+        <div className="flex gap-1 items-center">
+          {skills.map((skill, index) => {
+            const isOnCooldown = skill.currentCooldown > 0;
+            const hasInsufficientMana = mana < skill.manaCost;
+            const isDisabled = isOnCooldown || hasInsufficientMana;
+            
+            return (
+              <div
+                key={skill.id}
+                className="relative group"
+              >
+                <button
+                  onClick={() => handleSkillClick(skill.id)}
+                  className={`
+                    w-14 h-14 border-2 transition-all duration-200 relative overflow-hidden
+                    ${isDisabled 
+                      ? 'border-gray-600 bg-gray-800 opacity-60 cursor-not-allowed' 
+                      : 'border-yellow-400 bg-gray-700 hover:border-yellow-300 hover:bg-gray-600 cursor-pointer'
+                    }
+                    ${activeSkillId === skill.id ? 'border-red-400 bg-red-900/30' : ''}
+                  `}
+                  disabled={isDisabled}
+                  title={`${skill.name} (${index + 1}) - ${skill.description}`}
+                >
+                  <div className="text-xl">{skill.icon}</div>
+                  
+                  {/* Cooldown overlay */}
+                  {isOnCooldown && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background: `conic-gradient(from 0deg, transparent ${100 - getCooldownPercentage(skill)}%, rgba(0,0,0,0.8) ${100 - getCooldownPercentage(skill)}%)`
+                        }}
+                      />
+                      <span className="text-xs text-white font-bold z-10">
+                        {Math.ceil(skill.currentCooldown)}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Mana cost indicator */}
+                  {hasInsufficientMana && !isOnCooldown && (
+                    <div className="absolute inset-0 bg-blue-900/60 flex items-center justify-center">
+                      <span className="text-xs text-blue-200 font-bold">
+                        {skill.manaCost}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Key indicator */}
+                  <div className="absolute bottom-0 right-0 bg-black/80 text-yellow-400 text-xs w-4 h-4 flex items-center justify-center border border-yellow-400">
+                    {index + 1}
+                  </div>
+
+                  {/* Mana cost bottom indicator */}
+                  <div className="absolute bottom-0 left-0 bg-blue-600 text-white text-xs px-1 leading-none">
+                    {skill.manaCost}
+                  </div>
+                </button>
+
+                {/* Enhanced Tooltip - Albion Style */}
+                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-black/95 border border-yellow-400 text-white text-xs p-3 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-30 min-w-[200px]">
+                  <div className="font-bold text-yellow-400 text-sm mb-1">{skill.name}</div>
+                  <div className="text-gray-300 mb-2">{skill.description}</div>
+                  
+                  <div className="border-t border-gray-600 pt-2 space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Tecla:</span>
+                      <span className="text-yellow-400">{index + 1}</span>
+                    </div>
+                    {skill.damage && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Dano:</span>
+                        <span className="text-red-400">{skill.damage}</span>
+                      </div>
+                    )}
+                    {skill.healAmount && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Cura:</span>
+                        <span className="text-green-400">{skill.healAmount}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Alcance:</span>
+                      <span className="text-blue-400">{skill.range}m</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Cooldown:</span>
+                      <span className="text-purple-400">{skill.cooldown}s</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Mana:</span>
+                      <span className="text-blue-400">{skill.manaCost}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         
         <div className="text-xs text-gray-400 mt-2 text-center">
-          Pressione os números (1-5) para usar skills
-          <br />
-          <span className="text-yellow-400">Skills de ataque: clique no inimigo para focar</span>
+          <span className="text-yellow-400">1-5</span> para usar skills • 
+          <span className="text-blue-400">Azul</span> = sem mana • 
+          <span className="text-gray-400">Cinza</span> = cooldown
         </div>
       </div>
     </div>

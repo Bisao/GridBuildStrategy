@@ -6,12 +6,13 @@ import * as THREE from 'three';
 interface SkillEffectProps {
   position: THREE.Vector3;
   skillType: string;
+  startTime: number;
+  duration: number;
   onComplete: () => void;
 }
 
-export default function SkillEffect({ position, skillType, onComplete }: SkillEffectProps) {
+export default function SkillEffect({ position, skillType, startTime, duration, onComplete }: SkillEffectProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const startTime = useRef(Date.now());
   const particles = useRef<THREE.Mesh[]>([]);
 
   useEffect(() => {
