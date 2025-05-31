@@ -78,10 +78,20 @@ const Tower = ({ isPreview = false, canPlace = true, position, onStructureClick 
       ))}
 
       {/* Conical roof */}
-      <mesh position={[0, 2.8, 0]} castShadow>
-        <coneGeometry args={[0.5, 0.6, 8]} />
+      <mesh position={[0, 2.9, 0]} castShadow>
+        <coneGeometry args={[0.55, 0.8, 8]} />
         <meshLambertMaterial 
           color={roofColor}
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Roof rim */}
+      <mesh position={[0, 2.5, 0]} castShadow>
+        <cylinderGeometry args={[0.46, 0.46, 0.05, 8]} />
+        <meshLambertMaterial 
+          color="#654321"
           transparent={isPreview}
           opacity={opacity}
         />

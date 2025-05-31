@@ -55,9 +55,9 @@ const LargeHouse = ({ isPreview = false, canPlace = true, position, onStructureC
         />
       </mesh>
 
-      {/* Main roof */}
-      <mesh position={[0, 1.0, 0]} castShadow>
-        <boxGeometry args={[1.3, 0.1, 1.2]} />
+      {/* Main roof - front slope */}
+      <mesh position={[0, 1.05, 0.3]} rotation={[-Math.PI/6, 0, 0]} castShadow>
+        <boxGeometry args={[1.3, 0.08, 0.7]} />
         <meshLambertMaterial 
           color={roofColor}
           transparent={isPreview}
@@ -65,9 +65,9 @@ const LargeHouse = ({ isPreview = false, canPlace = true, position, onStructureC
         />
       </mesh>
 
-      {/* Main roof peak */}
-      <mesh position={[0, 1.2, 0]} rotation={[0, 0, Math.PI/4]} castShadow>
-        <boxGeometry args={[0.15, 1.3, 1.2]} />
+      {/* Main roof - back slope */}
+      <mesh position={[0, 1.05, -0.3]} rotation={[Math.PI/6, 0, 0]} castShadow>
+        <boxGeometry args={[1.3, 0.08, 0.7]} />
         <meshLambertMaterial 
           color={roofColor}
           transparent={isPreview}
@@ -75,9 +75,9 @@ const LargeHouse = ({ isPreview = false, canPlace = true, position, onStructureC
         />
       </mesh>
 
-      {/* Left wing roof */}
-      <mesh position={[-0.8, 0.8, 0.2]} castShadow>
-        <boxGeometry args={[0.7, 0.08, 0.8]} />
+      {/* Left wing roof - front */}
+      <mesh position={[-0.8, 0.75, 0.35]} rotation={[-Math.PI/6, 0, 0]} castShadow>
+        <boxGeometry args={[0.7, 0.06, 0.4]} />
         <meshLambertMaterial 
           color={roofColor}
           transparent={isPreview}
@@ -85,9 +85,29 @@ const LargeHouse = ({ isPreview = false, canPlace = true, position, onStructureC
         />
       </mesh>
 
-      {/* Right wing roof */}
-      <mesh position={[0.8, 0.8, 0.2]} castShadow>
-        <boxGeometry args={[0.7, 0.08, 0.8]} />
+      {/* Left wing roof - back */}
+      <mesh position={[-0.8, 0.75, 0.05]} rotation={[Math.PI/6, 0, 0]} castShadow>
+        <boxGeometry args={[0.7, 0.06, 0.4]} />
+        <meshLambertMaterial 
+          color={roofColor}
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Right wing roof - front */}
+      <mesh position={[0.8, 0.75, 0.35]} rotation={[-Math.PI/6, 0, 0]} castShadow>
+        <boxGeometry args={[0.7, 0.06, 0.4]} />
+        <meshLambertMaterial 
+          color={roofColor}
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Right wing roof - back */}
+      <mesh position={[0.8, 0.75, 0.05]} rotation={[Math.PI/6, 0, 0]} castShadow>
+        <boxGeometry args={[0.7, 0.06, 0.4]} />
         <meshLambertMaterial 
           color={roofColor}
           transparent={isPreview}

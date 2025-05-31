@@ -45,9 +45,9 @@ const Blacksmith = ({ isPreview = false, canPlace = true, position, onStructureC
         />
       </mesh>
 
-      {/* Roof */}
-      <mesh position={[0, 0.85, 0]} castShadow>
-        <boxGeometry args={[1.1, 0.1, 0.9]} />
+      {/* Roof - front slope */}
+      <mesh position={[0, 0.9, 0.3]} rotation={[-Math.PI/5, 0, 0]} castShadow>
+        <boxGeometry args={[1.1, 0.08, 0.7]} />
         <meshLambertMaterial 
           color={roofColor}
           transparent={isPreview}
@@ -55,11 +55,21 @@ const Blacksmith = ({ isPreview = false, canPlace = true, position, onStructureC
         />
       </mesh>
 
-      {/* Roof peak */}
-      <mesh position={[0, 1.05, 0]} rotation={[0, 0, Math.PI/4]} castShadow>
-        <boxGeometry args={[0.12, 1.1, 0.9]} />
+      {/* Roof - back slope */}
+      <mesh position={[0, 0.9, -0.3]} rotation={[Math.PI/5, 0, 0]} castShadow>
+        <boxGeometry args={[1.1, 0.08, 0.7]} />
         <meshLambertMaterial 
           color={roofColor}
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Ridge beam */}
+      <mesh position={[0, 1.15, 0]} castShadow>
+        <boxGeometry args={[1.1, 0.05, 0.08]} />
+        <meshLambertMaterial 
+          color="#654321"
           transparent={isPreview}
           opacity={opacity}
         />

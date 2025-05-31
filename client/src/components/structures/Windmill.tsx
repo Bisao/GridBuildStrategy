@@ -65,10 +65,20 @@ const Windmill = ({ isPreview = false, canPlace = true, position, onStructureCli
       </mesh>
 
       {/* Roof */}
-      <mesh position={[0, 2.2, 0]} castShadow>
-        <coneGeometry args={[0.35, 0.4, 8]} />
+      <mesh position={[0, 2.3, 0]} castShadow>
+        <coneGeometry args={[0.4, 0.6, 8]} />
         <meshLambertMaterial 
           color={roofColor}
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Roof base trim */}
+      <mesh position={[0, 2.0, 0]} castShadow>
+        <cylinderGeometry args={[0.32, 0.32, 0.05, 8]} />
+        <meshLambertMaterial 
+          color="#654321"
           transparent={isPreview}
           opacity={opacity}
         />

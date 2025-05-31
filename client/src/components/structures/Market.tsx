@@ -35,9 +35,9 @@ const Market = ({ isPreview = false, canPlace = true, position, onStructureClick
         />
       </mesh>
 
-      {/* Roof */}
-      <mesh position={[0, 0.75, 0]} castShadow>
-        <boxGeometry args={[1.5, 0.1, 1.1]} />
+      {/* Roof - front slope */}
+      <mesh position={[0, 0.85, 0.35]} rotation={[-Math.PI/5, 0, 0]} castShadow>
+        <boxGeometry args={[1.5, 0.08, 0.8]} />
         <meshLambertMaterial 
           color={roofColor}
           transparent={isPreview}
@@ -45,11 +45,21 @@ const Market = ({ isPreview = false, canPlace = true, position, onStructureClick
         />
       </mesh>
 
-      {/* Roof peak */}
-      <mesh position={[0, 0.95, 0]} rotation={[0, 0, Math.PI/4]} castShadow>
-        <boxGeometry args={[0.12, 1.5, 1.1]} />
+      {/* Roof - back slope */}
+      <mesh position={[0, 0.85, -0.35]} rotation={[Math.PI/5, 0, 0]} castShadow>
+        <boxGeometry args={[1.5, 0.08, 0.8]} />
         <meshLambertMaterial 
           color={roofColor}
+          transparent={isPreview}
+          opacity={opacity}
+        />
+      </mesh>
+
+      {/* Ridge beam */}
+      <mesh position={[0, 1.1, 0]} castShadow>
+        <boxGeometry args={[1.5, 0.05, 0.1]} />
+        <meshLambertMaterial 
+          color="#654321"
           transparent={isPreview}
           opacity={opacity}
         />
