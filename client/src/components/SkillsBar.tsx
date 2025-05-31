@@ -99,7 +99,7 @@ const SkillsBar: React.FC = () => {
             <div className="bg-blue-500 h-full w-full transition-all duration-300"></div>
           </div>
         </div>
-      </div></div>
+      </div>
     </div>
   );
 };

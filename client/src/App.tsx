@@ -104,9 +104,11 @@ function App() {
             far: 1000,
           }}
           gl={{
-            antialias: !isMobile,
-            powerPreference: isMobile ? "default" : "high-performance",
-            pixelRatio: Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2),
+            antialias: false,
+            powerPreference: "default",
+            pixelRatio: Math.min(window.devicePixelRatio, 1.5),
+            preserveDrawingBuffer: false,
+            alpha: false,
           }}
         >
           <color attach="background" args={["#1a1a2e"]} />
