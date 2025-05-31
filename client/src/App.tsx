@@ -26,7 +26,8 @@ function App() {
     isNPCPanelOpen, 
     setNPCPanelOpen,
     isStructurePanelOpen,
-    setStructurePanelOpen
+    setStructurePanelOpen,
+    createdNPCs
   } = useGameState();
 
   const [isMobile, setIsMobile] = useState(false);
@@ -43,8 +44,18 @@ function App() {
   }, []);
 
   const handleCreateNPC = (name: string, structureId: string) => {
-    console.log(`Creating NPC "${name}" for structure ID: ${structureId} at (${selectedHouse?.x}, ${selectedHouse?.z})`);
-    // TODO: Implement NPC creation logic with name and structure ID
+    if (!selectedHouse) return;
+    
+    const newNPC = {
+      id: `npc-${Date.now()}-${Math.random()}`,
+      name,
+      structureId,
+      position: { x: selectedHouse.x, z: selectedHouse.z },
+      type: "villager" as const
+    };
+    
+    useGameState.getState().addNPC(newNPC);
+    setNPCPanelOpen(false);
   };
 
   return (

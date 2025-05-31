@@ -1,6 +1,14 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 
+interface CreatedNPC {
+  id: string;
+  name: string;
+  structureId: string;
+  position: { x: number; z: number };
+  type: "villager" | "guard" | "merchant" | "farmer";
+}
+
 interface GameState {
   selectedStructure: string | null;
   isPlacementMode: boolean;
@@ -8,6 +16,7 @@ interface GameState {
   isNPCPanelOpen: boolean;
   isNPCCreationOpen: boolean;
   isStructurePanelOpen: boolean;
+  createdNPCs: CreatedNPC[];
   
   // Actions
   setSelectedStructure: (structure: string | null) => void;
@@ -16,16 +25,20 @@ interface GameState {
   setNPCPanelOpen: (open: boolean) => void;
   setNPCCreationOpen: (open: boolean) => void;
   setStructurePanelOpen: (open: boolean) => void;
+  addNPC: (npc: CreatedNPC) => void;
+  removeNPC: (npcId: string) => void;
+  getNPCsByStructure: (structureId: string) => CreatedNPC[];
 }
 
 export const useGameState = create<GameState>()(
-  subscribeWithSelector((set) => ({
+  subscribeWithSelector((set, get) => ({
     selectedStructure: null,
     isPlacementMode: false,
     selectedHouse: null,
     isNPCPanelOpen: false,
     isNPCCreationOpen: false,
     isStructurePanelOpen: true,
+    createdNPCs: [],
     
     setSelectedStructure: (structure) => {
       set({ 
@@ -60,6 +73,23 @@ export const useGameState = create<GameState>()(
 
     setNPCCreationOpen: (open) => {
       set({ isNPCCreationOpen: open });
+    },
+
+    addNPC: (npc) => {
+      set((state) => ({
+        createdNPCs: [...state.createdNPCs, npc]
+      }));
+      console.log(`NPC "${npc.name}" criado com sucesso na estrutura ${npc.structureId}`);
+    },
+
+    removeNPC: (npcId) => {
+      set((state) => ({
+        createdNPCs: state.createdNPCs.filter(npc => npc.id !== npcId)
+      }));
+    },
+
+    getNPCsByStructure: (structureId) => {
+      return get().createdNPCs.filter(npc => npc.structureId === structureId);
     }
   }))
 );

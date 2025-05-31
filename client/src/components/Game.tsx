@@ -191,6 +191,16 @@ const Game = () => {
           )}
         </group>
       )}
+
+      {/* Render created NPCs */}
+      {useGameState.getState().createdNPCs.map((npc) => (
+        <NPC
+          key={npc.id}
+          position={[npc.position.x, 0, npc.position.z]}
+          color="#8B4513"
+          animation="idle"
+        />
+      ))}
        
     </>
   );

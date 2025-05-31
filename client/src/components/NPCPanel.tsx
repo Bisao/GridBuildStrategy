@@ -126,7 +126,7 @@ export default function NPCPanel({
               <div className="text-sm text-gray-300 font-medium">
                 Criar Novo NPC
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm text-gray-400">Nome do NPC:</label>
                 <Input
