@@ -4,7 +4,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import Grid from "./Grid";
 import House from "./House";
 import CameraControls from "./CameraControls";
-import NPC from "./NPC";
+import { NPC } from "./NPC";
 import Windmill from "./structures/Windmill";
 import Tower from "./structures/Tower";
 import LargeHouse from "./structures/LargeHouse";
@@ -159,7 +159,7 @@ const Game = () => {
           position={[previewPosition.x, 0, previewPosition.z]}
           rotation={[0, (previewRotation * Math.PI) / 180, 0]}
         >
-          
+
           {selectedStructure === 'windmill' && (
             <Windmill 
               isPreview={true} 
@@ -202,7 +202,7 @@ const Game = () => {
           animation="idle"
         />
       ))}
-       
+
     </>
   );
 };
