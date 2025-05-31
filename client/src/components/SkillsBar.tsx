@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useGameState } from '../lib/stores/useGameState';
 
@@ -52,25 +53,25 @@ const SkillsBar: React.FC = () => {
             >
               {/* Ícone da habilidade */}
               <span className="text-lg mb-0.5">{skill.icon}</span>
-
+              
               {/* Tecla de atalho */}
               <span className="text-xs text-gray-300 font-bold leading-none">
                 {skill.key}
               </span>
-
+              
               {/* Indicador de cooldown (se houver) */}
               {skill.cooldown && (
                 <div className="absolute inset-0 bg-gray-900/60 rounded-lg flex items-center justify-center">
                   <span className="text-xs text-white font-bold">{skill.cooldown}</span>
                 </div>
               )}
-
+              
               {/* Indicador de ativo */}
               {skill.isActive && (
                 <div className="absolute inset-0 border-2 border-yellow-400 rounded-lg animate-pulse"></div>
               )}
             </button>
-
+            
             {/* Tooltip */}
             <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
               <div className="bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
@@ -81,23 +82,22 @@ const SkillsBar: React.FC = () => {
           </div>
         ))}
       </div>
-
-      {/* Barra de mana à esquerda */}
-      <div className="absolute top-1/2 -translate-y-1/2 -left-36">
-        <div className="flex flex-col items-center">
-          <span className="text-xs text-blue-300 mb-1 font-bold">💙 MANA</span>
-          <div className="bg-blue-900/80 h-3 w-32 rounded-full overflow-hidden border border-blue-400/50">
-            <div className="bg-blue-500 h-full w-full transition-all duration-300"></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Barra de vida à direita */}
-      <div className="absolute top-1/2 -translate-y-1/2 -right-36">
+      
+      {/* Barras de vida e mana acima do painel */}
+      <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 flex gap-3">
+        {/* Barra de vida */}
         <div className="flex flex-col items-center">
           <span className="text-xs text-red-300 mb-1 font-bold">❤️ VIDA</span>
           <div className="bg-red-900/80 h-3 w-32 rounded-full overflow-hidden border border-red-400/50">
             <div className="bg-red-500 h-full w-full transition-all duration-300"></div>
+          </div>
+        </div>
+        
+        {/* Barra de mana */}
+        <div className="flex flex-col items-center">
+          <span className="text-xs text-blue-300 mb-1 font-bold">💙 MANA</span>
+          <div className="bg-blue-900/80 h-3 w-32 rounded-full overflow-hidden border border-blue-400/50">
+            <div className="bg-blue-500 h-full w-full transition-all duration-300"></div>
           </div>
         </div>
       </div>
