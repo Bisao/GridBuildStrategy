@@ -54,6 +54,7 @@ function App() {
       type: "villager" as const
     };
     
+    console.log(`Criando NPC "${name}" vinculado à estrutura ${structureId} na posição (${selectedHouse.x}, ${selectedHouse.z})`);
     addNPC(newNPC);
     setNPCPanelOpen(false);
   };

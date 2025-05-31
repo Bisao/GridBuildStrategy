@@ -18,8 +18,11 @@ export default function NPCPanel({
   onClose, 
   onCreateNPC 
 }: NPCPanelProps) {
-  const { isNPCCreationOpen, setNPCCreationOpen } = useGameState();
+  const { isNPCCreationOpen, setNPCCreationOpen, getNPCsByStructure } = useGameState();
   const [npcName, setNpcName] = useState("");
+
+  // Obter NPCs da estrutura atual
+  const structureNPCs = housePosition ? getNPCsByStructure(housePosition.id) : [];
 
   // Determinar tipo de estrutura baseado no ID
   const getStructureInfo = (id: string) => {
@@ -103,11 +106,12 @@ export default function NPCPanel({
             <>
               <div className="flex justify-center">
                 <Button
-                  className="h-16 w-40 flex flex-col items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+                  className="h-16 w-40 flex flex-col items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white disabled:bg-gray-600 disabled:cursor-not-allowed"
                   onClick={handleOpenCreation}
+                  disabled={structureNPCs.length >= 4}
                 >
                   <Plus size={24} />
-                  <span>Criar NPC</span>
+                  <span>{structureNPCs.length >= 4 ? 'Estrutura Cheia' : 'Criar NPC'}</span>
                 </Button>
               </div>
 
@@ -117,8 +121,20 @@ export default function NPCPanel({
                 <div>• Posição: ({housePosition.x}, {housePosition.z})</div>
                 <div>• Descrição: {structureInfo?.description}</div>
                 <div>• ID: {housePosition.id}</div>
-                <div>• NPCs: 0/1</div>
-                <div>• Status: Vazia</div>
+                <div>• NPCs: {structureNPCs.length}/4</div>
+                <div>• Status: {structureNPCs.length > 0 ? 'Ocupada' : 'Vazia'}</div>
+                
+                {structureNPCs.length > 0 && (
+                  <div className="mt-2">
+                    <div className="font-medium mb-1">NPCs na estrutura:</div>
+                    {structureNPCs.map((npc) => (
+                      <div key={npc.id} className="flex items-center gap-2 ml-2">
+                        <User size={12} />
+                        <span>{npc.name} ({npc.type})</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </>
           ) : (
