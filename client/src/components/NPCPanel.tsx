@@ -7,7 +7,7 @@ interface NPCPanelProps {
   isOpen: boolean;
   housePosition: { x: number; z: number } | null;
   onClose: () => void;
-  onCreateNPC: (type: 'villager' | 'guard' | 'merchant' | 'farmer') => void;
+  onCreateNPC: (type: 'villager') => void;
 }
 
 export default function NPCPanel({ 
@@ -56,37 +56,13 @@ export default function NPCPanel({
             Gerencie esta casa e seus NPCs
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex justify-center">
             <Button
-              className="h-20 flex flex-col items-center justify-center gap-1 bg-green-600 hover:bg-green-700 text-white text-xs"
+              className="h-20 w-32 flex flex-col items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white"
               onClick={() => onCreateNPC('villager')}
             >
-              <User size={20} />
+              <User size={24} />
               <span>Aldeão</span>
-            </Button>
-            
-            <Button
-              className="h-20 flex flex-col items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs"
-              onClick={() => onCreateNPC('guard')}
-            >
-              <User size={20} />
-              <span>Guarda</span>
-            </Button>
-            
-            <Button
-              className="h-20 flex flex-col items-center justify-center gap-1 bg-purple-600 hover:bg-purple-700 text-white text-xs"
-              onClick={() => onCreateNPC('merchant')}
-            >
-              <User size={20} />
-              <span>Mercador</span>
-            </Button>
-            
-            <Button
-              className="h-20 flex flex-col items-center justify-center gap-1 bg-yellow-600 hover:bg-yellow-700 text-white text-xs"
-              onClick={() => onCreateNPC('farmer')}
-            >
-              <User size={20} />
-              <span>Fazendeiro</span>
             </Button>
           </div>
 
