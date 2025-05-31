@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
-import { User, X } from "lucide-react";
+import { X, Plus } from "lucide-react";
+import { useEffect } from "react";
 
 interface NPCPanelProps {
   isOpen: boolean;
@@ -9,7 +10,29 @@ interface NPCPanelProps {
   onCreateNPC: () => void;
 }
 
-const NPCPanel = ({ isOpen, housePosition, onClose, onCreateNPC }: NPCPanelProps) => {
+export default function NPCPanel({ 
+  isOpen, 
+  housePosition, 
+  onClose, 
+  onCreateNPC 
+}: NPCPanelProps) {
+  // Handle ESC key to close panel
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyPress);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen || !housePosition) return null;
 
   return (
@@ -32,7 +55,7 @@ const NPCPanel = ({ isOpen, housePosition, onClose, onCreateNPC }: NPCPanelProps
           <div className="text-sm text-gray-300">
             Gerencie esta casa e seus NPCs
           </div>
-          
+
           <Button
             className="w-full h-16 flex flex-col items-center justify-center gap-2 bg-green-600 hover:bg-green-700 border-green-500 text-white"
             onClick={onCreateNPC}
@@ -43,7 +66,7 @@ const NPCPanel = ({ isOpen, housePosition, onClose, onCreateNPC }: NPCPanelProps
               <div className="text-xs opacity-75">Adicionar habitante à casa</div>
             </div>
           </Button>
-          
+
           <div className="p-3 bg-gray-700/50 rounded text-sm text-gray-300">
             <div className="font-medium mb-1">Informações da Casa:</div>
             <div>• Posição: ({housePosition.x}, {housePosition.z})</div>
@@ -55,5 +78,3 @@ const NPCPanel = ({ isOpen, housePosition, onClose, onCreateNPC }: NPCPanelProps
     </div>
   );
 };
-
-export default NPCPanel;

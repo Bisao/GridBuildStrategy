@@ -29,17 +29,24 @@ const Game = () => {
     rotatePreview
   } = useGridPlacement();
 
-  // Handle keyboard input for rotation
+  // Handle keyboard input for rotation and escape
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (selectedStructure && event.key.toLowerCase() === 'r') {
+      if (event.key === 'Escape') {
+        // Cancel structure selection
+        if (selectedStructure) {
+          setSelectedStructure(null);
+        }
+        // Close NPC panel
+        setNPCPanelOpen(false);
+      } else if (selectedStructure && event.key.toLowerCase() === 'r') {
         rotatePreview();
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [selectedStructure, rotatePreview]);
+  }, [selectedStructure, rotatePreview, setSelectedStructure, setNPCPanelOpen]);
 
   // Handle mouse movement for preview positioning
   useFrame(() => {

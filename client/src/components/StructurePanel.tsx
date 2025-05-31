@@ -32,8 +32,9 @@ export default function StructurePanel({
           </Button>
           
           {selectedStructure && (
-            <div className="mt-2 p-2 bg-gray-700/50 rounded text-xs text-gray-300">
+            <div className="mt-2 p-2 bg-gray-700/50 rounded text-xs text-gray-300 space-y-1">
               <p>Pressione <kbd className="px-1 py-0.5 bg-gray-600 rounded text-white">R</kbd> para rotacionar</p>
+              <p>Pressione <kbd className="px-1 py-0.5 bg-gray-600 rounded text-white">ESC</kbd> para cancelar</p>
             </div>
           )}
         </CardContent>
