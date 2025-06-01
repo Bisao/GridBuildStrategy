@@ -57,15 +57,74 @@ export default function StructurePanel({
         <CardContent className="space-y-2 pt-0">
 
 
-        {/* Painel principal sem botões de estruturas */}
-        <div className="text-center text-gray-400 text-sm py-4">
-          <p>Use os ícones na parte superior para acessar:</p>
-          <div className="mt-2 space-y-1 text-xs">
-            <p>🏗️ Construção de estruturas</p>
-            <p>⚔️ Sistema de combate</p>
-            <p>💾 Salvar/Carregar jogo</p>
+        {/* Structure buttons */}
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              onClick={() => onSelectStructure('house')}
+              variant={selectedStructure === 'house' ? 'default' : 'outline'}
+              className="flex flex-col items-center gap-1 h-auto py-2 text-xs"
+            >
+              <Home size={16} />
+              Casa
+            </Button>
+
+            <Button
+              onClick={() => onSelectStructure('largehouse')}
+              variant={selectedStructure === 'largehouse' ? 'default' : 'outline'}
+              className="flex flex-col items-center gap-1 h-auto py-2 text-xs"
+            >
+              <Castle size={16} />
+              Casa Grande
+            </Button>
+
+            <Button
+              onClick={() => onSelectStructure('windmill')}
+              variant={selectedStructure === 'windmill' ? 'default' : 'outline'}
+              className="flex flex-col items-center gap-1 h-auto py-2 text-xs"
+            >
+              <Settings size={16} />
+              Moinho
+            </Button>
+
+            <Button
+              onClick={() => onSelectStructure('tower')}
+              variant={selectedStructure === 'tower' ? 'default' : 'outline'}
+              className="flex flex-col items-center gap-1 h-auto py-2 text-xs"
+            >
+              <Castle size={16} />
+              Torre
+            </Button>
+
+            <Button
+              onClick={() => onSelectStructure('blacksmith')}
+              variant={selectedStructure === 'blacksmith' ? 'default' : 'outline'}
+              className="flex flex-col items-center gap-1 h-auto py-2 text-xs"
+            >
+              <Hammer size={16} />
+              Ferraria
+            </Button>
+
+            <Button
+              onClick={() => onSelectStructure('market')}
+              variant={selectedStructure === 'market' ? 'default' : 'outline'}
+              className="flex flex-col items-center gap-1 h-auto py-2 text-xs"
+            >
+              <ShoppingCart size={16} />
+              Mercado
+            </Button>
           </div>
-        </div>
+
+          {/* Clear selection button */}
+          {selectedStructure && (
+            <Button
+              onClick={() => onSelectStructure(null)}
+              variant="destructive"
+              className="w-full mt-2 flex items-center justify-center gap-2"
+            >
+              <X size={16} />
+              Cancelar
+            </Button>
+          )}
 
           {selectedStructure && (
             <div className="mt-2 p-2 bg-gray-700/50 rounded text-xs text-gray-300 space-y-1">
