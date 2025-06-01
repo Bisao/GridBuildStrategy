@@ -2,8 +2,14 @@
 import React from 'react';
 import { useGameState } from '../lib/stores/useGameState';
 import { useSkills } from '../lib/stores/useSkills';
+import HUDIcons from './HUDIcons';
 
-export default function GameHUD() {
+interface GameHUDProps {
+  onOpenCombatPanel?: () => void;
+  onOpenStructurePanel?: () => void;
+}
+
+export default function GameHUD({ onOpenCombatPanel, onOpenStructurePanel }: GameHUDProps) {
   const { controlledNPCId, createdNPCs } = useGameState();
   const { skills, mana, maxMana } = useSkills();
 
@@ -41,40 +47,11 @@ export default function GameHUD() {
         </div>
       )}
 
-      {/* Top Right - Resource Icons */}
-      <div className="absolute top-4 right-4 pointer-events-auto">
-        <div className="flex gap-2">
-          {/* Resource Icons Row 1 */}
-          <div className="flex gap-1">
-            {['🍞', '🥤', '🏺', '❤️', '🛡️', '⚔️'].map((icon, index) => (
-              <div key={index} className="w-8 h-8 bg-black/70 border border-yellow-600/50 rounded-md flex items-center justify-center">
-                <span className="text-sm">{icon}</span>
-                <div className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                  {index + 1}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Resource Icons Row 2 */}
-        <div className="flex gap-1 mt-2 justify-end">
-          {['🎯', '👥', '🗺️'].map((icon, index) => (
-            <div key={index} className="w-8 h-8 bg-black/70 border border-yellow-600/50 rounded-md flex items-center justify-center">
-              <span className="text-sm">{icon}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Additional Icons */}
-        <div className="flex gap-1 mt-2 justify-end">
-          {['💰', '📊'].map((icon, index) => (
-            <div key={index} className="w-8 h-8 bg-black/70 border border-yellow-600/50 rounded-md flex items-center justify-center">
-              <span className="text-sm">{icon}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Top Right - Interface Icons */}
+      <HUDIcons 
+        onOpenCombatPanel={onOpenCombatPanel || (() => {})}
+        onOpenStructurePanel={onOpenStructurePanel || (() => {})}
+      />
 
       {/* Bottom Center - Skills Bar (only when controlling NPC) */}
       {controlledNPCId && (
@@ -207,7 +184,22 @@ export default function GameHUD() {
       )}
 
       {/* Bottom Right - Server Info */}
-      <div className="absolute bottom-4 right-4 pointer-events-auto">
+      <div className="absolute bottom-4 right-4 pointer-events-auto space-y-2">
+        {/* Bioma e Posição */}
+        <div className="bg-black/70 border border-yellow-600/50 rounded p-2 text-white text-xs">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-green-400">🌱</span>
+              <span>Planície Verde</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-blue-400">📍</span>
+              <span>X: {controlledNPC?.position.x.toFixed(1) || '0.0'}, Z: {controlledNPC?.position.z.toFixed(1) || '0.0'}</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Server Info */}
         <div className="bg-black/70 border border-yellow-600/50 rounded p-2 text-white text-xs">
           <div className="flex items-center gap-2">
             <span className="text-yellow-400">🌐</span>

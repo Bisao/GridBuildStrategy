@@ -172,6 +172,11 @@ function App() {
           onOpenSaveLoad={() => setIsSaveLoadPanelOpen(true)}
         />
 
+        <CombatTestPanel
+          isOpen={isCombatTestPanelOpen}
+          onClose={() => setCombatTestPanelOpen(false)}
+        />
+
         <SaveLoadPanel
           isOpen={isSaveLoadPanelOpen}
           onClose={() => setIsSaveLoadPanelOpen(false)}
@@ -204,7 +209,10 @@ function App() {
         />
 
         {/* Albion HUD */}
-        <GameHUD />
+        <GameHUD 
+          onOpenCombatPanel={() => setCombatTestPanelOpen(true)}
+          onOpenStructurePanel={() => setStructurePanelOpen(true)}
+        />
         <PlayerHUD />
       </div>
     </QueryClientProvider>
