@@ -151,17 +151,7 @@ function App() {
           </Suspense>
         </Canvas>
 
-        {/* Top UI */}
-        <div className="absolute top-4 left-4 z-10 flex gap-2">
-          <SaveLoadPanel />
-          <button
-            onClick={() => setCombatTestPanelOpen(!isCombatTestPanelOpen)}
-            className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium transition-colors"
-            title="Teste de Combate"
-          >
-            ⚔️ Combate
-          </button>
-        </div>
+        
 
         {/* UI overlay outside of Canvas */}
         <StructurePanel
