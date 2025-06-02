@@ -314,15 +314,48 @@ const Game = () => {
       )}
 
       {/* Render NPCs */}
-      {createdNPCs.map((npc) => (
-        <NPCVariation
-          key={npc.id}
-          position={[npc.position.x, 0, npc.position.z]}
-          type={npc.type as "villager" | "guard" | "merchant" | "farmer"}
-          animation={npc.animation as "idle" | "walk"}
-          rotation={npc.rotation || 0}
-        />
-      ))}
+        {createdNPCs.map((npc) => (
+          <group key={npc.id}>
+            {/* Use FBX model for NPCs with direct position */}
+            <FBXNPCModel
+              position={[npc.position.x, npc.position.y, npc.position.z]}
+              type={npc.class as "barbarian" | "knight" | "mage" | "rogue" | "rogue_hooded"}
+              animation={npc.animation as "idle" | "walk"}
+              rotation={npc.rotation}
+            />
+
+            {/* NPC Name Tag */}
+            <Html
+              position={[npc.position.x, npc.position.y + 2.2, npc.position.z]}
+              center
+              distanceFactor={8}
+              occlude={false}
+            >
+              <div className="bg-black/80 text-white px-2 py-1 rounded text-xs whitespace-nowrap pointer-events-none">
+                {npc.name}
+                {controlledNPCId === npc.id && " (Controlled)"}
+                {viewingNPCId === npc.id && " (Viewing)"}
+              </div>
+            </Html>
+
+            {/* Health bar */}
+            {npc.health < npc.maxHealth && (
+              <Html
+                position={[npc.position.x, npc.position.y + 2.5, npc.position.z]}
+                center
+                distanceFactor={8}
+                occlude={false}
+              >
+                <div className="w-16 h-1 bg-red-600 rounded overflow-hidden">
+                  <div 
+                    className="h-full bg-green-500 transition-all duration-300"
+                    style={{ width: `${(npc.health / npc.maxHealth) * 100}%` }}
+                  />
+                </div>
+              </Html>
+            )}
+          </group>
+        ))}
 
       {/* Render Enemies */}
       {enemies.map((enemy) => (

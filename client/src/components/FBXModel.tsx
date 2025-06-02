@@ -1,5 +1,3 @@
-
-
 import { useLoader } from '@react-three/fiber';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import * as THREE from 'three';
@@ -46,7 +44,7 @@ function FBXModelInner({
     try {
       // Clone the model to avoid sharing between instances
       const clonedFBX = fbx.clone();
-      
+
       // Apply texture if available
       if (texture) {
         clonedFBX.traverse((child) => {
@@ -117,4 +115,3 @@ export default function FBXModel(props: FBXModelProps) {
     </Suspense>
   );
 }
-
