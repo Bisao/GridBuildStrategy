@@ -24,6 +24,7 @@ const House = ({ isPreview = false, canPlace = true, position, onHouseClick }: H
   const handleClick = (event: any) => {
     if (!isPreview && position && onHouseClick) {
       event.stopPropagation();
+      console.log('Casa clicada na posição:', position);
       onHouseClick(position);
     }
   };

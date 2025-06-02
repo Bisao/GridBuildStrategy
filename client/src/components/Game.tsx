@@ -159,33 +159,37 @@ const Game = () => {
   };
 
   const handleClick = (event: any) => {
-    if (!event.object?.userData?.isGridTile) return;
-
-    const { gridX, gridZ } = event.object.userData;
-
-    // Right click to create wolf spawn
-    if (event.nativeEvent.button === 2) {
+    // Right click to create wolf spawn on grid tiles
+    if (event.object?.userData?.isGridTile && event.nativeEvent.button === 2) {
       event.stopPropagation();
+      const { gridX, gridZ } = event.object.userData;
       addWolfSpawn({ x: gridX, z: gridZ });
       return;
     }
 
-    if (selectedStructure) {
+    // Handle grid tile clicks for structure placement
+    if (event.object?.userData?.isGridTile && selectedStructure) {
+      const { gridX, gridZ } = event.object.userData;
       const position = { x: gridX, z: gridZ };
       addStructure(selectedStructure, position);
       setSelectedStructure(null);
+      return;
     }
   };
 
   const handleStructureClick = (position: { x: number; z: number }) => {
+    // Evitar abrir painel se estivermos no modo de colocação de estrutura
+    if (selectedStructure) return;
+
     // Encontrar a estrutura nas estruturas colocadas para obter o ID
     const structureClicked = placedStructures.find(
       structure => 
-        structure.x === position.x && 
-        structure.z === position.z
+        Math.abs(structure.x - position.x) < 0.1 && 
+        Math.abs(structure.z - position.z) < 0.1
     );
 
     if (structureClicked) {
+      console.log('Estrutura clicada:', structureClicked);
       setSelectedHouse({ x: position.x, z: position.z, id: structureClicked.id });
       setNPCPanelOpen(true);
     }
@@ -301,7 +305,7 @@ const Game = () => {
           {structure.type === 'house' && (
             <House 
               position={{ x: structure.x, z: structure.z }}
-              onStructureClick={handleStructureClick}
+              onHouseClick={handleStructureClick}
             />
           )}
           {structure.type === 'windmill' && (
