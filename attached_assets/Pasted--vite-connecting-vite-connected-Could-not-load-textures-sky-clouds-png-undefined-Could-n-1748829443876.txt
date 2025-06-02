@@ -1,0 +1,30 @@
+[vite] connecting...
+[vite] connected.
+Could not load /textures/sky-clouds.png: undefined
+Could not load /textures/sky-clouds.png: undefined
+The above error occurred in the <Skybox> component:
+
+    at Skybox (https://ef592112-3197-4bc2-bcd1-1e1112288aff-00-23mssazgcv0to.spock.replit.dev/src/components/Skybox.tsx:24:21)
+    at Game (https://ef592112-3197-4bc2-bcd1-1e1112288aff-00-23mssazgcv0to.spock.replit.dev/src/components/Game.tsx:38:26)
+    at Suspense
+    at Suspense
+    at ErrorBoundary (https://ef592112-3197-4bc2-bcd1-1e1112288aff-00-23mssazgcv0to.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-A3GN3WMN.js?v=a8a2f967:16490:5)
+    at FiberProvider (https://ef592112-3197-4bc2-bcd1-1e1112288aff-00-23mssazgcv0to.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-A3GN3WMN.js?v=a8a2f967:18170:21)
+    at Provider (https://ef592112-3197-4bc2-bcd1-1e1112288aff-00-23mssazgcv0to.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-A3GN3WMN.js?v=a8a2f967:17779:3)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+Could not load /textures/sky-clouds.png: undefined
+Could not load /textures/sky-clouds.png: undefined
+The above error occurred in the <ForwardRef(Canvas)> component:
+
+    at Canvas (https://ef592112-3197-4bc2-bcd1-1e1112288aff-00-23mssazgcv0to.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-A3GN3WMN.js?v=a8a2f967:18236:3)
+    at FiberProvider (https://ef592112-3197-4bc2-bcd1-1e1112288aff-00-23mssazgcv0to.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-A3GN3WMN.js?v=a8a2f967:18170:21)
+    at CanvasWrapper
+    at div
+    at QueryClientProvider (https://ef592112-3197-4bc2-bcd1-1e1112288aff-00-23mssazgcv0to.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=a8a2f967:2805:3)
+    at App (https://ef592112-3197-4bc2-bcd1-1e1112288aff-00-23mssazgcv0to.spock.replit.dev/src/App.tsx?v=iKQpkJf4jqwM3QS0nNacN:58:7)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+Could not load /textures/sky-clouds.png: undefined
+THREE.WebGLRenderer: Context Lost.
