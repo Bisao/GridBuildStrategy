@@ -10,7 +10,15 @@ export interface PlacedStructure {
 }
 
 export const useGridPlacement = () => {
-  const [placedStructures, setPlacedStructures] = useState<PlacedStructure[]>([]);
+  const [placedStructures, setPlacedStructures] = useState<PlacedStructure[]>([
+    {
+      id: "largehouse-initial",
+      type: "largehouse",
+      x: 0.5,
+      z: 0.5,
+      rotation: 0
+    }
+  ]);
   const [hoveredTile, setHoveredTile] = useState<{ x: number; z: number } | null>(null);
   const [previewPosition, setPreviewPosition] = useState<{ x: number; z: number } | null>(null);
   const [previewRotation, setPreviewRotation] = useState<number>(0);
