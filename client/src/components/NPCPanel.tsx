@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { User, X, Dice6, Settings } from "lucide-react";
+import { User, X, Dice6, Settings, Plus } from "lucide-react";
 import NPCConfigPanel from "./NPCConfigPanel";
 import { Canvas } from "@react-three/fiber";
 import FBXNPCModel from "./FBXNPCModel";
