@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
-import Grid from "./Grid";
+import Terrain from "./Terrain";
 import House from "./House";
 import NPC from "./NPC";
 import Enemy from "./Enemy";
@@ -171,8 +171,8 @@ const Game = () => {
       {/* Camera Controls */}
       <CameraControls />
 
-      {/* Grid */}
-      <Grid 
+      {/* Terrain */}
+      <Terrain 
         onPointerMove={handlePointerMove}
         onClick={handleClick}
         hoveredTile={hoveredTile}
