@@ -16,6 +16,7 @@ import LargeHouse from "./structures/LargeHouse";
 import Blacksmith from "./structures/Blacksmith";
 import Market from "./structures/Market";
 import { useAudio } from "../lib/stores/useAudio";
+import Skybox from "./Skybox";
 
 interface ActiveEffect {
   id: string;
@@ -192,6 +193,9 @@ const Game = () => {
 
   return (
     <>
+      {/* Fantasy Skybox */}
+      <Skybox />
+      
       {/* Midday Lighting Setup */}
       <ambientLight intensity={0.8} color="#E6F3FF" />
       <directionalLight 
