@@ -45,6 +45,29 @@ export default function FBXNPCModel({
 
   const config = modelConfigs[type];
 
+  // Safety check for config
+  if (!config) {
+    console.warn(`FBX model config not found for type: ${type}`);
+    return (
+      <group ref={groupRef}>
+        {/* Fallback simple character */}
+        <mesh position={[0, 1, 0]}>
+          <boxGeometry args={[0.4, 0.8, 0.2]} />
+          <meshStandardMaterial color="#8B4513" />
+        </mesh>
+        <mesh position={[0, 1.6, 0]}>
+          <boxGeometry args={[0.3, 0.3, 0.3]} />
+          <meshStandardMaterial color="#FDBCB4" />
+        </mesh>
+        {/* Shadow */}
+        <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.4, 8]} />
+          <meshBasicMaterial color="#000000" opacity={0.3} transparent />
+        </mesh>
+      </group>
+    );
+  }
+
   // Simple animation for the group (bobbing, rotation, etc.)
   useFrame((state) => {
     if (!groupRef.current) return;

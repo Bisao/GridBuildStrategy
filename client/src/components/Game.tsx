@@ -33,13 +33,12 @@ interface CreatedNPC {
   id: string;
   name: string;
   structureId: string;
-  position: { x: number; y: number; z: number };
+  position: { x: number; y?: number; z: number };
   type: "villager" | "guard" | "merchant" | "farmer";
-  rotation: number;
-  class?: string;
-  animation?: string;
-  health: number;
-  maxHealth: number;
+  rotation?: number;
+  animation?: "idle" | "walk";
+  health?: number;
+  maxHealth?: number;
 }
 
 const Game = () => {
@@ -360,15 +359,31 @@ const Game = () => {
       )}
 
       {/* Render NPCs */}
-        {createdNPCs.map((npc) => (
-          <group key={npc.id}>
-            {/* Use FBX model for NPCs with direct position */}
-            <FBXNPCModel
-              position={[npc.position.x, npc.position.y, npc.position.z]}
-              type={npc.class as "barbarian" | "knight" | "mage" | "rogue" | "rogue_hooded"}
-              animation={npc.animation as "idle" | "walk"}
-              rotation={npc.rotation}
-            />
+        {createdNPCs.map((npc) => {
+          // Map NPC type to FBX model type
+          const getFBXType = (npcType: string): "barbarian" | "knight" | "mage" | "rogue" | "rogue_hooded" => {
+            switch (npcType) {
+              case "guard":
+                return "knight";
+              case "merchant":
+                return "mage";
+              case "farmer":
+                return "barbarian";
+              case "villager":
+              default:
+                return "rogue";
+            }
+          };
+
+          return (
+            <group key={npc.id}>
+              {/* Use FBX model for NPCs with direct position */}
+              <FBXNPCModel
+                position={[npc.position.x, npc.position.y || 0, npc.position.z]}
+                type={getFBXType(npc.type)}
+                animation={(npc.animation as "idle" | "walk") || "idle"}
+                rotation={npc.rotation || 0}
+              />
 
             {/* NPC Name Tag */}
             <Html
@@ -401,7 +416,8 @@ const Game = () => {
               </Html>
             )}
           </group>
-        ))}
+        );
+        })}
 
       {/* Enemies */}
       {enemies.map((enemy) => {
