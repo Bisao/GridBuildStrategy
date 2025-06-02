@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import Grid from "./Grid";
@@ -18,6 +18,8 @@ import Market from "./structures/Market";
 import { useAudio } from "../lib/stores/useAudio";
 import Skybox from "./Skybox";
 import NPCVariation from "./NPCVariations";
+import { Html } from "@react-three/drei";
+import FBXNPCModel from "./FBXNPCModel";
 
 interface ActiveEffect {
   id: string;
@@ -25,6 +27,19 @@ interface ActiveEffect {
   skillType: string;
   startTime: number;
   duration: number;
+}
+
+interface CreatedNPC {
+  id: string;
+  name: string;
+  structureId: string;
+  position: { x: number; y: number; z: number };
+  type: "villager" | "guard" | "merchant" | "farmer";
+  rotation: number;
+  class?: string;
+  animation?: string;
+  health: number;
+  maxHealth: number;
 }
 
 const Game = () => {
@@ -49,7 +64,10 @@ const Game = () => {
     setControlledNPCId,
     viewingNPCId,
     setViewingNPCId,
-    removeEnemy
+    removeEnemy,
+    selectedHouse,
+    setSelectedHouse,
+    setNPCPanelOpen
   } = useGameState();
   const { isControlling } = useNPCControl();
 
