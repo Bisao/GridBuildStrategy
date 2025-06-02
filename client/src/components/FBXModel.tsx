@@ -1,8 +1,9 @@
 
+
 import { useLoader } from '@react-three/fiber';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import * as THREE from 'three';
-import { useEffect, useState, Suspense, useMemo } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
 interface FBXModelProps {
   modelPath: string;
@@ -22,23 +23,22 @@ function FBXModelInner({
   animation = "idle" 
 }: FBXModelProps) {
   const [modelInstance, setModelInstance] = useState<THREE.Group | null>(null);
-  const [hasError, setHasError] = useState(false);
 
-  // Use useMemo to prevent re-loading on every render
-  const { fbx, texture } = useMemo(() => {
-    try {
-      const loadedFbx = useLoader(FBXLoader, modelPath);
-      const loadedTexture = texturePath ? useLoader(THREE.TextureLoader, texturePath) : null;
-      return { fbx: loadedFbx, texture: loadedTexture };
-    } catch (error) {
-      console.error(`Failed to load FBX model: ${modelPath}`, error);
-      setHasError(true);
-      return { fbx: null, texture: null };
+  // Load FBX model
+  let fbx: THREE.Group | null = null;
+  let texture: THREE.Texture | null = null;
+
+  try {
+    fbx = useLoader(FBXLoader, modelPath);
+    if (texturePath) {
+      texture = useLoader(THREE.TextureLoader, texturePath);
     }
-  }, [modelPath, texturePath]);
+  } catch (error) {
+    console.error(`Failed to load FBX model: ${modelPath}`, error);
+  }
 
   useEffect(() => {
-    if (!fbx || hasError) {
+    if (!fbx) {
       setModelInstance(null);
       return;
     }
@@ -71,12 +71,11 @@ function FBXModelInner({
       setModelInstance(clonedFBX);
     } catch (error) {
       console.error('Error processing FBX model:', error);
-      setHasError(true);
     }
-  }, [fbx, texture, hasError]);
+  }, [fbx, texture]);
 
   // Render fallback if there's an error or no model
-  if (hasError || !modelInstance) {
+  if (!modelInstance) {
     return (
       <group position={position} rotation={rotation} scale={scale}>
         {/* Fallback simple character */}
@@ -118,3 +117,4 @@ export default function FBXModel(props: FBXModelProps) {
     </Suspense>
   );
 }
+

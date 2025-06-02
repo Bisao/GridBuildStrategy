@@ -12,10 +12,11 @@ export interface PlacedStructure {
 export const useGridPlacement = () => {
   const [placedStructures, setPlacedStructures] = useState<PlacedStructure[]>([
     {
-      id: "largehouse-initial",
-      type: "largehouse",
+      id: 'largehouse-initial',
+      type: 'largehouse',
       x: 0.5,
       z: 0.5,
+      position: { x: 0.5, y: 0, z: 0.5 },
       rotation: 0
     }
   ]);
