@@ -32,14 +32,19 @@ export default function FBXModel({
     fbx = useLoader(FBXLoader, modelPath);
   } catch (error) {
     console.error(`Failed to load FBX model: ${modelPath}`, error);
-    setLoadError(true);
+    // Don't set error state here to avoid infinite loop
   }
 
   // Load texture if provided
   const texture = texturePath ? useLoader(THREE.TextureLoader, texturePath) : null;
 
   useEffect(() => {
-    if (!fbx) return;
+    if (!fbx) {
+      setLoadError(true);
+      return;
+    }
+
+    setLoadError(false);
 
     // Clone the model to avoid sharing between instances
     const clonedFBX = fbx.clone();
@@ -92,7 +97,7 @@ export default function FBXModel({
   });
 
   // Render fallback if FBX failed to load
-  if (loadError || !fbx) {
+  if (loadError) {
     return (
       <group position={position} rotation={rotation} scale={scale}>
         {/* Fallback simple character */}
