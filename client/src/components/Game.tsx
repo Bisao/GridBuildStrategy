@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
+import { Html } from "@react-three/drei";
 import Grid from "./Grid";
 import House from "./House";
 import Enemy from "./Enemy";
@@ -18,6 +19,7 @@ import Market from "./structures/Market";
 import { useAudio } from "../lib/stores/useAudio";
 import Skybox from "./Skybox";
 import NPCVariation from "./NPCVariations";
+import FBXNPCModel from "./FBXNPCModel";
 
 interface ActiveEffect {
   id: string;
@@ -27,11 +29,26 @@ interface ActiveEffect {
   duration: number;
 }
 
+interface CreatedNPC {
+  id: string;
+  name: string;
+  structureId: string;
+  position: { x: number; y: number; z: number };
+  type: "villager" | "guard" | "merchant" | "farmer";
+  class: "barbarian" | "knight" | "mage" | "rogue" | "rogue_hooded";
+  rotation: number;
+  animation: "idle" | "walk";
+  health: number;
+  maxHealth: number;
+}</interface>
+
 const Game = () => {
   const { camera, gl } = useThree();
   const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
   const raycaster = useRef(new THREE.Raycaster());
   const [activeEffects, setActiveEffects] = useState<ActiveEffect[]>([]);
+  const [selectedHouse, setSelectedHouse] = useState<{ x: number; z: number; id: string } | null>(null);
+  const [isNPCPanelOpen, setNPCPanelOpen] = useState(false);
 
   const { 
     selectedStructure, 
@@ -77,6 +94,25 @@ const Game = () => {
     canPlaceStructure,
     rotatePreview
   } = useGridPlacement();
+
+  // Criar spawn de lobo automaticamente quando não houver spawns
+  useEffect(() => {
+    if (wolfSpawns.length === 0) {
+      // Criar spawns em posições estratégicas do grid
+      const spawnPositions = [
+        { x: -8, z: -8 },
+        { x: 8, z: -8 },
+        { x: -8, z: 8 },
+        { x: 8, z: 8 },
+        { x: 0, z: -9 },
+        { x: 0, z: 9 }
+      ];
+
+      spawnPositions.forEach(position => {
+        addWolfSpawn(position);
+      });
+    }
+  }, [wolfSpawns.length, addWolfSpawn]);
 
   // Handle keyboard input for rotation and escape
   useEffect(() => {
@@ -307,7 +343,12 @@ const Game = () => {
           position={[previewPosition.x, 0, previewPosition.z]}
           rotation={[0, (previewRotation * Math.PI) / 180, 0]}
         >
-
+          {selectedStructure === 'house' && (
+            <House 
+              isPreview={true} 
+              canPlace={canPlaceStructure(previewPosition.x, previewPosition.z)}
+            />
+          )}
           {selectedStructure === 'windmill' && (
             <Windmill 
               isPreview={true} 
