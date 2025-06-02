@@ -32,18 +32,18 @@ function FBXModelInner({
     }
   } catch (error) {
     console.error(`Failed to load FBX model: ${modelPath}`, error);
-    setLoadError(true);
+    // Error will be handled by the conditional rendering below
   }
 
   useEffect(() => {
-    if (!fbx || loadError) return;
+    if (!fbx) return;
 
     // Clone the model to avoid sharing between instances
     const clonedFBX = fbx.clone();
 });
 
   // Render fallback if FBX failed to load
-  if (loadError || !fbx) {
+  if (!fbx) {
     return (
       <group position={position} rotation={rotation} scale={scale}>
         {/* Fallback simple character */}
