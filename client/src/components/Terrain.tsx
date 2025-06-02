@@ -147,7 +147,11 @@ const Terrain = ({ onPointerMove, onClick, hoveredTile }: TerrainProps) => {
         
         {/* Tile border for hovered state */}
         {isHovered && (
-          <mesh position={[0, 0.11, 0]}>
+          <mesh 
+            position={[0, 0.11, 0]}
+            onPointerMove={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+          >
             <boxGeometry args={[TILE_SIZE + 0.02, 0.02, TILE_SIZE + 0.02]} />
             <meshBasicMaterial color="#FFFF00" transparent opacity={0.8} />
           </mesh>
@@ -155,7 +159,11 @@ const Terrain = ({ onPointerMove, onClick, hoveredTile }: TerrainProps) => {
 
         {/* Trees for forest biome */}
         {tile.hasTree && (
-          <group position={[Math.random() * 0.4 - 0.2, 0.1, Math.random() * 0.4 - 0.2]}>
+          <group 
+            position={[Math.random() * 0.4 - 0.2, 0.1, Math.random() * 0.4 - 0.2]}
+            onPointerMove={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Tree trunk */}
             <mesh position={[0, 0.3, 0]} castShadow>
               <cylinderGeometry args={[0.05, 0.08, 0.6, 6]} />
@@ -175,6 +183,8 @@ const Terrain = ({ onPointerMove, onClick, hoveredTile }: TerrainProps) => {
             position={[Math.random() * 0.3 - 0.15, 0.15, Math.random() * 0.3 - 0.15]} 
             castShadow
             rotation={[0, Math.random() * Math.PI, 0]}
+            onPointerMove={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             <dodecahedronGeometry args={[0.1 + Math.random() * 0.1]} />
             <meshLambertMaterial color="#696969" />
@@ -183,7 +193,11 @@ const Terrain = ({ onPointerMove, onClick, hoveredTile }: TerrainProps) => {
 
         {/* Water animation effect */}
         {tile.biome === 'water' && (
-          <mesh position={[0, 0.05, 0]}>
+          <mesh 
+            position={[0, 0.05, 0]}
+            onPointerMove={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+          >
             <planeGeometry args={[TILE_SIZE * 0.9, TILE_SIZE * 0.9]} />
             <meshBasicMaterial 
               color="#87CEEB" 
@@ -203,7 +217,11 @@ const Terrain = ({ onPointerMove, onClick, hoveredTile }: TerrainProps) => {
       
       {/* Ambient elements */}
       {/* Add some clouds */}
-      <group position={[0, 8, 0]}>
+      <group 
+        position={[0, 8, 0]}
+        onPointerMove={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+      >
         {Array.from({ length: 8 }, (_, i) => (
           <mesh 
             key={`cloud-${i}`}
@@ -212,6 +230,8 @@ const Terrain = ({ onPointerMove, onClick, hoveredTile }: TerrainProps) => {
               Math.random() * 3,
               (Math.random() - 0.5) * 40
             ]}
+            onPointerMove={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             <sphereGeometry args={[1 + Math.random(), 8, 6]} />
             <meshBasicMaterial color="#FFFFFF" transparent opacity={0.8} />
