@@ -24,9 +24,16 @@ export default function FBXModel({
   const groupRef = useRef<THREE.Group>(null);
   const [mixer, setMixer] = useState<THREE.AnimationMixer | null>(null);
   const [actions, setActions] = useState<{ [key: string]: THREE.AnimationAction }>({});
+  const [loadError, setLoadError] = useState<boolean>(false);
 
-  // Load FBX model
-  const fbx = useLoader(FBXLoader, modelPath);
+  // Load FBX model with error handling
+  let fbx = null;
+  try {
+    fbx = useLoader(FBXLoader, modelPath);
+  } catch (error) {
+    console.error(`Failed to load FBX model: ${modelPath}`, error);
+    setLoadError(true);
+  }
 
   // Load texture if provided
   const texture = texturePath ? useLoader(THREE.TextureLoader, texturePath) : null;
@@ -83,6 +90,23 @@ export default function FBXModel({
       mixer.update(delta);
     }
   });
+
+  // Render fallback if FBX failed to load
+  if (loadError || !fbx) {
+    return (
+      <group position={position} rotation={rotation} scale={scale}>
+        {/* Fallback simple character */}
+        <mesh position={[0, 1, 0]}>
+          <boxGeometry args={[0.4, 0.8, 0.2]} />
+          <meshStandardMaterial color="#8B4513" />
+        </mesh>
+        <mesh position={[0, 1.6, 0]}>
+          <boxGeometry args={[0.3, 0.3, 0.3]} />
+          <meshStandardMaterial color="#FDBCB4" />
+        </mesh>
+      </group>
+    );
+  }
 
   return (
     <group 
