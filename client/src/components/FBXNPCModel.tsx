@@ -74,20 +74,29 @@ export default function FBXNPCModel({
 
     const time = state.clock.elapsedTime;
 
-    // Update position directly - this is critical for movement
-    groupRef.current.position.set(position[0], position[1], position[2]);
+    // Force update position every frame - critical for movement
+    groupRef.current.position.x = position[0];
+    groupRef.current.position.z = position[2];
     
-    // Apply animations on top of base position
+    // Apply base Y position with animations
+    const baseY = position[1];
     if (animation === "idle") {
       // Gentle breathing animation
-      groupRef.current.position.y = position[1] + Math.sin(time * 2) * 0.02;
+      groupRef.current.position.y = baseY + Math.sin(time * 2) * 0.02;
     } else if (animation === "walk" || animation === "walking") {
       // Walking bob animation
-      groupRef.current.position.y = position[1] + Math.abs(Math.sin(time * 8)) * 0.05;
+      groupRef.current.position.y = baseY + Math.abs(Math.sin(time * 8)) * 0.05;
+    } else {
+      groupRef.current.position.y = baseY;
     }
 
     // Apply rotation
     groupRef.current.rotation.y = rotation;
+
+    // Debug: Log position updates for moving NPCs
+    if (animation === "walk" || animation === "walking") {
+      console.log(`FBX Model Position: (${groupRef.current.position.x.toFixed(2)}, ${groupRef.current.position.z.toFixed(2)})`);
+    }
   });
 
   return (

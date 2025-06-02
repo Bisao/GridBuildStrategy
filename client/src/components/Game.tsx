@@ -375,14 +375,18 @@ const Game = () => {
             }
           };
 
+          // Debug current NPC position
+          if (npc.animation === "walking" || npc.animation === "walk") {
+            console.log(`Rendering NPC ${npc.id} at position:`, npc.position);
+          }
+
           return (
-            <group key={`npc-${npc.id}`}>
+            <group key={`npc-${npc.id}`} position={[npc.position.x, npc.position.y || 0, npc.position.z]}>
               {/* Use FBX model for NPCs with direct position */}
               <FBXNPCModel
-                key={`fbx-${npc.id}-${npc.position.x}-${npc.position.z}`}
-                position={[npc.position.x, npc.position.y || 0, npc.position.z]}
+                position={[0, 0, 0]} // Position handled by group
                 type={getFBXType(npc.type)}
-                animation={npc.animation === "walk" ? "walk" : (npc.animation || "idle")}
+                animation={npc.animation === "walking" ? "walk" : (npc.animation || "idle")}
                 rotation={npc.rotation || 0}
               />
 
