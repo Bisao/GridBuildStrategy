@@ -376,12 +376,13 @@ const Game = () => {
           };
 
           return (
-            <group key={npc.id}>
+            <group key={`npc-${npc.id}`}>
               {/* Use FBX model for NPCs with direct position */}
               <FBXNPCModel
+                key={`fbx-${npc.id}-${npc.position.x}-${npc.position.z}`}
                 position={[npc.position.x, npc.position.y || 0, npc.position.z]}
                 type={getFBXType(npc.type)}
-                animation={npc.animation === "walking" ? "walk" : (npc.animation || "idle")}
+                animation={npc.animation === "walk" ? "walk" : (npc.animation || "idle")}
                 rotation={npc.rotation || 0}
               />
 

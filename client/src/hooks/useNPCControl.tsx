@@ -196,6 +196,15 @@ export const useNPCControl = () => {
       animation
     });
 
+    // Debug: Log updated NPC state
+    if (targetPosition) {
+      console.log(`NPC ${controlledNPCId} updated:`, {
+        position: newPosition,
+        rotation: newRotation,
+        animation
+      });
+    }
+
     // Update camera to follow NPC (isometric view)
     const isometricOffset = new THREE.Vector3(-8, 12, -8);
     const targetCameraPosition = new THREE.Vector3(newPosition.x, 0, newPosition.z).add(isometricOffset);
