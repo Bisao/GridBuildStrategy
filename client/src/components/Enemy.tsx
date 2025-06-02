@@ -7,10 +7,11 @@ import { useGameState } from "../lib/stores/useGameState";
 interface EnemyProps {
   id: string;
   position: { x: number; z: number };
-  onDestroy?: (id: string) => void;
+  spawnId?: string;
+  onDestroy?: (id: string, spawnId?: string) => void;
 }
 
-export default function Enemy({ id, position, onDestroy }: EnemyProps) {
+export default function Enemy({ id, position, spawnId, onDestroy }: EnemyProps) {
   const groupRef = useRef<THREE.Group>(null);
   const tailRef = useRef<THREE.Mesh>(null);
   const headRef = useRef<THREE.Mesh>(null);
@@ -156,7 +157,7 @@ export default function Enemy({ id, position, onDestroy }: EnemyProps) {
       
       if (newHealth <= 0 && onDestroy) {
         console.log(`Lobo ${id} foi derrotado!`);
-        setTimeout(() => onDestroy(id), 500);
+        setTimeout(() => onDestroy(id, spawnId), 500);
       }
       
       return newHealth;

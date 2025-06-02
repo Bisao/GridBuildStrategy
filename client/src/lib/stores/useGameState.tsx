@@ -21,6 +21,11 @@ interface Enemy {
   health: number;
 }
 
+interface WolfSpawn {
+  id: string;
+  position: { x: number; z: number };
+}
+
 interface GameState {
   selectedStructure: string | null;
   isPlacementMode: boolean;
@@ -34,6 +39,7 @@ interface GameState {
   viewingNPCId: string | null;
   createdNPCs: CreatedNPC[];
   enemies: Enemy[];
+  wolfSpawns: WolfSpawn[];
   currentGameStateId: number | null;
   currentGameStateName: string | null;
   isSaving: boolean;
@@ -61,6 +67,10 @@ interface GameState {
   removeEnemy: (id: string) => void;
   spawnTestEnemy: () => void;
 
+  addWolfSpawn: (position: { x: number; z: number }) => void;
+  removeWolfSpawn: (spawnId: string) => void;
+  spawnWolfAtSpawn: (spawnId: string) => void;
+
   // Persistence actions
   saveGame: (name: string, structures: any[]) => Promise<void>;
   updateCurrentSave: (structures: any[]) => Promise<void>;
@@ -86,6 +96,7 @@ export const useGameState = create<GameState>()(
     viewingNPCId: null,
     createdNPCs: [],
     enemies: [],
+    wolfSpawns: [],
     currentGameStateId: null,
     currentGameStateName: null,
     isSaving: false,
@@ -157,34 +168,34 @@ export const useGameState = create<GameState>()(
     updateNPC: (npcId, updates) => {
       set((state) => {
         const { controlledNPCId, setControlledNPCId } = get();
-        
+
         return {
           createdNPCs: state.createdNPCs.map(npc => {
             if (npc.id === npcId) {
               const updatedNPC = { ...npc, ...updates };
-              
+
               // Check if NPC died (HP reached 0)
               if (updatedNPC.health <= 0 && npc.health > 0) {
                 console.log(`${npc.name} morreu! Teleportando para casa...`);
-                
+
                 // If this was the controlled NPC, release control
                 if (controlledNPCId === npcId) {
                   setControlledNPCId(null);
                   console.log(`Controle do NPC ${npc.name} perdido devido à morte`);
                 }
-                
+
                 // Get home position based on structure type - spawn exactly on the house grid position
                 const getHomePosition = (structureId: string) => {
                   const coords = structureId.split('-').slice(1).map(Number);
                   const baseX = coords[0] || 0;
                   const baseZ = coords[1] || 0;
-                  
+
                   // Return exact house position on the grid
                   return { x: baseX, z: baseZ };
                 };
-                
+
                 const homePosition = getHomePosition(npc.structureId);
-                
+
                 // Teleport to home with full health and mana
                 return {
                   ...updatedNPC,
@@ -195,7 +206,7 @@ export const useGameState = create<GameState>()(
                   rotation: 0 // Reset rotation
                 };
               }
-              
+
               return updatedNPC;
             }
             return npc;
@@ -260,6 +271,45 @@ export const useGameState = create<GameState>()(
         set((state) => ({
           enemies: [...state.enemies, enemy]
         }));
+      }
+    },
+
+    addWolfSpawn: (position) => {
+      const newSpawn = {
+        id: `wolfSpawn-${Date.now()}-${Math.random()}`,
+        position: position,
+      };
+      set((state) => ({
+        wolfSpawns: [...state.wolfSpawns, newSpawn],
+      }));
+      get().spawnWolfAtSpawn(newSpawn.id); // Spawn immediately after creation
+    },
+
+    removeWolfSpawn: (spawnId) => {
+      set((state) => ({
+        wolfSpawns: state.wolfSpawns.filter((spawn) => spawn.id !== spawnId),
+      }));
+    },
+
+    spawnWolfAtSpawn: (spawnId) => {
+      const spawn = get().wolfSpawns.find((s) => s.id === spawnId);
+      if (spawn) {
+        const enemy: Enemy = {
+          id: `wolf-${Date.now()}-${Math.random()}`,
+          position: { ...spawn.position },
+          health: 50,
+        };
+        set((state) => ({
+          enemies: [...state.enemies, enemy],
+        }));
+
+        // Set timeout to respawn wolf after 30 seconds (30000 ms)
+        setTimeout(() => {
+          const wolfIsAlive = get().enemies.some((enemy) => enemy.id === enemy.id);
+          if(!wolfIsAlive){
+            get().spawnWolfAtSpawn(spawnId)
+          }
+        }, 30000);
       }
     },
 

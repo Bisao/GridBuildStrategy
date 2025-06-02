@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import Grid from "./Grid";
 import House from "./House";
 import Enemy from "./Enemy";
+import WolfSpawn from "./WolfSpawn";
 import SkillEffect from "./SkillEffect";
 import CameraControls from "./CameraControls";
 import { useGridPlacement } from "../hooks/useGridPlacement";
@@ -34,11 +35,16 @@ const Game = () => {
 
   const { 
     selectedStructure, 
-    setSelectedStructure, 
-    setSelectedHouse, 
-    setNPCPanelOpen,
+    structures, 
+    addStructure, 
+    setSelectedStructure,
     createdNPCs,
+    addNPC,
     enemies,
+    spawnEnemy,
+    wolfSpawns,
+    addWolfSpawn,
+    spawnWolfAtSpawn,
     controlledNPCId,
     setControlledNPCId,
     viewingNPCId,
@@ -46,6 +52,21 @@ const Game = () => {
     removeEnemy
   } = useGameState();
   const { isControlling } = useNPCControl();
+
+  // Handle enemy destruction and respawning
+  const handleEnemyDestroy = (enemyId: string, spawnId?: string) => {
+    // Remove the enemy
+    useGameState.setState((state) => ({
+      enemies: state.enemies.filter(enemy => enemy.id !== enemyId)
+    }));
+
+    // Schedule respawn if it came from a spawn point
+    if (spawnId) {
+      setTimeout(() => {
+        spawnWolfAtSpawn(spawnId);
+      }, 30000); // 30 seconds
+    }
+  };
   const { 
     placedStructures, 
     hoveredTile, 
@@ -102,15 +123,22 @@ const Game = () => {
   };
 
   const handleClick = (event: any) => {
-    if (selectedStructure) {
+    if (!event.object?.userData?.isGridTile) return;
+
+    const { gridX, gridZ } = event.object.userData;
+
+    // Right click to create wolf spawn
+    if (event.nativeEvent.button === 2) {
       event.stopPropagation();
-      raycaster.current.setFromCamera(mousePosition, camera);
-      const success = handleGridClick(raycaster.current, selectedStructure);
-      if (success) {
-        console.log("Structure placed successfully!");
-      }
+      addWolfSpawn({ x: gridX, z: gridZ });
+      return;
     }
-    // NPC movement is handled in useNPCControl hook
+
+    if (selectedStructure) {
+      const position = { x: gridX, z: gridZ };
+      addStructure(selectedStructure, position);
+      setSelectedStructure(null);
+    }
   };
 
   const handleStructureClick = (position: { x: number; z: number }) => {
@@ -357,15 +385,24 @@ const Game = () => {
           </group>
         ))}
 
-      {/* Render Enemies */}
-      {enemies.map((enemy) => (
-              <Enemy
-                key={enemy.id}
-                id={enemy.id}
-                position={enemy.position}
-                onDestroy={(id) => removeEnemy(id)}
-              />
-            ))}
+      {/* Enemies */}
+      {enemies.map((enemy) => {
+        // Find the spawn that created this enemy based on position
+        const spawn = wolfSpawns.find(s => 
+          Math.abs(s.position.x - enemy.position.x) < 0.1 && 
+          Math.abs(s.position.z - enemy.position.z) < 0.1
+        );
+
+        return (
+          <Enemy
+            key={enemy.id}
+            id={enemy.id}
+            position={enemy.position}
+            spawnId={spawn?.id}
+            onDestroy={handleEnemyDestroy}
+          />
+        );
+      })}
 
             {/* Skill Effects */}
         {activeEffects.map(effect => (
@@ -378,7 +415,14 @@ const Game = () => {
             onComplete={() => removeEffect(effect.id)}
           />
         ))}
-
+      {/* Wolf Spawns */}
+      {wolfSpawns.map((spawn) => (
+        <WolfSpawn
+          key={spawn.id}
+          id={spawn.id}
+          position={spawn.position}
+        />
+      ))}
     </>
   );
 };
