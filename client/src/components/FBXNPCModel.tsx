@@ -68,20 +68,19 @@ export default function FBXNPCModel({
     );
   }
 
-  // Simple animation for the group (bobbing, rotation, etc.)
+  // Animation and movement logic
   useFrame((state) => {
     if (!groupRef.current) return;
 
     const time = state.clock.elapsedTime;
 
-    // Always update position first
-    groupRef.current.position.x = position[0];
-    groupRef.current.position.z = position[2];
+    // Update position smoothly
+    groupRef.current.position.set(position[0], position[1], position[2]);
 
     if (animation === "idle") {
       // Gentle breathing animation
       groupRef.current.position.y = position[1] + Math.sin(time * 2) * 0.02;
-    } else if (animation === "walk") {
+    } else if (animation === "walk" || animation === "walking") {
       // Walking bob animation
       groupRef.current.position.y = position[1] + Math.abs(Math.sin(time * 8)) * 0.05;
     } else {

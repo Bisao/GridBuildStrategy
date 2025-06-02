@@ -381,7 +381,7 @@ const Game = () => {
               <FBXNPCModel
                 position={[npc.position.x, npc.position.y || 0, npc.position.z]}
                 type={getFBXType(npc.type)}
-                animation={(npc.animation as "idle" | "walk") || "idle"}
+                animation={npc.animation === "walking" ? "walk" : (npc.animation || "idle")}
                 rotation={npc.rotation || 0}
               />
 
