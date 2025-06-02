@@ -1,103 +1,49 @@
-
-import { useRef, useEffect, useState } from 'react';
-import { useFrame, useLoader } from '@react-three/fiber';
-import { FBXLoader } from 'three-stdlib';
+import { useLoader } from '@react-three/fiber';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import * as THREE from 'three';
+import { useEffect, useState, Suspense } from 'react';
 
 interface FBXModelProps {
   modelPath: string;
   texturePath?: string;
   position: [number, number, number];
-  rotation?: [number, number, number];
   scale?: [number, number, number];
-  animation?: string;
+  rotation?: [number, number, number];
+  animation?: "idle" | "walk";
 }
 
-export default function FBXModel({ 
+function FBXModelInner({ 
   modelPath, 
   texturePath, 
   position, 
-  rotation = [0, 0, 0], 
-  scale = [1, 1, 1],
-  animation 
+  scale = [1, 1, 1], 
+  rotation = [0, 0, 0],
+  animation = "idle" 
 }: FBXModelProps) {
-  const groupRef = useRef<THREE.Group>(null);
-  const [mixer, setMixer] = useState<THREE.AnimationMixer | null>(null);
-  const [actions, setActions] = useState<{ [key: string]: THREE.AnimationAction }>({});
-  const [loadError, setLoadError] = useState<boolean>(false);
+  const [loadError, setLoadError] = useState(false);
 
-  // Load FBX model with error handling
-  let fbx = null;
+  let fbx;
+  let texture = null;
+
   try {
     fbx = useLoader(FBXLoader, modelPath);
+    if (texturePath) {
+      texture = useLoader(THREE.TextureLoader, texturePath);
+    }
   } catch (error) {
     console.error(`Failed to load FBX model: ${modelPath}`, error);
-    // Don't set error state here to avoid infinite loop
+    setLoadError(true);
   }
 
-  // Load texture if provided
-  const texture = texturePath ? useLoader(THREE.TextureLoader, texturePath) : null;
-
   useEffect(() => {
-    if (!fbx) {
-      setLoadError(true);
-      return;
-    }
-
-    setLoadError(false);
+    if (!fbx || loadError) return;
 
     // Clone the model to avoid sharing between instances
     const clonedFBX = fbx.clone();
-    
-    // Apply texture if provided
-    if (texture) {
-      clonedFBX.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          child.material = new THREE.MeshStandardMaterial({ 
-            map: texture,
-            transparent: true
-          });
-        }
-      });
-    }
-
-    // Setup animations
-    if (clonedFBX.animations && clonedFBX.animations.length > 0) {
-      const newMixer = new THREE.AnimationMixer(clonedFBX);
-      const newActions: { [key: string]: THREE.AnimationAction } = {};
-
-      clonedFBX.animations.forEach((clip) => {
-        const action = newMixer.clipAction(clip);
-        newActions[clip.name] = action;
-      });
-
-      setMixer(newMixer);
-      setActions(newActions);
-
-      // Play default animation
-      if (animation && newActions[animation]) {
-        newActions[animation].play();
-      } else if (Object.keys(newActions).length > 0) {
-        Object.values(newActions)[0].play();
-      }
-    }
-
-    // Add model to group
-    if (groupRef.current) {
-      groupRef.current.clear();
-      groupRef.current.add(clonedFBX);
-    }
-  }, [fbx, texture, animation]);
-
-  // Animation loop
-  useFrame((state, delta) => {
-    if (mixer) {
-      mixer.update(delta);
-    }
-  });
+});
 
   // Render fallback if FBX failed to load
-  if (loadError) {
+  if (loadError || !fbx) {
     return (
       <group position={position} rotation={rotation} scale={scale}>
         {/* Fallback simple character */}
@@ -114,11 +60,28 @@ export default function FBXModel({
   }
 
   return (
-    <group 
-      ref={groupRef} 
-      position={position} 
-      rotation={rotation} 
-      scale={scale}
-    />
+    <group position={position} rotation={rotation} scale={scale}>
+      <primitive object={fbx} />
+    </group>
+  );
+}
+
+export default function FBXModel(props: FBXModelProps) {
+  return (
+    <Suspense fallback={
+      <group position={props.position} rotation={props.rotation} scale={props.scale}>
+        {/* Loading fallback */}
+        <mesh position={[0, 1, 0]}>
+          <boxGeometry args={[0.4, 0.8, 0.2]} />
+          <meshStandardMaterial color="#666666" />
+        </mesh>
+        <mesh position={[0, 1.6, 0]}>
+          <boxGeometry args={[0.3, 0.3, 0.3]} />
+          <meshStandardMaterial color="#999999" />
+        </mesh>
+      </group>
+    }>
+      <FBXModelInner {...props} />
+    </Suspense>
   );
 }

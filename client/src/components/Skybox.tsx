@@ -1,38 +1,37 @@
-
-import { useRef } from 'react';
+import { useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
-import { useTexture } from '@react-three/drei';
+import { Suspense } from 'react';
 
-const Skybox = () => {
-  const skyboxRef = useRef<THREE.Mesh>(null);
-  
-  // Load the sky texture
-  const skyTexture = useTexture('/textures/sky-clouds.png');
-  
-  // Configure texture settings
-  skyTexture.wrapS = THREE.RepeatWrapping;
-  skyTexture.wrapT = THREE.ClampToEdgeWrapping;
-  skyTexture.repeat.set(4, 1); // Repeat horizontally for seamless sky
-  
-  const skyMaterial = new THREE.MeshBasicMaterial({
-    map: skyTexture,
-    side: THREE.BackSide,
-    fog: false
-  });
+function SkyboxInner() {
+  try {
+    const texture = useLoader(THREE.TextureLoader, '/textures/sky-clouds.png');
 
-  // Slowly rotate the sky for dynamic effect
-  useFrame((state) => {
-    if (skyboxRef.current) {
-      skyboxRef.current.rotation.y += 0.0002; // Very slow rotation
-    }
-  });
+    return (
+      <mesh scale={[100, 100, 100]}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshBasicMaterial map={texture} side={THREE.BackSide} />
+      </mesh>
+    );
+  } catch (error) {
+    console.warn('Failed to load skybox texture, using fallback');
+    return (
+      <mesh scale={[100, 100, 100]}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshBasicMaterial color="#87CEEB" side={THREE.BackSide} />
+      </mesh>
+    );
+  }
+}
 
+export default function Skybox() {
   return (
-    <mesh ref={skyboxRef} material={skyMaterial}>
-      <sphereGeometry args={[100, 32, 16]} />
-    </mesh>
+    <Suspense fallback={
+      <mesh scale={[100, 100, 100]}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshBasicMaterial color="#87CEEB" side={THREE.BackSide} />
+      </mesh>
+    }>
+      <SkyboxInner />
+    </Suspense>
   );
-};
-
-export default Skybox;
+}
