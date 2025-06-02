@@ -127,6 +127,13 @@ export const useNPCControl = () => {
     
     // Stop control if NPC is dead
     if (controlledNPC.health <= 0) {
+      // Clear target position and enemy selection when NPC dies
+      setTargetPosition(null);
+      if (selectedEnemyId) {
+        const setSelected = (window as any)[`enemy_${selectedEnemyId}_setSelected`];
+        if (setSelected) setSelected(false);
+        setSelectedEnemyId(null);
+      }
       return;
     }
 

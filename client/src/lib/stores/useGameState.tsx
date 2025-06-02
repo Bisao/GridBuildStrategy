@@ -165,7 +165,7 @@ export const useGameState = create<GameState>()(
               
               // Check if NPC died (HP reached 0)
               if (updatedNPC.health <= 0 && npc.health > 0) {
-                console.log(`${npc.name} morreu! Respawnando em casa...`);
+                console.log(`${npc.name} morreu! Teleportando para casa...`);
                 
                 // If this was the controlled NPC, release control
                 if (controlledNPCId === npcId) {
@@ -173,12 +173,39 @@ export const useGameState = create<GameState>()(
                   console.log(`Controle do NPC ${npc.name} perdido devido à morte`);
                 }
                 
-                // Respawn at home with full health and mana
+                // Get home position based on structure type
+                const getHomePosition = (structureId: string) => {
+                  const structureType = structureId.split('-')[0];
+                  const coords = structureId.split('-').slice(1).map(Number);
+                  const baseX = coords[0] || 0;
+                  const baseZ = coords[1] || 0;
+                  
+                  // Return position in front of the structure entrance
+                  switch (structureType) {
+                    case 'house':
+                    case 'largehouse':
+                      return { x: baseX, z: baseZ + 2 }; // In front of house
+                    case 'blacksmith':
+                    case 'market':
+                      return { x: baseX + 1, z: baseZ + 2 }; // Near entrance
+                    case 'windmill':
+                    case 'tower':
+                      return { x: baseX, z: baseZ + 3 }; // Safe distance from tall structures
+                    default:
+                      return { x: baseX, z: baseZ + 1 }; // Default safe position
+                  }
+                };
+                
+                const homePosition = getHomePosition(npc.structureId);
+                
+                // Teleport to home with full health and mana
                 return {
                   ...updatedNPC,
+                  position: homePosition,
                   health: updatedNPC.maxHealth || 100,
                   mana: updatedNPC.maxMana || 100,
-                  animation: "idle"
+                  animation: "idle",
+                  rotation: 0 // Reset rotation
                 };
               }
               

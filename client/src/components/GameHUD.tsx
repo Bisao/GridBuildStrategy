@@ -23,13 +23,23 @@ export default function GameHUD({ onOpenCombatPanel, onOpenStructurePanel }: Gam
 
   return (
     <div className="fixed inset-0 pointer-events-none z-20">
+      {/* Death notification */}
+      {controlledNPCId && isDead && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+          <div className="bg-red-900/90 border-2 border-red-500 rounded-lg p-6 text-center animate-pulse">
+            <div className="text-red-200 text-2xl font-bold mb-2">💀 {playerName} Morreu!</div>
+            <div className="text-red-300 text-lg">Teleportando para casa...</div>
+          </div>
+        </div>
+      )}
+
       {/* Top Left - Player Info (only when controlling NPC) */}
       {controlledNPCId && (
         <div className="absolute top-4 left-4 pointer-events-auto">
-          <div className="flex items-center gap-3 bg-black/70 rounded-lg p-3 border border-yellow-600/50">
+          <div className={`flex items-center gap-3 bg-black/70 rounded-lg p-3 border ${isDead ? 'border-red-500/50' : 'border-yellow-600/50'}`}>
             {/* Player Avatar */}
-            <div className="w-12 h-12 rounded-full border-2 border-yellow-500 bg-gradient-to-br from-yellow-600 to-orange-700 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">🧙</span>
+            <div className={`w-12 h-12 rounded-full border-2 ${isDead ? 'border-red-500' : 'border-yellow-500'} bg-gradient-to-br ${isDead ? 'from-red-600 to-red-900' : 'from-yellow-600 to-orange-700'} flex items-center justify-center`}>
+              <span className="text-white font-bold text-lg">{isDead ? '💀' : '🧙'}</span>
             </div>
 
             {/* Player Stats */}
