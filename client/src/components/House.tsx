@@ -12,7 +12,7 @@ interface HouseProps {
 const House = ({ isPreview = false, canPlace = true, position, onHouseClick }: HouseProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const woodTexture = useTexture("/textures/wood.jpg");
-
+  
   // Configure wood texture
   woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping;
   woodTexture.repeat.set(2, 2);
@@ -24,7 +24,6 @@ const House = ({ isPreview = false, canPlace = true, position, onHouseClick }: H
   const handleClick = (event: any) => {
     if (!isPreview && position && onHouseClick) {
       event.stopPropagation();
-      console.log('Casa clicada na posição:', position);
       onHouseClick(position);
     }
   };
@@ -71,7 +70,7 @@ const House = ({ isPreview = false, canPlace = true, position, onHouseClick }: H
           opacity={opacity}
         />
       </mesh>
-
+      
       <mesh position={[0.25, 0.25, 0.41]} castShadow>
         <boxGeometry args={[0.15, 0.15, 0.02]} />
         <meshLambertMaterial 

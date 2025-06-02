@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
 import Grid from "./Grid";
 import House from "./House";
 import Enemy from "./Enemy";
@@ -19,7 +18,6 @@ import Market from "./structures/Market";
 import { useAudio } from "../lib/stores/useAudio";
 import Skybox from "./Skybox";
 import NPCVariation from "./NPCVariations";
-import FBXNPCModel from "./FBXNPCModel";
 
 interface ActiveEffect {
   id: string;
@@ -29,26 +27,11 @@ interface ActiveEffect {
   duration: number;
 }
 
-interface CreatedNPC {
-  id: string;
-  name: string;
-  structureId: string;
-  position: { x: number; y: number; z: number };
-  type: "villager" | "guard" | "merchant" | "farmer";
-  class: "barbarian" | "knight" | "mage" | "rogue" | "rogue_hooded";
-  rotation: number;
-  animation: "idle" | "walk";
-  health: number;
-  maxHealth: number;
-}
-
 const Game = () => {
   const { camera, gl } = useThree();
   const [mousePosition, setMousePosition] = useState(new THREE.Vector2());
   const raycaster = useRef(new THREE.Raycaster());
   const [activeEffects, setActiveEffects] = useState<ActiveEffect[]>([]);
-  const [selectedHouse, setSelectedHouse] = useState<{ x: number; z: number; id: string } | null>(null);
-  const [isNPCPanelOpen, setNPCPanelOpen] = useState(false);
 
   const { 
     selectedStructure, 
@@ -95,25 +78,6 @@ const Game = () => {
     rotatePreview
   } = useGridPlacement();
 
-  // Criar spawn de lobo automaticamente quando não houver spawns
-  useEffect(() => {
-    if (wolfSpawns.length === 0) {
-      // Criar spawns em posições estratégicas do grid
-      const spawnPositions = [
-        { x: -8, z: -8 },
-        { x: 8, z: -8 },
-        { x: -8, z: 8 },
-        { x: 8, z: 8 },
-        { x: 0, z: -9 },
-        { x: 0, z: 9 }
-      ];
-
-      spawnPositions.forEach(position => {
-        addWolfSpawn(position);
-      });
-    }
-  }, [wolfSpawns.length, addWolfSpawn]);
-
   // Handle keyboard input for rotation and escape
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -159,37 +123,33 @@ const Game = () => {
   };
 
   const handleClick = (event: any) => {
-    // Right click to create wolf spawn on grid tiles
-    if (event.object?.userData?.isGridTile && event.nativeEvent.button === 2) {
+    if (!event.object?.userData?.isGridTile) return;
+
+    const { gridX, gridZ } = event.object.userData;
+
+    // Right click to create wolf spawn
+    if (event.nativeEvent.button === 2) {
       event.stopPropagation();
-      const { gridX, gridZ } = event.object.userData;
       addWolfSpawn({ x: gridX, z: gridZ });
       return;
     }
 
-    // Handle grid tile clicks for structure placement
-    if (event.object?.userData?.isGridTile && selectedStructure) {
-      const { gridX, gridZ } = event.object.userData;
+    if (selectedStructure) {
       const position = { x: gridX, z: gridZ };
       addStructure(selectedStructure, position);
       setSelectedStructure(null);
-      return;
     }
   };
 
   const handleStructureClick = (position: { x: number; z: number }) => {
-    // Evitar abrir painel se estivermos no modo de colocação de estrutura
-    if (selectedStructure) return;
-
     // Encontrar a estrutura nas estruturas colocadas para obter o ID
     const structureClicked = placedStructures.find(
       structure => 
-        Math.abs(structure.x - position.x) < 0.1 && 
-        Math.abs(structure.z - position.z) < 0.1
+        structure.x === position.x && 
+        structure.z === position.z
     );
 
     if (structureClicked) {
-      console.log('Estrutura clicada:', structureClicked);
       setSelectedHouse({ x: position.x, z: position.z, id: structureClicked.id });
       setNPCPanelOpen(true);
     }
@@ -305,7 +265,7 @@ const Game = () => {
           {structure.type === 'house' && (
             <House 
               position={{ x: structure.x, z: structure.z }}
-              onHouseClick={handleStructureClick}
+              onStructureClick={handleStructureClick}
             />
           )}
           {structure.type === 'windmill' && (
@@ -347,12 +307,7 @@ const Game = () => {
           position={[previewPosition.x, 0, previewPosition.z]}
           rotation={[0, (previewRotation * Math.PI) / 180, 0]}
         >
-          {selectedStructure === 'house' && (
-            <House 
-              isPreview={true} 
-              canPlace={canPlaceStructure(previewPosition.x, previewPosition.z)}
-            />
-          )}
+
           {selectedStructure === 'windmill' && (
             <Windmill 
               isPreview={true} 

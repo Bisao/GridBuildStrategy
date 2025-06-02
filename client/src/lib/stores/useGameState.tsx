@@ -302,7 +302,14 @@ export const useGameState = create<GameState>()(
         set((state) => ({
           enemies: [...state.enemies, enemy],
         }));
-        console.log(`Lobo criado no spawn ${spawnId} na posição (${spawn.position.x}, ${spawn.position.z})`);
+
+        // Set timeout to respawn wolf after 30 seconds (30000 ms)
+        setTimeout(() => {
+          const wolfIsAlive = get().enemies.some((enemy) => enemy.id === enemy.id);
+          if(!wolfIsAlive){
+            get().spawnWolfAtSpawn(spawnId)
+          }
+        }, 30000);
       }
     },
 
