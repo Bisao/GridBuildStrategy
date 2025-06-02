@@ -3,7 +3,6 @@ import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import Grid from "./Grid";
 import House from "./House";
-import NPC from "./NPC";
 import Enemy from "./Enemy";
 import SkillEffect from "./SkillEffect";
 import CameraControls from "./CameraControls";
@@ -17,6 +16,7 @@ import Blacksmith from "./structures/Blacksmith";
 import Market from "./structures/Market";
 import { useAudio } from "../lib/stores/useAudio";
 import Skybox from "./Skybox";
+import NPCVariation from "./NPCVariations";
 
 interface ActiveEffect {
   id: string;
@@ -195,7 +195,7 @@ const Game = () => {
     <>
       {/* Fantasy Skybox */}
       <Skybox />
-      
+
       {/* Midday Lighting Setup */}
       <ambientLight intensity={0.8} color="#E6F3FF" />
       <directionalLight 
@@ -315,14 +315,12 @@ const Game = () => {
 
       {/* Render NPCs */}
       {createdNPCs.map((npc) => (
-        <NPC
+        <NPCVariation
           key={npc.id}
-          id={npc.id}
-          name={npc.name}
           position={[npc.position.x, 0, npc.position.z]}
-          type={npc.type}
-          rotation={npc.rotation}
-          animation={npc.animation}
+          type={npc.type as "villager" | "guard" | "merchant" | "farmer"}
+          animation={npc.animation as "idle" | "walk"}
+          rotation={npc.rotation || 0}
         />
       ))}
 

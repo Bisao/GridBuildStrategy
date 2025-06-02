@@ -304,20 +304,27 @@ export default function NPCPanel({
               {/* NPC Preview */}
               <div className="bg-gray-700/50 rounded-lg p-3">
                 <div className="text-sm text-gray-400 mb-2">Preview:</div>
-                <div className="flex items-center justify-center bg-gray-800 rounded h-20">
-                  <div className="text-center">
-                    <div className="text-2xl mb-1">
-                      {npcType === "villager" && "🧑‍🌾"}
-                      {npcType === "guard" && "🛡️"}
-                      {npcType === "merchant" && "💰"}
-                      {npcType === "farmer" && "🌾"}
-                    </div>
-                    <div className="text-xs text-gray-400">
-                      Modelo: {npcType === "villager" ? "Rogue" : 
-                               npcType === "guard" ? "Knight" : 
-                               npcType === "merchant" ? "Mage" : "Barbarian"}
-                    </div>
-                  </div>
+                <div className="flex items-center justify-center bg-gray-800 rounded h-32">
+                  <Canvas
+                    camera={{ position: [0, 1, 3], fov: 45 }}
+                    style={{ width: '100%', height: '100%' }}
+                  >
+                    <ambientLight intensity={0.5} />
+                    <directionalLight position={[2, 2, 2]} intensity={1} />
+                    <FBXNPCModel
+                      position={[0, 0, 0]}
+                      type={npcType === "villager" ? "rogue" : 
+                           npcType === "guard" ? "knight" : 
+                           npcType === "merchant" ? "mage" : "barbarian"}
+                      animation="idle"
+                      rotation={0}
+                    />
+                  </Canvas>
+                </div>
+                <div className="text-xs text-gray-400 text-center mt-1">
+                  Modelo: {npcType === "villager" ? "Rogue" : 
+                           npcType === "guard" ? "Knight" : 
+                           npcType === "merchant" ? "Mage" : "Barbarian"}
                 </div>
               </div>
 
