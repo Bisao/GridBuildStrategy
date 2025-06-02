@@ -172,6 +172,8 @@ export const useNPCControl = () => {
         // Face movement direction
         newRotation = Math.atan2(moveDirection.x, moveDirection.z);
         animation = "walking";
+        
+        console.log(`Moving NPC to: (${newPosition.x.toFixed(2)}, ${newPosition.z.toFixed(2)})`);
       } else {
         // Reached target, stop moving
         setTargetPosition(null);
@@ -185,7 +187,11 @@ export const useNPCControl = () => {
 
     // Update NPC
     updateNPC(controlledNPCId, {
-      position: newPosition,
+      position: {
+        x: newPosition.x,
+        y: newPosition.y || 0,
+        z: newPosition.z
+      },
       rotation: newRotation,
       animation
     });

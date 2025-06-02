@@ -74,18 +74,22 @@ export default function FBXNPCModel({
 
     const time = state.clock.elapsedTime;
 
-    // Update position smoothly
-    groupRef.current.position.set(position[0], position[1], position[2]);
+    // Update position directly - this is critical for movement
+    groupRef.current.position.x = position[0];
+    groupRef.current.position.z = position[2];
+    
+    // Apply base Y position
+    const baseY = position[1];
 
     if (animation === "idle") {
       // Gentle breathing animation
-      groupRef.current.position.y = position[1] + Math.sin(time * 2) * 0.02;
+      groupRef.current.position.y = baseY + Math.sin(time * 2) * 0.02;
     } else if (animation === "walk" || animation === "walking") {
       // Walking bob animation
-      groupRef.current.position.y = position[1] + Math.abs(Math.sin(time * 8)) * 0.05;
+      groupRef.current.position.y = baseY + Math.abs(Math.sin(time * 8)) * 0.05;
     } else {
       // Default position
-      groupRef.current.position.y = position[1];
+      groupRef.current.position.y = baseY;
     }
 
     // Apply rotation
