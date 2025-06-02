@@ -40,7 +40,7 @@ interface CreatedNPC {
   animation: "idle" | "walk";
   health: number;
   maxHealth: number;
-}</interface>
+}
 
 const Game = () => {
   const { camera, gl } = useThree();
