@@ -166,6 +166,30 @@ const Game = () => {
     setActiveEffects(prev => prev.filter(effect => effect.id !== effectId));
   };
 
+  const handleCreateNPC = (name: string, structureId: string, type: "villager" | "guard" | "merchant" | "farmer" = "villager") => {
+    const structure = placedStructures.find(s => s.id === structureId);
+    if (!structure) return;
+
+    // Generate random position around the structure
+    const randomOffset = () => (Math.random() - 0.5) * 2;
+    const position = {
+      x: structure.position.x + randomOffset(),
+      z: structure.position.z + randomOffset()
+    };
+
+    const newNPC: CreatedNPC = {
+      id: `npc-${Date.now()}-${Math.random()}`,
+      name,
+      structureId,
+      position,
+      type,
+      rotation: Math.random() * Math.PI * 2
+    };
+
+    addNPC(newNPC);
+    console.log('NPC criado:', newNPC);
+  };
+
   return (
     <>
       {/* Midday Lighting Setup */}

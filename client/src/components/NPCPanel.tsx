@@ -34,6 +34,7 @@ export default function NPCPanel({
   const [npcName, setNpcName] = useState("");
   const [npcSurname, setNpcSurname] = useState("");
   const [isNPCCreationOpen, setNPCCreationOpen] = useState(false);
+  const [npcType, setNpcType] = useState<"villager" | "guard" | "merchant" | "farmer">("villager"); // Added npcType state
 
   // Arrays para geração aleatória de nomes
   const firstNames = [
@@ -65,7 +66,7 @@ export default function NPCPanel({
   const getNPCsByStructure = (structureId: string) => {
     return createdNPCs.filter(npc => npc.structureId === structureId);
   };
-  
+
   // Obter NPCs da estrutura atual
   const structureNPCs = housePosition ? getNPCsByStructure(housePosition.id) : [];
 
@@ -255,8 +256,8 @@ export default function NPCPanel({
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-300 font-medium">
-                  Criar Novo NPC
+                <div className="text-sm text-gray-300">
+                  Criar um novo NPC para esta estrutura
                 </div>
                 <Button
                   variant="ghost"
@@ -267,6 +268,53 @@ export default function NPCPanel({
                 >
                   🎲
                 </Button>
+              </div>
+
+              {/* NPC Type Selection with Preview */}
+              <div className="space-y-2">
+                <label className="text-sm text-gray-400">Tipo do NPC:</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { type: "villager" as const, label: "Aldeão", emoji: "🧑‍🌾", model: "rogue" },
+                    { type: "guard" as const, label: "Guarda", emoji: "🛡️", model: "knight" },
+                    { type: "merchant" as const, label: "Comerciante", emoji: "💰", model: "mage" },
+                    { type: "farmer" as const, label: "Fazendeiro", emoji: "🌾", model: "barbarian" }
+                  ].map(({ type, label, emoji, model }) => (
+                    <Button
+                      key={type}
+                      variant={npcType === type ? "default" : "outline"}
+                      className={`h-16 flex flex-col items-center justify-center gap-1 ${
+                        npcType === type 
+                          ? "bg-blue-600 hover:bg-blue-700 border-blue-500" 
+                          : "bg-gray-700 hover:bg-gray-600 border-gray-600"
+                      }`}
+                      onClick={() => setNpcType(type)}
+                    >
+                      <span className="text-lg">{emoji}</span>
+                      <span className="text-xs">{label}</span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* NPC Preview */}
+              <div className="bg-gray-700/50 rounded-lg p-3">
+                <div className="text-sm text-gray-400 mb-2">Preview:</div>
+                <div className="flex items-center justify-center bg-gray-800 rounded h-20">
+                  <div className="text-center">
+                    <div className="text-2xl mb-1">
+                      {npcType === "villager" && "🧑‍🌾"}
+                      {npcType === "guard" && "🛡️"}
+                      {npcType === "merchant" && "💰"}
+                      {npcType === "farmer" && "🌾"}
+                    </div>
+                    <div className="text-xs text-gray-400">
+                      Modelo: {npcType === "villager" ? "Rogue" : 
+                               npcType === "guard" ? "Knight" : 
+                               npcType === "merchant" ? "Mage" : "Barbarian"}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-3">
