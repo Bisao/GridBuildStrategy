@@ -9,6 +9,10 @@ interface CreatedNPC {
   type: "villager" | "guard" | "merchant" | "farmer";
   rotation?: number;
   animation?: "idle" | "walk";
+  health?: number;
+  maxHealth?: number;
+  mana?: number;
+  maxMana?: number;
 }
 
 interface Enemy {
@@ -136,8 +140,16 @@ export const useGameState = create<GameState>()(
     },
 
     addNPC: (npc) => {
+      const npcWithStats = {
+        ...npc,
+        animation: npc.animation || "idle",
+        health: npc.health || 100,
+        maxHealth: npc.maxHealth || 100,
+        mana: npc.mana || 100,
+        maxMana: npc.maxMana || 100
+      };
       set((state) => ({
-        createdNPCs: [...state.createdNPCs, { ...npc, animation: npc.animation || "idle" }]
+        createdNPCs: [...state.createdNPCs, npcWithStats]
       }));
       console.log(`NPC "${npc.name}" criado com sucesso na estrutura ${npc.structureId}`);
     },

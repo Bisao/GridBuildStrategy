@@ -14,11 +14,11 @@ export default function GameHUD({ onOpenCombatPanel, onOpenStructurePanel }: Gam
   const controlledNPC = createdNPCs.find(npc => npc.id === controlledNPCId);
   const playerName = controlledNPC?.name || "Player";
 
-  // Mock values for demonstration
-  const health = 1374;
-  const maxHealth = 1374;
-  const energy = 147;
-  const maxEnergy = 147;
+  // Get real NPC stats
+  const health = controlledNPC?.health || 100;
+  const maxHealth = controlledNPC?.maxHealth || 100;
+  const energy = controlledNPC?.mana || 100;
+  const maxEnergy = controlledNPC?.maxMana || 100;
 
   return (
     <div className="fixed inset-0 pointer-events-none z-20">

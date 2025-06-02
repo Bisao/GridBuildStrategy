@@ -11,9 +11,6 @@ export default function SkillsBar() {
     setActiveSkill, 
     useSkill, 
     updateCooldowns,
-    updateMana,
-    mana,
-    maxMana,
     initializeSkills 
   } = useSkills();
   
@@ -21,14 +18,18 @@ export default function SkillsBar() {
     controlledNPCId, 
     createdNPCs, 
     enemies, 
-    removeEnemy 
+    removeEnemy,
+    updateNPC
   } = useGameState();
   
   const lastUpdateTime = useRef(performance.now());
 
-  // Mock health values - you can integrate with actual combat system later
-  const health = 85;
-  const maxHealth = 100;
+  // Get controlled NPC stats
+  const controlledNPC = controlledNPCId ? createdNPCs.find(npc => npc.id === controlledNPCId) : null;
+  const health = controlledNPC?.health || 0;
+  const maxHealth = controlledNPC?.maxHealth || 100;
+  const mana = controlledNPC?.mana || 0;
+  const maxMana = controlledNPC?.maxMana || 100;
 
   // Initialize skills on mount
   useEffect(() => {
@@ -37,7 +38,7 @@ export default function SkillsBar() {
     }
   }, [skills.length, initializeSkills]);
 
-  // Update cooldowns and mana
+  // Update cooldowns and regenerate mana
   useEffect(() => {
     const updateLoop = () => {
       const currentTime = performance.now();
@@ -45,24 +46,30 @@ export default function SkillsBar() {
       lastUpdateTime.current = currentTime;
       
       updateCooldowns(deltaTime);
-      updateMana(deltaTime);
+      
+      // Regenerate mana for controlled NPC
+      if (controlledNPC && controlledNPC.mana < controlledNPC.maxMana) {
+        const newMana = Math.min(controlledNPC.maxMana, controlledNPC.mana + (deltaTime * 10));
+        updateNPC(controlledNPC.id, { mana: newMana });
+      }
+      
       requestAnimationFrame(updateLoop);
     };
     
     const animationId = requestAnimationFrame(updateLoop);
     return () => cancelAnimationFrame(animationId);
-  }, [updateCooldowns, updateMana]);
+  }, [updateCooldowns, controlledNPC, updateNPC]);
 
   // Handle skill activation
   const handleSkillClick = (skillId: string) => {
-    if (!controlledNPCId) {
+    if (!controlledNPCId || !controlledNPC) {
       console.log("Nenhum NPC controlado!");
       return;
     }
 
     const skill = skills.find(s => s.id === skillId);
-    if (!skill || skill.currentCooldown > 0 || mana < skill.manaCost) {
-      if (mana < skill.manaCost) {
+    if (!skill || skill.currentCooldown > 0 || controlledNPC.mana < skill.manaCost) {
+      if (controlledNPC.mana < skill.manaCost) {
         console.log("Mana insuficiente!");
       }
       return;
@@ -94,14 +101,17 @@ export default function SkillsBar() {
 
   // Execute skill when active skill is used
   const executeActiveSkill = (skillId: string, targetPosition?: THREE.Vector3) => {
-    if (!controlledNPCId) return;
+    if (!controlledNPCId || !controlledNPC) return;
 
     const skill = skills.find(s => s.id === skillId);
-    const controlledNPC = createdNPCs.find(npc => npc.id === controlledNPCId);
     
-    if (!skill || !controlledNPC || !useSkill(skillId)) {
+    if (!skill || !useSkill(skillId)) {
       return;
     }
+
+    // Consume mana from NPC
+    const newMana = Math.max(0, controlledNPC.mana - skill.manaCost);
+    updateNPC(controlledNPC.id, { mana: newMana });
 
     console.log(`Executando skill: ${skill.name}`);
 
@@ -147,6 +157,9 @@ export default function SkillsBar() {
 
   const executeHealSkill = (skill: any, npc: any) => {
     const healAmount = skill.healAmount || 40;
+    const newHealth = Math.min(npc.maxHealth, npc.health + healAmount);
+    updateNPC(npc.id, { health: newHealth });
+    
     console.log(`${npc.name} se curou em ${healAmount} pontos de vida!`);
     
     const createEffect = (window as any).createSkillEffect;
@@ -179,12 +192,11 @@ export default function SkillsBar() {
   };
 
   const executeSkillOnEnemy = (enemyId: string) => {
-    if (!controlledNPCId) return;
+    if (!controlledNPCId || !controlledNPC) return;
 
     const enemy = enemies.find(e => e.id === enemyId);
-    const controlledNPC = createdNPCs.find(npc => npc.id === controlledNPCId);
     
-    if (!enemy || !controlledNPC) return;
+    if (!enemy) return;
 
     const npcPos = new THREE.Vector3(controlledNPC.position.x, 0, controlledNPC.position.z);
     const enemyPos = new THREE.Vector3(enemy.position.x, 0, enemy.position.z);
@@ -198,6 +210,10 @@ export default function SkillsBar() {
 
     if (distance <= basicAttack.range) {
       if (useSkill('basic_attack')) {
+        // Consume mana
+        const newMana = Math.max(0, controlledNPC.mana - basicAttack.manaCost);
+        updateNPC(controlledNPC.id, { mana: newMana });
+
         const damage = basicAttack.damage || 25;
         const takeDamageFunc = (window as any)[`enemy_${enemy.id}_takeDamage`];
         
@@ -228,7 +244,7 @@ export default function SkillsBar() {
     };
   }, [activeSkillId, controlledNPCId, skills, enemies]);
 
-  if (!controlledNPCId) {
+  if (!controlledNPCId || !controlledNPC) {
     return null;
   }
 
@@ -261,7 +277,7 @@ export default function SkillsBar() {
           
           {/* Health text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white font-bold text-sm">
-            <span className="text-lg">{health}</span>
+            <span className="text-lg">{Math.floor(health)}</span>
             <span className="text-xs opacity-80">{maxHealth}</span>
           </div>
           
