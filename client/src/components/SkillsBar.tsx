@@ -133,17 +133,21 @@ export default function SkillsBar() {
 
   const executeAttackSkill = (skill: any, npc: any, targetPosition?: THREE.Vector3) => {
     const npcPos = new THREE.Vector3(npc.position.x, 0, npc.position.z);
+    let enemiesHit = 0;
     
     enemies.forEach(enemy => {
       const enemyPos = new THREE.Vector3(enemy.position.x, 0, enemy.position.z);
       const distance = npcPos.distanceTo(enemyPos);
       
       if (distance <= skill.range) {
-        const damage = skill.damage || 25;
+        const baseDamage = skill.damage || 25;
+        // Add some variation to damage
+        const damage = baseDamage + Math.floor(Math.random() * 10) - 5;
         const takeDamageFunc = (window as any)[`enemy_${enemy.id}_takeDamage`];
         
         if (takeDamageFunc) {
           takeDamageFunc(damage);
+          enemiesHit++;
           console.log(`${npc.name} usou ${skill.name} e causou ${damage} de dano!`);
           
           const createEffect = (window as any).createSkillEffect;
@@ -153,6 +157,10 @@ export default function SkillsBar() {
         }
       }
     });
+    
+    if (enemiesHit === 0) {
+      console.log(`${skill.name} não atingiu nenhum inimigo (alcance: ${skill.range}m)`);
+    }
   };
 
   const executeHealSkill = (skill: any, npc: any) => {
@@ -214,12 +222,13 @@ export default function SkillsBar() {
         const newMana = Math.max(0, controlledNPC.mana - basicAttack.manaCost);
         updateNPC(controlledNPC.id, { mana: newMana });
 
-        const damage = basicAttack.damage || 25;
+        const baseDamage = basicAttack.damage || 25;
+        const damage = baseDamage + Math.floor(Math.random() * 10) - 5;
         const takeDamageFunc = (window as any)[`enemy_${enemy.id}_takeDamage`];
         
         if (takeDamageFunc) {
           takeDamageFunc(damage);
-          console.log(`${controlledNPC.name} atacou o inimigo com ${basicAttack.name}!`);
+          console.log(`${controlledNPC.name} atacou o inimigo com ${basicAttack.name} causando ${damage} de dano!`);
           
           const createEffect = (window as any).createSkillEffect;
           if (createEffect) {
@@ -228,18 +237,59 @@ export default function SkillsBar() {
         }
       }
     } else {
-      console.log("Inimigo muito longe para atacar!");
+      console.log(`Inimigo muito longe para atacar! Distância: ${distance.toFixed(1)}m (máximo: ${basicAttack.range}m)`);
     }
+  };
+
+  // Create damage effect function
+  const createDamageEffect = (position: THREE.Vector3, damage: number, source: 'player' | 'enemy') => {
+    const damageElement = document.createElement('div');
+    damageElement.style.position = 'fixed';
+    damageElement.style.pointerEvents = 'none';
+    damageElement.style.zIndex = '1000';
+    damageElement.style.fontSize = '24px';
+    damageElement.style.fontWeight = 'bold';
+    damageElement.style.color = source === 'player' ? '#FF4444' : '#44FF44';
+    damageElement.style.textShadow = '2px 2px 4px rgba(0,0,0,0.8)';
+    damageElement.textContent = `-${damage}`;
+    
+    // Convert 3D position to screen coordinates (simplified)
+    const screenX = window.innerWidth / 2 + (position.x * 20);
+    const screenY = window.innerHeight / 2 - (position.z * 20) - 100;
+    
+    damageElement.style.left = `${screenX}px`;
+    damageElement.style.top = `${screenY}px`;
+    
+    document.body.appendChild(damageElement);
+    
+    // Animate the damage number
+    let opacity = 1;
+    let y = screenY;
+    const animate = () => {
+      opacity -= 0.02;
+      y -= 2;
+      damageElement.style.opacity = opacity.toString();
+      damageElement.style.top = `${y}px`;
+      
+      if (opacity > 0) {
+        requestAnimationFrame(animate);
+      } else {
+        document.body.removeChild(damageElement);
+      }
+    };
+    requestAnimationFrame(animate);
   };
 
   // Expose functions globally for world interaction
   useEffect(() => {
     (window as any).executeActiveSkill = executeActiveSkill;
     (window as any).executeSkillOnEnemy = executeSkillOnEnemy;
+    (window as any).createDamageEffect = createDamageEffect;
     (window as any).enemies = enemies;
     return () => {
       delete (window as any).executeActiveSkill;
       delete (window as any).executeSkillOnEnemy;
+      delete (window as any).createDamageEffect;
       delete (window as any).enemies;
     };
   }, [activeSkillId, controlledNPCId, skills, enemies]);

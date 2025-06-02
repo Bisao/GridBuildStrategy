@@ -17,11 +17,17 @@ export default function Enemy({ id, position, onDestroy }: EnemyProps) {
   const leftEarRef = useRef<THREE.Mesh>(null);
   const rightEarRef = useRef<THREE.Mesh>(null);
   const [health, setHealth] = useState(100);
+  const [maxHealth] = useState(100);
   const [isAttacking, setIsAttacking] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
   const [attackCooldown, setAttackCooldown] = useState(0);
-  const { createdNPCs, controlledNPCId } = useGameState();
+  const [isHurt, setIsHurt] = useState(false);
+  const [attackRange] = useState(2);
+  const [aggroRange] = useState(15);
+  const [speed] = useState(0.02);
+  const [damage] = useState(15);
+  const { createdNPCs, controlledNPCId, updateNPC } = useGameState();
 
   // Wolf AI and animation
   useFrame((state) => {
@@ -36,11 +42,11 @@ export default function Enemy({ id, position, onDestroy }: EnemyProps) {
     const distance = wolfPos.distanceTo(npcPos);
 
     // Wolf behavior
-    if (distance > 2 && distance < 15) {
+    if (distance > attackRange && distance < aggroRange) {
       // Move towards NPC
       const direction = npcPos.clone().sub(wolfPos).normalize();
-      position.x += direction.x * 0.02;
-      position.z += direction.z * 0.02;
+      position.x += direction.x * speed;
+      position.z += direction.z * speed;
       groupRef.current.position.set(position.x, 0, position.z);
       
       // Face the target
@@ -49,17 +55,25 @@ export default function Enemy({ id, position, onDestroy }: EnemyProps) {
       
       setIsMoving(true);
       setIsAttacking(false);
-    } else if (distance <= 2) {
+    } else if (distance <= attackRange) {
       // Attack if close enough
       setIsMoving(false);
       if (attackCooldown <= 0) {
         setIsAttacking(true);
         setAttackCooldown(120); // 2 seconds at 60fps
         
-        // Deal damage to NPC
-        const takeDamageFunc = (window as any)[`npc_${controlledNPCId}_takeDamage`];
-        if (takeDamageFunc) {
-          takeDamageFunc(15);
+        // Deal damage to NPC using proper system
+        if (controlledNPC && controlledNPC.health > 0) {
+          const newHealth = Math.max(0, controlledNPC.health - damage);
+          updateNPC(controlledNPC.id, { health: newHealth });
+          
+          // Show damage effect on NPC
+          const createDamageEffect = (window as any).createDamageEffect;
+          if (createDamageEffect) {
+            createDamageEffect(npcPos, damage, 'enemy');
+          }
+          
+          console.log(`Lobo atacou ${controlledNPC.name} causando ${damage} de dano! HP: ${newHealth}/${controlledNPC.maxHealth}`);
         }
       }
     } else {
@@ -122,9 +136,25 @@ export default function Enemy({ id, position, onDestroy }: EnemyProps) {
   const takeDamage = (damage: number) => {
     setHealth(prev => {
       const newHealth = Math.max(0, prev - damage);
-      if (newHealth <= 0 && onDestroy) {
-        setTimeout(() => onDestroy(id), 100);
+      
+      // Visual feedback for taking damage
+      setIsHurt(true);
+      setTimeout(() => setIsHurt(false), 200);
+      
+      // Create damage number effect
+      const createDamageEffect = (window as any).createDamageEffect;
+      if (createDamageEffect) {
+        const wolfPos = new THREE.Vector3(position.x, 0, position.z);
+        createDamageEffect(wolfPos, damage, 'player');
       }
+      
+      console.log(`Lobo recebeu ${damage} de dano! HP: ${newHealth}/${maxHealth}`);
+      
+      if (newHealth <= 0 && onDestroy) {
+        console.log(`Lobo ${id} foi derrotado!`);
+        setTimeout(() => onDestroy(id), 500);
+      }
+      
       return newHealth;
     });
   };
@@ -159,8 +189,9 @@ export default function Enemy({ id, position, onDestroy }: EnemyProps) {
     };
   }, [id, position]);
 
-  const healthPercent = health / 100;
-  const wolfColor = isAttacking ? "#8B4513" : "#696969";
+  const healthPercent = health / maxHealth;
+  const wolfColor = isHurt ? "#FF0000" : (isAttacking ? "#8B4513" : "#696969");
+  const eyeColor = isAttacking ? "#FF0000" : (health < maxHealth * 0.3 ? "#FF8800" : "#FFD700");
 
   return (
     <group ref={groupRef} position={[position.x, 0, position.z]}>
@@ -197,11 +228,11 @@ export default function Enemy({ id, position, onDestroy }: EnemyProps) {
       {/* Wolf Eyes */}
       <mesh position={[-0.12, 0.85, 1.0]}>
         <boxGeometry args={[0.06, 0.06, 0.06]} />
-        <meshStandardMaterial color={isAttacking ? "#FF0000" : "#FFD700"} />
+        <meshStandardMaterial color={eyeColor} />
       </mesh>
       <mesh position={[0.12, 0.85, 1.0]}>
         <boxGeometry args={[0.06, 0.06, 0.06]} />
-        <meshStandardMaterial color={isAttacking ? "#FF0000" : "#FFD700"} />
+        <meshStandardMaterial color={eyeColor} />
       </mesh>
 
       {/* Wolf Ears */}

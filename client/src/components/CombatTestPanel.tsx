@@ -151,6 +151,15 @@ export default function CombatTestPanel({ isOpen, onClose }: CombatTestPanelProp
             <div className="text-xs space-y-1">
               <div>Inimigos ativos: {enemies.length}</div>
               <div>NPC controlado: {controlledNPCId ? '✓' : '✗'}</div>
+              {controlledNPCId && (() => {
+                const npc = createdNPCs.find(n => n.id === controlledNPCId);
+                return npc ? (
+                  <>
+                    <div>HP: {Math.floor(npc.health || 0)}/{npc.maxHealth || 100}</div>
+                    <div>Mana: {Math.floor(npc.mana || 0)}/{npc.maxMana || 100}</div>
+                  </>
+                ) : null;
+              })()}
             </div>
           </div>
 
