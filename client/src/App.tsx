@@ -16,7 +16,9 @@ import { useGameState } from "./lib/stores/useGameState";
 import { useCombatState } from "./lib/stores/useCombatState";
 
 import PlayerHUD from "./components/PlayerHUD"; // Import PlayerHUD
-import GameHUD from "./components/GameHUD";
+import GameHUD from './components/GameHUD';
+import SkillsBar from './components/SkillsBar';
+import { Toaster } from 'sonner';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -151,7 +153,7 @@ function App() {
           </Suspense>
         </Canvas>
 
-        
+
 
         {/* UI overlay outside of Canvas */}
         <StructurePanel
@@ -203,6 +205,10 @@ function App() {
           onOpenCombatPanel={() => setCombatTestPanelOpen(true)}
           onOpenStructurePanel={() => setStructurePanelOpen(true)}
         />
+
+        <SkillsBar />
+
+        <Toaster position="top-center" />
         <PlayerHUD />
       </div>
     </QueryClientProvider>

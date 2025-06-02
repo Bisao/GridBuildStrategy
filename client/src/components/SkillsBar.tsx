@@ -32,8 +32,10 @@ export default function SkillsBar() {
 
   // Initialize skills on mount
   useEffect(() => {
-    initializeSkills();
-  }, [initializeSkills]);
+    if (skills.length === 0) {
+      initializeSkills();
+    }
+  }, [skills.length, initializeSkills]);
 
   // Update cooldowns and mana
   useEffect(() => {
