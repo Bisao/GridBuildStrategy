@@ -1,45 +1,71 @@
 
+import FBXNPCModel from "./FBXNPCModel";
 import NPC from "./NPC";
 
 interface NPCVariationProps {
   position: [number, number, number];
   type: "villager" | "guard" | "merchant" | "farmer";
   animation?: "idle" | "walk";
+  rotation?: number;
 }
 
-export default function NPCVariation({ position, type, animation = "idle" }: NPCVariationProps) {
-  const npcConfigs = {
-    villager: {
-      color: "#8B4513", // Brown clothes
-      hairColor: "#654321",
-      skinColor: "#FDBCB4"
-    },
-    guard: {
-      color: "#2F4F4F", // Dark slate gray armor
-      hairColor: "#000000",
-      skinColor: "#FDBCB4"
-    },
-    merchant: {
-      color: "#800080", // Purple robes
-      hairColor: "#FFD700",
-      skinColor: "#FDBCB4"
-    },
-    farmer: {
-      color: "#228B22", // Green overalls
-      hairColor: "#8B4513",
-      skinColor: "#D2691E"
-    }
+export default function NPCVariation({ position, type, animation = "idle", rotation = 0 }: NPCVariationProps) {
+  // Map NPC types to FBX model types
+  const typeMapping = {
+    villager: "rogue" as const,
+    guard: "knight" as const,
+    merchant: "mage" as const,
+    farmer: "barbarian" as const
   };
 
-  const config = npcConfigs[type];
+  const fbxType = typeMapping[type];
+
+  // Use FBX model if available, fallback to basic NPC
+  try {
+    return (
+      <FBXNPCModel
+        position={position}
+        type={fbxType}
+        animation={animation}
+        rotation={rotation}
+      />
+    );
+  } catch (error) {
+    // Fallback to basic NPC model if FBX fails to load
+    console.warn(`Failed to load FBX model for ${type}, using basic model:`, error);
+    
+    const npcConfigs = {
+      villager: {
+        color: "#8B4513", // Brown clothes
+        hairColor: "#654321",
+        skinColor: "#FDBCB4"
+      },
+      guard: {
+        color: "#2F4F4F", // Dark slate gray armor
+        hairColor: "#000000",
+        skinColor: "#FDBCB4"
+      },
+      merchant: {
+        color: "#800080", // Purple robes
+        hairColor: "#FFD700",
+        skinColor: "#FDBCB4"
+      },
+      farmer: {
+        color: "#228B22", // Green overalls
+        hairColor: "#8B4513",
+        skinColor: "#D2691E"
+      }
+    };
+
+    const config = npcConfigs[type];
 
   return (
-    <group position={position}>
-      {/* Body */}
-      <mesh position={[0, 1, 0]}>
-        <boxGeometry args={[0.4, 0.8, 0.2]} />
-        <meshStandardMaterial color={config.color} />
-      </mesh>
+      <group position={position}>
+        {/* Body */}
+        <mesh position={[0, 1, 0]}>
+          <boxGeometry args={[0.4, 0.8, 0.2]} />
+          <meshStandardMaterial color={config.color} />
+        </mesh>
 
       {/* Head */}
       <mesh position={[0, 1.6, 0]}>
@@ -130,10 +156,11 @@ export default function NPCVariation({ position, type, animation = "idle" }: NPC
       )}
 
       {/* Shadow */}
-      <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[0.4, 8]} />
-        <meshBasicMaterial color="#000000" opacity={0.3} transparent />
-      </mesh>
-    </group>
-  );
+        <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.4, 8]} />
+          <meshBasicMaterial color="#000000" opacity={0.3} transparent />
+        </mesh>
+      </group>
+    );
+  }
 }
