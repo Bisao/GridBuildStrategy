@@ -1,7 +1,8 @@
+
 import { useLoader } from '@react-three/fiber';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import * as THREE from 'three';
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useMemo } from 'react';
 
 interface FBXModelProps {
   modelPath: string;
@@ -20,30 +21,62 @@ function FBXModelInner({
   rotation = [0, 0, 0],
   animation = "idle" 
 }: FBXModelProps) {
-  const [loadError, setLoadError] = useState(false);
+  const [modelInstance, setModelInstance] = useState<THREE.Group | null>(null);
+  const [hasError, setHasError] = useState(false);
 
-  let fbx;
-  let texture = null;
-
-  try {
-    fbx = useLoader(FBXLoader, modelPath);
-    if (texturePath) {
-      texture = useLoader(THREE.TextureLoader, texturePath);
+  // Use useMemo to prevent re-loading on every render
+  const { fbx, texture } = useMemo(() => {
+    try {
+      const loadedFbx = useLoader(FBXLoader, modelPath);
+      const loadedTexture = texturePath ? useLoader(THREE.TextureLoader, texturePath) : null;
+      return { fbx: loadedFbx, texture: loadedTexture };
+    } catch (error) {
+      console.error(`Failed to load FBX model: ${modelPath}`, error);
+      setHasError(true);
+      return { fbx: null, texture: null };
     }
-  } catch (error) {
-    console.error(`Failed to load FBX model: ${modelPath}`, error);
-    // Error will be handled by the conditional rendering below
-  }
+  }, [modelPath, texturePath]);
 
   useEffect(() => {
-    if (!fbx) return;
+    if (!fbx || hasError) {
+      setModelInstance(null);
+      return;
+    }
 
-    // Clone the model to avoid sharing between instances
-    const clonedFBX = fbx.clone();
-});
+    try {
+      // Clone the model to avoid sharing between instances
+      const clonedFBX = fbx.clone();
+      
+      // Apply texture if available
+      if (texture) {
+        clonedFBX.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            if (child.material) {
+              if (Array.isArray(child.material)) {
+                child.material.forEach(mat => {
+                  if (mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshBasicMaterial) {
+                    mat.map = texture;
+                    mat.needsUpdate = true;
+                  }
+                });
+              } else if (child.material instanceof THREE.MeshStandardMaterial || child.material instanceof THREE.MeshBasicMaterial) {
+                child.material.map = texture;
+                child.material.needsUpdate = true;
+              }
+            }
+          }
+        });
+      }
 
-  // Render fallback if FBX failed to load
-  if (!fbx) {
+      setModelInstance(clonedFBX);
+    } catch (error) {
+      console.error('Error processing FBX model:', error);
+      setHasError(true);
+    }
+  }, [fbx, texture, hasError]);
+
+  // Render fallback if there's an error or no model
+  if (hasError || !modelInstance) {
     return (
       <group position={position} rotation={rotation} scale={scale}>
         {/* Fallback simple character */}
@@ -61,7 +94,7 @@ function FBXModelInner({
 
   return (
     <group position={position} rotation={rotation} scale={scale}>
-      <primitive object={fbx} />
+      <primitive object={modelInstance} />
     </group>
   );
 }
