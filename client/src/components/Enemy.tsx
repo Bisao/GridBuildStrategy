@@ -73,7 +73,11 @@ export default function Enemy({ id, position, onDestroy }: EnemyProps) {
             createDamageEffect(npcPos, damage, 'enemy');
           }
           
-          console.log(`Lobo atacou ${controlledNPC.name} causando ${damage} de dano! HP: ${newHealth}/${controlledNPC.maxHealth}`);
+          if (newHealth <= 0) {
+            console.log(`Lobo matou ${controlledNPC.name}! O NPC será respawnado em casa.`);
+          } else {
+            console.log(`Lobo atacou ${controlledNPC.name} causando ${damage} de dano! HP: ${newHealth}/${controlledNPC.maxHealth}`);
+          }
         }
       }
     } else {

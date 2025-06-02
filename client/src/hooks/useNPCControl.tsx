@@ -124,6 +124,11 @@ export const useNPCControl = () => {
 
     const controlledNPC = createdNPCs.find(npc => npc.id === controlledNPCId);
     if (!controlledNPC) return;
+    
+    // Stop control if NPC is dead
+    if (controlledNPC.health <= 0) {
+      return;
+    }
 
     const currentTime = Date.now();
     const deltaTime = Math.min((currentTime - lastUpdateTime.current) / 1000, 0.016);

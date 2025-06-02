@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from "react";
 import { useSkills } from "../lib/stores/useSkills";
 import { useGameState } from "../lib/stores/useGameState";
@@ -13,7 +12,7 @@ export default function SkillsBar() {
     updateCooldowns,
     initializeSkills 
   } = useSkills();
-  
+
   const { 
     controlledNPCId, 
     createdNPCs, 
@@ -21,7 +20,7 @@ export default function SkillsBar() {
     removeEnemy,
     updateNPC
   } = useGameState();
-  
+
   const lastUpdateTime = useRef(performance.now());
 
   // Get controlled NPC stats
@@ -30,6 +29,8 @@ export default function SkillsBar() {
   const maxHealth = controlledNPC?.maxHealth || 100;
   const mana = controlledNPC?.mana || 0;
   const maxMana = controlledNPC?.maxMana || 100;
+
+  const isDead = health <= 0;
 
   // Initialize skills on mount
   useEffect(() => {
@@ -44,18 +45,18 @@ export default function SkillsBar() {
       const currentTime = performance.now();
       const deltaTime = (currentTime - lastUpdateTime.current) / 1000;
       lastUpdateTime.current = currentTime;
-      
+
       updateCooldowns(deltaTime);
-      
+
       // Regenerate mana for controlled NPC
       if (controlledNPC && controlledNPC.mana < controlledNPC.maxMana) {
         const newMana = Math.min(controlledNPC.maxMana, controlledNPC.mana + (deltaTime * 10));
         updateNPC(controlledNPC.id, { mana: newMana });
       }
-      
+
       requestAnimationFrame(updateLoop);
     };
-    
+
     const animationId = requestAnimationFrame(updateLoop);
     return () => cancelAnimationFrame(animationId);
   }, [updateCooldowns, controlledNPC, updateNPC]);
@@ -68,7 +69,7 @@ export default function SkillsBar() {
     }
 
     const skill = skills.find(s => s.id === skillId);
-    if (!skill || skill.currentCooldown > 0 || controlledNPC.mana < skill.manaCost) {
+    if (!skill || skill.currentCooldown > 0 || controlledNPC.mana < skill.manaCost || isDead) {
       if (controlledNPC.mana < skill.manaCost) {
         console.log("Mana insuficiente!");
       }
@@ -97,14 +98,14 @@ export default function SkillsBar() {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [activeSkillId, controlledNPCId]);
+  }, [activeSkillId, controlledNPCId, isDead]);
 
   // Execute skill when active skill is used
   const executeActiveSkill = (skillId: string, targetPosition?: THREE.Vector3) => {
-    if (!controlledNPCId || !controlledNPC) return;
+    if (!controlledNPCId || !controlledNPC || isDead) return;
 
     const skill = skills.find(s => s.id === skillId);
-    
+
     if (!skill || !useSkill(skillId)) {
       return;
     }
@@ -134,22 +135,22 @@ export default function SkillsBar() {
   const executeAttackSkill = (skill: any, npc: any, targetPosition?: THREE.Vector3) => {
     const npcPos = new THREE.Vector3(npc.position.x, 0, npc.position.z);
     let enemiesHit = 0;
-    
+
     enemies.forEach(enemy => {
       const enemyPos = new THREE.Vector3(enemy.position.x, 0, enemy.position.z);
       const distance = npcPos.distanceTo(enemyPos);
-      
+
       if (distance <= skill.range) {
         const baseDamage = skill.damage || 25;
         // Add some variation to damage
         const damage = baseDamage + Math.floor(Math.random() * 10) - 5;
         const takeDamageFunc = (window as any)[`enemy_${enemy.id}_takeDamage`];
-        
+
         if (takeDamageFunc) {
           takeDamageFunc(damage);
           enemiesHit++;
           console.log(`${npc.name} usou ${skill.name} e causou ${damage} de dano!`);
-          
+
           const createEffect = (window as any).createSkillEffect;
           if (createEffect) {
             createEffect(enemyPos, skill.id);
@@ -157,7 +158,7 @@ export default function SkillsBar() {
         }
       }
     });
-    
+
     if (enemiesHit === 0) {
       console.log(`${skill.name} não atingiu nenhum inimigo (alcance: ${skill.range}m)`);
     }
@@ -167,9 +168,9 @@ export default function SkillsBar() {
     const healAmount = skill.healAmount || 40;
     const newHealth = Math.min(npc.maxHealth, npc.health + healAmount);
     updateNPC(npc.id, { health: newHealth });
-    
+
     console.log(`${npc.name} se curou em ${healAmount} pontos de vida!`);
-    
+
     const createEffect = (window as any).createSkillEffect;
     if (createEffect) {
       const npcPos = new THREE.Vector3(npc.position.x, 0, npc.position.z);
@@ -180,7 +181,7 @@ export default function SkillsBar() {
   const executeUtilitySkill = (skill: any, npc: any, targetPosition?: THREE.Vector3) => {
     if (skill.id === 'dash' && targetPosition) {
       console.log(`${npc.name} fez uma investida!`);
-      
+
       const createEffect = (window as any).createSkillEffect;
       if (createEffect) {
         const npcPos = new THREE.Vector3(npc.position.x, 0, npc.position.z);
@@ -191,7 +192,7 @@ export default function SkillsBar() {
 
   const executeDefenseSkill = (skill: any, npc: any, targetPosition?: THREE.Vector3) => {
     console.log(`${npc.name} usou ${skill.name} defensivamente!`);
-    
+
     const createEffect = (window as any).createSkillEffect;
     if (createEffect) {
       const npcPos = new THREE.Vector3(npc.position.x, 0, npc.position.z);
@@ -200,10 +201,10 @@ export default function SkillsBar() {
   };
 
   const executeSkillOnEnemy = (enemyId: string) => {
-    if (!controlledNPCId || !controlledNPC) return;
+    if (!controlledNPCId || !controlledNPC || isDead) return;
 
     const enemy = enemies.find(e => e.id === enemyId);
-    
+
     if (!enemy) return;
 
     const npcPos = new THREE.Vector3(controlledNPC.position.x, 0, controlledNPC.position.z);
@@ -225,11 +226,11 @@ export default function SkillsBar() {
         const baseDamage = basicAttack.damage || 25;
         const damage = baseDamage + Math.floor(Math.random() * 10) - 5;
         const takeDamageFunc = (window as any)[`enemy_${enemy.id}_takeDamage`];
-        
+
         if (takeDamageFunc) {
           takeDamageFunc(damage);
           console.log(`${controlledNPC.name} atacou o inimigo com ${basicAttack.name} causando ${damage} de dano!`);
-          
+
           const createEffect = (window as any).createSkillEffect;
           if (createEffect) {
             createEffect(enemyPos, 'basic_attack');
@@ -252,16 +253,16 @@ export default function SkillsBar() {
     damageElement.style.color = source === 'player' ? '#FF4444' : '#44FF44';
     damageElement.style.textShadow = '2px 2px 4px rgba(0,0,0,0.8)';
     damageElement.textContent = `-${damage}`;
-    
+
     // Convert 3D position to screen coordinates (simplified)
     const screenX = window.innerWidth / 2 + (position.x * 20);
     const screenY = window.innerHeight / 2 - (position.z * 20) - 100;
-    
+
     damageElement.style.left = `${screenX}px`;
     damageElement.style.top = `${screenY}px`;
-    
+
     document.body.appendChild(damageElement);
-    
+
     // Animate the damage number
     let opacity = 1;
     let y = screenY;
@@ -270,7 +271,7 @@ export default function SkillsBar() {
       y -= 2;
       damageElement.style.opacity = opacity.toString();
       damageElement.style.top = `${y}px`;
-      
+
       if (opacity > 0) {
         requestAnimationFrame(animate);
       } else {
@@ -292,7 +293,7 @@ export default function SkillsBar() {
       delete (window as any).createDamageEffect;
       delete (window as any).enemies;
     };
-  }, [activeSkillId, controlledNPCId, skills, enemies]);
+  }, [activeSkillId, controlledNPCId, skills, enemies, isDead]);
 
   if (!controlledNPCId || !controlledNPC) {
     return null;
@@ -308,7 +309,7 @@ export default function SkillsBar() {
   return (
     <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-20">
       <div className="flex items-center justify-center gap-8">
-        
+
         {/* Health Orb - Left Side */}
         <div className="relative">
           <div className="w-24 h-24 rounded-full border-4 border-red-800 bg-gradient-to-br from-red-900 via-red-700 to-red-500 shadow-2xl relative overflow-hidden">
@@ -317,20 +318,20 @@ export default function SkillsBar() {
               className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-red-400 to-red-300 transition-all duration-500"
               style={{ height: `${healthPercentage}%` }}
             />
-            
+
             {/* Shine effect */}
             <div className="absolute inset-2 rounded-full bg-gradient-to-br from-red-200/20 via-transparent to-transparent" />
-            
+
             {/* Border glow */}
             <div className="absolute inset-0 rounded-full border-2 border-red-400/50 shadow-inner" />
           </div>
-          
+
           {/* Health text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white font-bold text-sm">
             <span className="text-lg">{Math.floor(health)}</span>
             <span className="text-xs opacity-80">{maxHealth}</span>
           </div>
-          
+
           {/* Health icon */}
           <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 rounded-full border-2 border-red-400 flex items-center justify-center">
             <span className="text-white text-xs">❤️</span>
@@ -343,13 +344,13 @@ export default function SkillsBar() {
           <div className="text-center mb-2 text-yellow-400 font-bold text-sm border-b border-yellow-600/50 pb-1">
             HABILIDADES
           </div>
-          
-          <div className="flex gap-2">
+
+          <div className={`flex gap-2 ${isDead ? 'relative' : ''}`}>
             {skills.map((skill, index) => {
               const isOnCooldown = skill.currentCooldown > 0;
               const hasInsufficientMana = mana < skill.manaCost;
-              const isDisabled = isOnCooldown || hasInsufficientMana;
-              
+              const isDisabled = isOnCooldown || hasInsufficientMana || isDead;
+
               return (
                 <div key={skill.id} className="relative group">
                   <button
@@ -366,7 +367,7 @@ export default function SkillsBar() {
                     title={`${skill.name} (${index + 1})`}
                   >
                     <div className="text-lg">{skill.icon}</div>
-                    
+
                     {/* Cooldown overlay */}
                     {isOnCooldown && (
                       <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
@@ -383,14 +384,14 @@ export default function SkillsBar() {
                     )}
 
                     {/* Mana cost indicator */}
-                    {hasInsufficientMana && !isOnCooldown && (
+                    {hasInsufficientMana && !isOnCooldown && !isDead && (
                       <div className="absolute inset-0 bg-blue-900/70 flex items-center justify-center">
                         <span className="text-xs text-blue-200 font-bold">
                           {skill.manaCost}
                         </span>
                       </div>
                     )}
-                    
+
                     {/* Key number */}
                     <div className="absolute -bottom-1 -right-1 bg-yellow-600 text-black text-xs w-4 h-4 flex items-center justify-center rounded-full border border-yellow-400 font-bold">
                       {index + 1}
@@ -401,7 +402,7 @@ export default function SkillsBar() {
                   <div className="absolute bottom-14 left-1/2 transform -translate-x-1/2 bg-black/95 border border-yellow-400 text-white text-xs p-3 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-30 min-w-[180px]">
                     <div className="font-bold text-yellow-400 mb-1">{skill.name}</div>
                     <div className="text-gray-300 mb-2">{skill.description}</div>
-                    
+
                     <div className="border-t border-gray-600 pt-2 space-y-1 text-xs">
                       {skill.damage && (
                         <div className="flex justify-between">
@@ -432,8 +433,15 @@ export default function SkillsBar() {
                 </div>
               );
             })}
+
+            {/* Death overlay */}
+            {isDead && (
+              <div className="absolute inset-0 bg-red-900/80 rounded-lg flex items-center justify-center">
+                <span className="text-xs font-bold text-red-200">MORTO</span>
+              </div>
+            )}
           </div>
-          
+
           {/* Control instructions */}
           <div className="text-xs text-gray-400 mt-2 text-center">
             Teclas <span className="text-yellow-400">1-5</span> para usar
@@ -448,20 +456,20 @@ export default function SkillsBar() {
               className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-400 to-blue-300 transition-all duration-500"
               style={{ height: `${manaPercentage}%` }}
             />
-            
+
             {/* Shine effect */}
             <div className="absolute inset-2 rounded-full bg-gradient-to-br from-blue-200/20 via-transparent to-transparent" />
-            
+
             {/* Border glow */}
             <div className="absolute inset-0 rounded-full border-2 border-blue-400/50 shadow-inner" />
           </div>
-          
+
           {/* Mana text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white font-bold text-sm">
             <span className="text-lg">{Math.floor(mana)}</span>
             <span className="text-xs opacity-80">{maxMana}</span>
           </div>
-          
+
           {/* Mana icon */}
           <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-600 rounded-full border-2 border-blue-400 flex items-center justify-center">
             <span className="text-white text-xs">💧</span>

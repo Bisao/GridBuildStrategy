@@ -155,13 +155,39 @@ export const useGameState = create<GameState>()(
     },
 
     updateNPC: (npcId, updates) => {
-      set((state) => ({
-        createdNPCs: state.createdNPCs.map(npc => 
-          npc.id === npcId 
-            ? { ...npc, ...updates }
-            : npc
-        )
-      }));
+      set((state) => {
+        const { controlledNPCId, setControlledNPCId } = get();
+        
+        return {
+          createdNPCs: state.createdNPCs.map(npc => {
+            if (npc.id === npcId) {
+              const updatedNPC = { ...npc, ...updates };
+              
+              // Check if NPC died (HP reached 0)
+              if (updatedNPC.health <= 0 && npc.health > 0) {
+                console.log(`${npc.name} morreu! Respawnando em casa...`);
+                
+                // If this was the controlled NPC, release control
+                if (controlledNPCId === npcId) {
+                  setControlledNPCId(null);
+                  console.log(`Controle do NPC ${npc.name} perdido devido à morte`);
+                }
+                
+                // Respawn at home with full health and mana
+                return {
+                  ...updatedNPC,
+                  health: updatedNPC.maxHealth || 100,
+                  mana: updatedNPC.maxMana || 100,
+                  animation: "idle"
+                };
+              }
+              
+              return updatedNPC;
+            }
+            return npc;
+          })
+        };
+      });
     },
 
     removeNPC: (npcId) => {

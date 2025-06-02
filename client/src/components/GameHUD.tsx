@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useGameState } from '../lib/stores/useGameState';
 import HUDIcons from './HUDIcons';
@@ -20,6 +19,8 @@ export default function GameHUD({ onOpenCombatPanel, onOpenStructurePanel }: Gam
   const energy = controlledNPC?.mana || 100;
   const maxEnergy = controlledNPC?.maxMana || 100;
 
+  const isDead = health <= 0;
+
   return (
     <div className="fixed inset-0 pointer-events-none z-20">
       {/* Top Left - Player Info (only when controlling NPC) */}
@@ -30,7 +31,7 @@ export default function GameHUD({ onOpenCombatPanel, onOpenStructurePanel }: Gam
             <div className="w-12 h-12 rounded-full border-2 border-yellow-500 bg-gradient-to-br from-yellow-600 to-orange-700 flex items-center justify-center">
               <span className="text-white font-bold text-lg">🧙</span>
             </div>
-            
+
             {/* Player Stats */}
             <div className="text-white">
               <div className="font-bold text-yellow-400 text-sm">{playerName}</div>
@@ -51,7 +52,7 @@ export default function GameHUD({ onOpenCombatPanel, onOpenStructurePanel }: Gam
         onOpenStructurePanel={onOpenStructurePanel || (() => {})}
       />
 
-      
+
 
       {/* Bottom Right - Server Info */}
       <div className="absolute bottom-4 right-4 pointer-events-auto space-y-2">
@@ -68,7 +69,7 @@ export default function GameHUD({ onOpenCombatPanel, onOpenStructurePanel }: Gam
             </div>
           </div>
         </div>
-        
+
         {/* Server Info */}
         <div className="bg-black/70 border border-yellow-600/50 rounded p-2 text-white text-xs">
           <div className="flex items-center gap-2">
