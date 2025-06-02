@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
-import Terrain from "./Terrain";
+import Grid from "./Grid";
 import House from "./House";
 import NPC from "./NPC";
 import Enemy from "./Enemy";
@@ -171,25 +171,8 @@ const Game = () => {
       {/* Camera Controls */}
       <CameraControls />
 
-      {/* Fixed Clouds */}
-      <group position={[0, 8, 0]}>
-        {Array.from({ length: 8 }, (_, i) => (
-          <mesh 
-            key={`cloud-${i}`}
-            position={[
-              (Math.random() - 0.5) * 40,
-              Math.random() * 3,
-              (Math.random() - 0.5) * 40
-            ]}
-          >
-            <sphereGeometry args={[1 + Math.random(), 8, 6]} />
-            <meshBasicMaterial color="#FFFFFF" transparent opacity={0.8} />
-          </mesh>
-        ))}
-      </group>
-
-      {/* Terrain */}
-      <Terrain 
+      {/* Grid */}
+      <Grid 
         onPointerMove={handlePointerMove}
         onClick={handleClick}
         hoveredTile={hoveredTile}

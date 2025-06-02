@@ -35,7 +35,7 @@ export const useGridPlacement = () => {
       const gridZ = tileZ + 0.5;
 
       // Constrain to grid bounds
-      const GRID_SIZE = 30;
+      const GRID_SIZE = 20;
       const halfGrid = GRID_SIZE / 2;
 
       if (tileX >= -halfGrid && tileX < halfGrid && tileZ >= -halfGrid && tileZ < halfGrid) {

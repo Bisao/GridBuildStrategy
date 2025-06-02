@@ -134,24 +134,18 @@ function App() {
           <color attach="background" args={["#1a1a2e"]} />
 
           {/* Lighting setup */}
-          <ambientLight intensity={0.6} />
+          <ambientLight intensity={0.4} />
           <directionalLight
-            position={[15, 15, 10]}
-            intensity={1.2}
+            position={[10, 10, 5]}
+            intensity={1}
             castShadow
             shadow-mapSize-width={2048}
             shadow-mapSize-height={2048}
-            shadow-camera-far={80}
-            shadow-camera-left={-30}
-            shadow-camera-right={30}
-            shadow-camera-top={30}
-            shadow-camera-bottom={-30}
-          />
-          {/* Additional atmospheric lighting */}
-          <directionalLight
-            position={[-5, 8, -5]}
-            intensity={0.3}
-            color="#87CEEB"
+            shadow-camera-far={50}
+            shadow-camera-left={-20}
+            shadow-camera-right={20}
+            shadow-camera-top={20}
+            shadow-camera-bottom={-20}
           />
 
           <Suspense fallback={null}>
