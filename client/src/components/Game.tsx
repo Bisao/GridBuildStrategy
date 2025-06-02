@@ -168,6 +168,27 @@ const Game = () => {
 
   return (
     <>
+      {/* Midday Lighting Setup */}
+      <ambientLight intensity={0.8} color="#E6F3FF" />
+      <directionalLight 
+        position={[10, 20, 10]} 
+        intensity={1.2} 
+        color="#FFFACD"
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={50}
+        shadow-camera-left={-20}
+        shadow-camera-right={20}
+        shadow-camera-top={20}
+        shadow-camera-bottom={-20}
+      />
+      <directionalLight 
+        position={[-5, 15, -5]} 
+        intensity={0.4} 
+        color="#87CEEB"
+      />
+
       {/* Camera Controls */}
       <CameraControls />
 
